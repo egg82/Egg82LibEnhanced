@@ -1,7 +1,6 @@
 ﻿using Egg82LibEnhanced.Core;
 using Egg82LibEnhanced.Enums;
 using Egg82LibEnhanced.Events;
-using Egg82LibEnhanced.Utils;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
@@ -11,13 +10,6 @@ namespace Egg82LibEnhanced.Engines {
 	public class AudioEngine : IAudioEngine {
 		//vars
 		public event EventHandler<ExceptionEventArgs> Error = null;
-
-		private double _masterVolume = 1.0d;
-		private double _ambientVolume = 1.0d;
-		private double _musicVolume = 1.0d;
-		private double _sfxVolume = 1.0d;
-		private double _uiVolume = 1.0d;
-		private double _voiceVolume = 1.0d;
 
 		private Dictionary<string, Audio> sounds = new Dictionary<string, Audio>();
 		private WaveInEvent inputDevice = new WaveInEvent();
@@ -50,7 +42,7 @@ namespace Egg82LibEnhanced.Engines {
 				sounds[name].Dispose();
 				sounds.Remove(name);
 			}
-			Audio audio = new Audio(type, format, getVolume(type), data, _currentOutputDevice);
+			Audio audio = new Audio(type, format, 1.0d, data, _currentOutputDevice);
 			audio.Error += onError;
 			sounds.Add(name, audio);
 		}
@@ -66,107 +58,21 @@ namespace Egg82LibEnhanced.Engines {
 				sounds.Remove(name);
 			}
 		}
-		public void PlayAudio(string name, bool repeat = false) {
+		public Audio GetAudio(string name) {
 			if (name == null) {
 				throw new ArgumentNullException("name");
 			}
 
 			Audio audio = null;
 			if (sounds.TryGetValue(name, out audio)) {
-				audio.Repeating = repeat;
-				audio.Play();
+				return audio;
 			}
-		}
-		public void PauseAudio(string name) {
-			if (name == null) {
-				throw new ArgumentNullException("name");
-			}
-
-			Audio audio = null;
-			if (sounds.TryGetValue(name, out audio)) {
-				audio.Pause();
-			}
+			return null;
 		}
 		public int NumAudio {
 			get {
 				return sounds.Count;
 			}
-		}
-
-		public int GetPositionInBytes(string name) {
-			if (name == null) {
-				throw new ArgumentNullException("name");
-			}
-
-			Audio audio = null;
-			if (sounds.TryGetValue(name, out audio)) {
-				return audio.PositionInBytes;
-			}
-			return -1;
-		}
-		public void SetPositionInBytes(string name, int positionInBytes) {
-			if (name == null) {
-				throw new ArgumentNullException("name");
-			}
-
-			Audio audio = null;
-			if (sounds.TryGetValue(name, out audio)) {
-				audio.PositionInBytes = (int) MathUtil.Clamp(0.0d, (double) audio.Length, (double) positionInBytes);
-			}
-		}
-		public TimeSpan GetPositionInTime(string name) {
-			if (name == null) {
-				throw new ArgumentNullException("name");
-			}
-
-			Audio audio = null;
-			if (sounds.TryGetValue(name, out audio)) {
-				return audio.PositionInTime;
-			}
-			return new TimeSpan();
-		}
-		public void SetPositionInTime(string name, TimeSpan positionInTime) {
-			if (name == null) {
-				throw new ArgumentNullException("name");
-			}
-			if (positionInTime == null) {
-				throw new ArgumentNullException("positionInTime");
-			}
-
-			Audio audio = null;
-			if (sounds.TryGetValue(name, out audio)) {
-				audio.PositionInTime = positionInTime;
-			}
-		}
-		public double GetPan(string name) {
-			if (name == null) {
-				throw new ArgumentNullException("name");
-			}
-			Audio audio = null;
-			if (sounds.TryGetValue(name, out audio)) {
-				return audio.Pan;
-			}
-			return 0.0d;
-		}
-		public void SetPan(string name, double pan) {
-			if (name == null) {
-				throw new ArgumentNullException("name");
-			}
-			Audio audio = null;
-			if (sounds.TryGetValue(name, out audio)) {
-				audio.Pan = pan;
-			}
-		}
-		public int LengthInBytes(string name) {
-			if (name == null) {
-				throw new ArgumentNullException("name");
-			}
-
-			Audio audio = null;
-			if (sounds.TryGetValue(name, out audio)) {
-				return audio.Length;
-			}
-			return -1;
 		}
 
 		public string CurrentOutputDeviceName {
@@ -270,101 +176,6 @@ namespace Egg82LibEnhanced.Engines {
 			}
 		}
 
-		public double MasterVolume {
-			get {
-				return _masterVolume;
-			}
-			set {
-				if (double.IsNaN(value) || double.IsInfinity(value) || value == _masterVolume) {
-					return;
-				}
-				_masterVolume = value;
-				foreach (KeyValuePair<string, Audio> kvp in sounds) {
-					kvp.Value.Volume = getVolume(kvp.Value.Type);
-				}
-			}
-		}
-		public double AmbientVolume {
-			get {
-				return _ambientVolume;
-			}
-			set {
-				if (double.IsNaN(value) || double.IsInfinity(value) || value == _ambientVolume) {
-					return;
-				}
-				_ambientVolume = value;
-				foreach (KeyValuePair<string, Audio> kvp in sounds) {
-					if (kvp.Value.Type == AudioType.Ambient) {
-						kvp.Value.Volume = getVolume(kvp.Value.Type);
-					}
-				}
-			}
-		}
-		public double MusicVolume {
-			get {
-				return _musicVolume;
-			}
-			set {
-				if (double.IsNaN(value) || double.IsInfinity(value) || value == _musicVolume) {
-					return;
-				}
-				_musicVolume = value;
-				foreach (KeyValuePair<string, Audio> kvp in sounds) {
-					if (kvp.Value.Type == AudioType.Music) {
-						kvp.Value.Volume = getVolume(kvp.Value.Type);
-					}
-				}
-			}
-		}
-		public double SfxVolume {
-			get {
-				return _sfxVolume;
-			}
-			set {
-				if (double.IsNaN(value) || double.IsInfinity(value) || value == _sfxVolume) {
-					return;
-				}
-				_sfxVolume = value;
-				foreach (KeyValuePair<string, Audio> kvp in sounds) {
-					if (kvp.Value.Type == AudioType.Sfx) {
-						kvp.Value.Volume = getVolume(kvp.Value.Type);
-					}
-				}
-			}
-		}
-		public double UiVolume {
-			get {
-				return _uiVolume;
-			}
-			set {
-				if (double.IsNaN(value) || double.IsInfinity(value) || value == _uiVolume) {
-					return;
-				}
-				_uiVolume = value;
-				foreach (KeyValuePair<string, Audio> kvp in sounds) {
-					if (kvp.Value.Type == AudioType.Ui) {
-						kvp.Value.Volume = getVolume(kvp.Value.Type);
-					}
-				}
-			}
-		}
-		public double VoiceVolume {
-			get {
-				return _voiceVolume;
-			}
-			set {
-				if (double.IsNaN(value) || double.IsInfinity(value) || value == _voiceVolume) {
-					return;
-				}
-				_voiceVolume = value;
-				foreach (KeyValuePair<string, Audio> kvp in sounds) {
-					if (kvp.Value.Type == AudioType.Voice) {
-						kvp.Value.Volume = getVolume(kvp.Value.Type);
-					}
-				}
-			}
-		}
-
 		//private
 		private void onError(object sender, ExceptionEventArgs e) {
 			if (Error != null) {
@@ -389,23 +200,6 @@ namespace Egg82LibEnhanced.Engines {
 					inputDevice.StopRecording();
 				}
 			}
-		}
-		
-		private double getVolume(AudioType type) {
-			double volume = 1.0d;
-			if (type == AudioType.Ambient) {
-				volume = _ambientVolume;
-			} else if (type == AudioType.Music) {
-				volume = _musicVolume;
-			} else if (type == AudioType.Sfx) {
-				volume = _sfxVolume;
-			} else if (type == AudioType.Ui) {
-				volume = _uiVolume;
-			} else if (type == AudioType.Voice) {
-				volume = _voiceVolume;
-			}
-			volume *= _masterVolume;
-			return volume;
 		}
 	}
 }

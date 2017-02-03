@@ -15,16 +15,16 @@ namespace Test {
 		static void Main(string[] args) {
 			Start.ProvideDefaultServices();
 
-			graphicsWindow = new BaseWindow(1280, 720, "Graphics Test", Styles.Titlebar | Styles.Close, true, 16);
+			/*graphicsWindow = new BaseWindow(1280, 720, "Graphics Test", Styles.Titlebar | Styles.Close, true, 16);
 			graphicsWindow.AddState(new GraphicsTestState());
 			
-			/*physicsWindow = new BaseWindow(1280, 720, "Physics Test", Styles.Titlebar | Styles.Close, true, 16);
-			physicsWindow.AddState(new PhysicsTestState());
+			physicsWindow = new BaseWindow(1280, 720, "Physics Test", Styles.Titlebar | Styles.Close, true, 16);
+			physicsWindow.AddState(new PhysicsTestState());*/
 
 			inputWindow = new BaseWindow(1280, 720, "Input Test", Styles.Titlebar | Styles.Close, true, 16);
 			inputWindow.AddState(new InputTestState());
 
-			clientServerWindow = new BaseWindow(1280, 720, "Client/Server Test", Styles.Titlebar | Styles.Close, true, 16);
+			/*clientServerWindow = new BaseWindow(1280, 720, "Client/Server Test", Styles.Titlebar | Styles.Close, true, 16);
 			clientServerWindow.AddState(new ClientServerTestState());
 
 			audioWindow = new BaseWindow(1280, 720, "Audio Test", Styles.Titlebar | Styles.Close, true, 16);

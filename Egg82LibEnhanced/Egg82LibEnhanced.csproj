@@ -116,6 +116,9 @@
   <ItemGroup>
     <Compile Include="Base\BaseSprite.cs" />
     <Compile Include="Base\BaseState.cs" />
+    <Compile Include="Core\Controllers.cs" />
+    <Compile Include="Core\Keyboard.cs" />
+    <Compile Include="Core\Mouse.cs" />
     <Compile Include="Enums\InteractableState.cs" />
     <Compile Include="Graphics\BitmapAtlas.cs" />
     <Compile Include="Graphics\Button.cs" />

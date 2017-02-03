@@ -43,8 +43,8 @@ namespace Egg82LibEnhanced.Graphics {
 
 		//private
 		protected override void OnUpdate(double deltaTime) {
-			if (inputEngine.MouseX >= GlobalX && inputEngine.MouseX <= GlobalX + GlobalWidth && inputEngine.MouseY >= GlobalY && inputEngine.MouseY <= GlobalY + GlobalHeight) {
-				if (inputEngine.IsLeftMouseDown) {
+			if (inputEngine.Mouse.X >= GlobalX && inputEngine.Mouse.X <= GlobalX + GlobalWidth && inputEngine.Mouse.Y >= GlobalY && inputEngine.Mouse.Y <= GlobalY + GlobalHeight) {
+				if (inputEngine.Mouse.LeftButtonDown) {
 					if (_state != InteractableState.Down) {
 						if (downTexture != null) {
 							Texture = downTexture;

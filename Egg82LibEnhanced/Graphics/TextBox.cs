@@ -101,8 +101,8 @@ namespace Egg82LibEnhanced.Graphics {
 			drawString();
 			dirty = false;
 
-			if (inputEngine.MouseX >= GlobalX && inputEngine.MouseX <= GlobalX + GlobalWidth && inputEngine.MouseY >= GlobalY && inputEngine.MouseY <= GlobalY + GlobalHeight) {
-				if (inputEngine.IsLeftMouseDown) {
+			if (inputEngine.Mouse.X >= GlobalX && inputEngine.Mouse.X <= GlobalX + GlobalWidth && inputEngine.Mouse.Y >= GlobalY && inputEngine.Mouse.Y <= GlobalY + GlobalHeight) {
+				if (inputEngine.Mouse.LeftButtonDown) {
 					if (_state != InteractableState.Down) {
 						_state = InteractableState.Down;
 						if (Pressed != null) {

@@ -77,7 +77,9 @@ namespace Egg82LibEnhanced.Core {
 			}
 		}
 
-		public void Play() {
+		public void Play(bool repeat = false) {
+			Repeating = repeat;
+
 			if (_playing) {
 				return;
 			}

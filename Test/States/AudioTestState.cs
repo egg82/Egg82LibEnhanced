@@ -1,5 +1,7 @@
 ﻿using Egg82LibEnhanced.Base;
+using Egg82LibEnhanced.Core;
 using Egg82LibEnhanced.Engines;
+using Egg82LibEnhanced.Enums;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Utils;
 using System;
@@ -19,9 +21,10 @@ namespace Test.States {
 		//public
 		public override void OnEnter() {
 			FileUtil.Open(ambientPath);
-			audioEngine.AddAudio("ambient1", Egg82LibEnhanced.Enums.AudioType.Ambient, Egg82LibEnhanced.Enums.AudioFormat.Mp3, FileUtil.Read(ambientPath, 0, (int) FileUtil.GetTotalBytes(ambientPath)));
+			audioEngine.AddAudio("ambient1", AudioType.Ambient, AudioFormat.Mp3, FileUtil.Read(ambientPath, 0, (int) FileUtil.GetTotalBytes(ambientPath)));
 			FileUtil.Close(ambientPath);
-			audioEngine.PlayAudio("ambient1", true);
+			Audio a = audioEngine.GetAudio("ambient1");
+			a.Play(true);
 		}
 		public override void OnExit() {
 			

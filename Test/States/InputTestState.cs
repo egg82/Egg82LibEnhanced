@@ -33,17 +33,17 @@ namespace Test.States {
 
 		//private
 		protected override void OnUpdate(double deltaTime) {
-			if (inputEngine.IsAnyKeyDown(leftKeys)) {
+			if (inputEngine.Keyboard.IsAnyKeyDown(leftKeys)) {
 				sprite.X -= sprite.Speed;
 				sprite.Rotation -= sprite.Speed;
 			}
-			if (inputEngine.IsAnyKeyDown(rightKeys)) {
+			if (inputEngine.Keyboard.IsAnyKeyDown(rightKeys)) {
 				sprite.X += sprite.Speed;
 				sprite.Rotation += sprite.Speed;
 			}
 
-			PrecisePoint stick = inputEngine.GetStickPosition(0, XboxStickCode.Left);
-			if (stick.Length > inputEngine.DeadZone) {
+			PrecisePoint stick = inputEngine.Controllers.GetStickPosition(0, XboxStickCode.Left);
+			if (stick.Length > inputEngine.Controllers.DeadZone) {
 				sprite.X += stick.X * sprite.Speed;
 				sprite.Rotation += stick.X * sprite.Speed;
 			}
