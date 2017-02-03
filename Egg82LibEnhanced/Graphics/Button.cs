@@ -1,12 +1,11 @@
-﻿using Egg82LibEnhanced.Base;
-using Egg82LibEnhanced.Engines;
+﻿using Egg82LibEnhanced.Engines;
 using Egg82LibEnhanced.Enums;
 using Egg82LibEnhanced.Patterns;
 using SFML.Graphics;
 using System;
 
 namespace Egg82LibEnhanced.Graphics {
-	public class Button : BaseSprite, IInteractable {
+	public class Button : DisplayObject, IInteractable {
 		//vars
 		public event EventHandler Entered = null;
 		public event EventHandler Exited = null;

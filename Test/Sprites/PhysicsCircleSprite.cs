@@ -1,5 +1,4 @@
-﻿using Egg82LibEnhanced.Base;
-using Egg82LibEnhanced.Engines;
+﻿using Egg82LibEnhanced.Engines;
 using Egg82LibEnhanced.Patterns.Prototypes;
 using Egg82LibEnhanced.Utils;
 using FarseerPhysics.Dynamics;
@@ -10,7 +9,7 @@ using System;
 using System.IO;
 
 namespace Test.Sprites {
-	class PhysicsCircleSprite : BaseSprite, IPrototype {
+	class PhysicsCircleSprite : Egg82LibEnhanced.Graphics.Sprite, IPrototype {
 		//vars
 		private Body physicsBody = null;
 		private float minSpeed = 180.0f;

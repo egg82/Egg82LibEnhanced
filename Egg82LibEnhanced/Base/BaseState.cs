@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Egg82LibEnhanced.Graphics;
+using System;
 using System.Collections.Generic;
 
 namespace Egg82LibEnhanced.Base {
-	public abstract class BaseState : BaseSprite {
+	public abstract class BaseState : DisplayObjectContainer {
 		//vars
 		private List<Type> exitStates = new List<Type>();
 

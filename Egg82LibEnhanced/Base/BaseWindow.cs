@@ -1,4 +1,5 @@
 ﻿using Egg82LibEnhanced.Engines;
+using Egg82LibEnhanced.Graphics;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Patterns.Interfaces;
 using Egg82LibEnhanced.Startup;
@@ -20,7 +21,7 @@ namespace Egg82LibEnhanced.Base {
 		private World _physicsWorld = null;
 		//private PhysicsWorld _physicsWorld = null;
 
-		private QuadTree<BaseSprite> _quadTree = null;
+		private QuadTree<DisplayObject> _quadTree = null;
 		private PreciseRectangle oldSize = new PreciseRectangle();
 		
 		private bool _isFinalized = false;
@@ -45,7 +46,7 @@ namespace Egg82LibEnhanced.Base {
 
 			SetVerticalSyncEnabled(vSync);
 			SetView(new View(new FloatRect(0.0f, 0.0f, (float) width, (float) height)));
-			_quadTree = new QuadTree<BaseSprite>(new PreciseRectangle(0.0d, 0.0d, Width, Height));
+			_quadTree = new QuadTree<DisplayObject>(new PreciseRectangle(0.0d, 0.0d, Width, Height));
 
 			SetActive(false);
 
@@ -224,7 +225,7 @@ namespace Egg82LibEnhanced.Base {
 			}
 		}*/
 
-		public QuadTree<BaseSprite> QuadTree {
+		public QuadTree<DisplayObject> QuadTree {
 			get {
 				return _quadTree;
 			}
@@ -245,8 +246,8 @@ namespace Egg82LibEnhanced.Base {
 			Close();
 		}
 		private void onResize(object sender, SizeEventArgs e) {
-			List<BaseSprite> objects = _quadTree.GetAllObjects();
-			_quadTree = new QuadTree<BaseSprite>(new PreciseRectangle((double) e.Width, (double) e.Height));
+			List<DisplayObject> objects = _quadTree.GetAllObjects();
+			_quadTree = new QuadTree<DisplayObject>(new PreciseRectangle((double) e.Width, (double) e.Height));
 			SetView(new View(new FloatRect(0.0f, 0.0f, (float) Width, (float) Height)));
 			
 			for (int i = 0; i < objects.Count; i++) {

@@ -1,10 +1,9 @@
-﻿using Egg82LibEnhanced.Base;
-using SFML.Graphics;
+﻿using SFML.Graphics;
 using System;
 using System.IO;
 
 namespace Test.Sprites {
-	class InputCircleSprite : BaseSprite {
+	class InputCircleSprite : Egg82LibEnhanced.Graphics.Sprite {
 		//vars
 		private double _speed = 1.0d;
 
@@ -24,8 +23,6 @@ namespace Test.Sprites {
 		}
 
 		//private
-		protected override void OnUpdate(double deltaTime) {
-			
-		}
+
 	}
 }

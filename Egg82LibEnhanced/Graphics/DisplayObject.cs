@@ -1,25 +1,23 @@
-﻿using Egg82LibEnhanced.Core;
+﻿using Egg82LibEnhanced.Base;
+using Egg82LibEnhanced.Core;
 using Egg82LibEnhanced.Patterns.Interfaces;
 using Egg82LibEnhanced.Utils;
 using SFML.Graphics;
 using SFML.Window;
 using System;
-using System.Collections.Generic;
 
-namespace Egg82LibEnhanced.Base {
-	public abstract class BaseSprite : IUpdatable, IDrawable, IQuad {
+namespace Egg82LibEnhanced.Graphics {
+	public abstract class DisplayObject : IUpdatable, IDrawable, IQuad {
 		//vars
 		public bool Visible = true;
-		
+
 		private SpriteGraphics _graphics = new SpriteGraphics();
-		private Sprite graphicsSprite = new Sprite();
-		
-		private List<BaseSprite> children = new List<BaseSprite>();
-		private BaseSprite _parent = null;
-		private BaseWindow _window = null;
-		
+		private SFML.Graphics.Sprite graphicsSprite = new SFML.Graphics.Sprite();
 		private RenderStates renderState = RenderStates.Default;
-		private Sprite renderSprite = new Sprite();
+		private SFML.Graphics.Sprite renderSprite = new SFML.Graphics.Sprite();
+
+		private DisplayObject _parent = null;
+		private BaseWindow _window = null;
 
 		private PrecisePoint previousScale = new PrecisePoint(1.0d, 1.0d);
 		private PrecisePoint _scale = new PrecisePoint(1.0d, 1.0d);
@@ -33,18 +31,18 @@ namespace Egg82LibEnhanced.Base {
 		private PreciseRectangle _textureBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
 
 		private PrecisePoint _transformOriginOffset = new PrecisePoint(0.0d, 0.0d);
-		private Transform globalTransform = Transform.Identity;
+		private Transform _globalTransform = Transform.Identity;
 		private Transform localTransform = Transform.Identity;
 
 		private SpriteSkew _skew = new SpriteSkew();
 		private Vertex[] skewBox = new Vertex[4];
 
 		//constructor
-		public BaseSprite() {
+		public DisplayObject() {
 			_graphics.BoundsChanged += onGraphicsBoundsChanged;
 			graphicsSprite.Texture = TextureUtil.FromBitmap(_graphics.Bitmap);
 		}
-		~BaseSprite() {
+		~DisplayObject() {
 			if (_window != null) {
 				_window.QuadTree.Remove(this);
 			}
@@ -52,10 +50,6 @@ namespace Egg82LibEnhanced.Base {
 
 		//public
 		public void Update(double deltaTime) {
-			for (int i = 0; i < children.Count; i++) {
-				children[i].Update(deltaTime);
-			}
-			
 			OnUpdate(deltaTime);
 
 			if (previousGlobalBounds.X != _globalBounds.X || previousGlobalBounds.Y != _globalBounds.Y) {
@@ -67,9 +61,6 @@ namespace Egg82LibEnhanced.Base {
 			}
 		}
 		public void SwapBuffers() {
-			for (int i = 0; i < children.Count; i++) {
-				children[i].SwapBuffers();
-			}
 			OnSwapBuffers();
 		}
 		public void Draw(RenderTarget target, Transform parentTransform) {
@@ -80,14 +71,10 @@ namespace Egg82LibEnhanced.Base {
 			applyTransforms();
 			renderGraphics();
 
-			globalTransform = parentTransform * localTransform;
-			renderState.Transform = globalTransform;
+			_globalTransform = parentTransform * localTransform;
+			renderState.Transform = _globalTransform;
 			target.Draw(graphicsSprite, renderState);
 			target.Draw(renderSprite, renderState);
-
-			for (int i = children.Count - 1; i >= 0; i--) {
-				children[i].Draw(target, globalTransform);
-			}
 		}
 
 		public PreciseRectangle LocalBounds {
@@ -101,7 +88,7 @@ namespace Egg82LibEnhanced.Base {
 			}
 		}
 
-		public BaseSprite Parent {
+		public DisplayObject Parent {
 			get {
 				return _parent;
 			}
@@ -245,7 +232,7 @@ namespace Egg82LibEnhanced.Base {
 					_textureBounds.Width = value.Size.X;
 					_textureBounds.Height = value.Size.Y;
 				}
-				
+
 				renderSprite.Texture = value;
 				renderSprite.TextureRect = new IntRect(0, 0, (int) _textureBounds.Width, (int) _textureBounds.Height);
 				applyBounds();
@@ -370,81 +357,18 @@ namespace Egg82LibEnhanced.Base {
 			}
 		}
 
-		public void AddChild(BaseSprite sprite, int index = 0) {
-			if (sprite == null) {
-				throw new ArgumentNullException("sprite");
-			}
-			if (sprite.Parent != null) {
-				throw new Exception("sprite cannot be added if it already has a parent.");
-			}
-
-			if (children.Contains(sprite)) {
-				return;
-			}
-			if (index > children.Count) {
-				index = children.Count;
-			}
-			if (index < 0) {
-				index = 0;
-			}
-
-			children.Insert(index, sprite);
-			sprite.Parent = this;
-			sprite.Window = _window;
-		}
-		public void RemoveChild(BaseSprite sprite) {
-			if (sprite == null) {
-				throw new ArgumentNullException("sprite");
-			}
-
-			int index = children.IndexOf(sprite);
-			if (index == -1) {
-				throw new Exception("sprite is not a child of this object.");
-			}
-
-			children.RemoveAt(index);
-			sprite.Parent = null;
-			sprite.Window = null;
-		}
-		public BaseSprite GetChildAt(int index) {
-			if (index < 0 || index >= children.Count) {
-				return null;
-			}
-			return children[index];
-		}
-		public int IndexOf(BaseSprite child) {
-			if (child == null) {
-				throw new ArgumentNullException("child");
-			}
-
-			return children.IndexOf(child);
-		}
-		public void SetIndex(BaseSprite child, int index) {
-			if (child == null) {
-				throw new ArgumentNullException("child");
-			}
-			if (index > children.Count) {
-				index = children.Count;
-			}
-			if (index < 0) {
-				index = 0;
-			}
-
-			int currentIndex = children.IndexOf(child);
-			if (currentIndex == -1) {
-				return;
-			}
-
-			children.RemoveAt(currentIndex);
-			children.Insert(index, child);
-		}
-
 		//private
+		protected Transform GlobalTransform {
+			get {
+				return _globalTransform;
+			}
+		}
+
 		protected abstract void OnUpdate(double deltaTime);
 		virtual protected void OnSwapBuffers() {
 
 		}
-		
+
 		private void applyTransforms() {
 			bool globalBoundsChanged = false;
 

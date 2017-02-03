@@ -1,10 +1,9 @@
-﻿using Egg82LibEnhanced.Base;
-using SFML.Graphics;
+﻿using SFML.Graphics;
 using System;
 using System.Drawing;
 
 namespace Egg82LibEnhanced.Core {
-	public class SubSprite : BaseSprite {
+	public class SubSprite : Graphics.Sprite {
 		//vars
 
 		//constructor
@@ -22,8 +21,6 @@ namespace Egg82LibEnhanced.Core {
 		//public
 
 		//private
-		protected override void OnUpdate(double deltaTime) {
-			
-		}
+
 	}
 }

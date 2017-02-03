@@ -1,12 +1,11 @@
-﻿using Egg82LibEnhanced.Base;
-using Egg82LibEnhanced.Patterns.Prototypes;
+﻿using Egg82LibEnhanced.Patterns.Prototypes;
 using Egg82LibEnhanced.Utils;
 using SFML.Graphics;
 using System;
 using System.IO;
 
 namespace Test.Sprites {
-	class CircleSprite : BaseSprite, IPrototype {
+	class CircleSprite : Egg82LibEnhanced.Graphics.Sprite, IPrototype {
 		//vars
 		private double speed = MathUtil.Random(1.0d, 2.0d);
 

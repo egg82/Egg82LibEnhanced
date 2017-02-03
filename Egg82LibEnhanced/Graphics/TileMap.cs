@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 
 namespace Egg82LibEnhanced.Graphics {
-	public class TileMap : BaseSprite {
+	public class TileMap : Sprite {
 		//vars
 		private Bitmap currentBitmap = new Bitmap(1, 1);
 		private BitmapAtlas atlas = null;
