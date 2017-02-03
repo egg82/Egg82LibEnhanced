@@ -165,10 +165,12 @@
     <Compile Include="Patterns\Command.cs" />
     <Compile Include="Patterns\Interfaces\IDrawable.cs" />
     <Compile Include="Patterns\Interfaces\IUpdatable.cs" />
+    <Compile Include="Patterns\IRegistry.cs" />
     <Compile Include="Patterns\ObjectPool.cs" />
     <Compile Include="Patterns\Prototypes\IPrototype.cs" />
     <Compile Include="Patterns\Prototypes\IPrototypeFactory.cs" />
     <Compile Include="Patterns\Prototypes\PrototypeFactory.cs" />
+    <Compile Include="Patterns\Registry.cs" />
     <Compile Include="Patterns\ServiceLocator.cs" />
     <Compile Include="Patterns\States\FiniteState.cs" />
     <Compile Include="Patterns\States\FiniteStateMachine.cs" />
@@ -183,6 +185,7 @@
     <Compile Include="Utils\PreciseTimer.cs" />
     <Compile Include="Utils\QuadTree.cs" />
     <Compile Include="Utils\ReflectUtil.cs" />
+    <Compile Include="Utils\SettingsUtil.cs" />
     <Compile Include="Utils\SQLite.cs" />
     <Compile Include="Utils\TextureUtil.cs" />
   </ItemGroup>

@@ -9,7 +9,7 @@ namespace Egg82LibEnhanced.Engines {
 	public class GameEngine : IGameEngine {
 		//vars
 		private List<BaseWindow> windows = new List<BaseWindow>();
-		private PreciseTimer updateTimer = new PreciseTimer((1.0d / 60.0d) * 1000.0d);
+		private PreciseTimer updateTimer = new PreciseTimer((1.0d / 120.0d) * 1000.0d);
 		private double targetUpdateInterval = (1.0d / 60.0d) * 1000.0d;
 		private PreciseTimer drawTimer = new PreciseTimer((1.0d / 60.0d) * 1000.0d);
 
@@ -84,7 +84,7 @@ namespace Egg82LibEnhanced.Engines {
 					throw new InvalidOperationException("value cannot be NaN or infinity.");
 				}
 				if (value < 0.0d) {
-					targetUpdateInterval = 0.001d;
+					targetUpdateInterval = 0.002d;
 				} else {
 					targetUpdateInterval = value;
 				}

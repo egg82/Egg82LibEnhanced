@@ -27,3 +27,5 @@ C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\NAudio.xml
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\NAudio.Vorbis.xml
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\NVorbis.dll
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\NVorbis.xml
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\Newtonsoft.Json.dll
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\Newtonsoft.Json.xml
