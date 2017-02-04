@@ -83,7 +83,7 @@ namespace Egg82LibEnhanced.Engines {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
 					throw new InvalidOperationException("value cannot be NaN or infinity.");
 				}
-				if (value < 0.0d) {
+				if (value < 0.0d || value < 0.002d && value > 0.0d) {
 					targetUpdateInterval = 0.002d;
 				} else {
 					targetUpdateInterval = value;
@@ -99,7 +99,7 @@ namespace Egg82LibEnhanced.Engines {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
 					throw new InvalidOperationException("value cannot be NaN or infinity.");
 				}
-				if (value < 0.0d) {
+				if (value < 0.0d || value < 0.001d && value > 0.0d) {
 					drawTimer.Interval = 0.001d;
 				} else {
 					drawTimer.Interval = value;
