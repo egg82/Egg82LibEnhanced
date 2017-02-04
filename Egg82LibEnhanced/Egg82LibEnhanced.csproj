@@ -106,6 +106,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\IMod.cs" />
+    <Compile Include="Core\ModContainer.cs" />
+    <Compile Include="Events\ModDataEventArgs.cs" />
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Base\BaseState.cs" />
     <Compile Include="Core\Controllers.cs" />

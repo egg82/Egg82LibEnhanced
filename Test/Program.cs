@@ -34,7 +34,7 @@ namespace Test {
 				Start.UpdateEvents();
 			} while (Start.NumWindowsOpen > 0);
 
-			Start.DestroyServices();
+			Start.DestroyDefaultServices();
 			Environment.Exit(0);
 		}
 	}

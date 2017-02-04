@@ -226,15 +226,19 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 			set {
 				if (value == null) {
-					throw new ArgumentNullException("value");
-				}
-				if (renderSprite.Texture == null || (_textureBounds.X == 0.0d && _textureBounds.Y == 0.0d && _textureBounds.Width == renderSprite.TextureRect.Width && _textureBounds.Height == renderSprite.TextureRect.Height)) {
-					_textureBounds.Width = value.Size.X;
-					_textureBounds.Height = value.Size.Y;
-				}
+					renderSprite.TextureRect = new IntRect(0, 0, 0, 0);
+					renderSprite.Texture = null;
+					_textureBounds.Width = 0.0d;
+					_textureBounds.Height = 0.0d;
+				} else {
+					if (renderSprite.Texture == null || (_textureBounds.X == 0.0d && _textureBounds.Y == 0.0d && _textureBounds.Width == renderSprite.TextureRect.Width && _textureBounds.Height == renderSprite.TextureRect.Height)) {
+						_textureBounds.Width = value.Size.X;
+						_textureBounds.Height = value.Size.Y;
+					}
 
-				renderSprite.Texture = value;
-				renderSprite.TextureRect = new IntRect(0, 0, (int) _textureBounds.Width, (int) _textureBounds.Height);
+					renderSprite.Texture = value;
+					renderSprite.TextureRect = new IntRect(0, 0, (int) _textureBounds.Width, (int) _textureBounds.Height);
+				}
 				applyBounds();
 				applyGlobalBounds();
 			}
@@ -388,7 +392,6 @@ namespace Egg82LibEnhanced.Graphics {
 				previousBounds.Width = _bounds.Width;
 				previousBounds.Height = _bounds.Height;
 				globalBoundsChanged = true;
-				//renderSprite.TextureRect = new IntRect(renderSprite.TextureRect.Left, renderSprite.TextureRect.Top, (int) _bounds.Width, (int) _bounds.Height);
 			}
 			if (_skew.Changed) {
 				skewBox[0] = new Vertex(new Vector2f(0.0f, 0.0f), new Vector2f((float) _skew.TopLeftX, (float) _skew.TopLeftY));

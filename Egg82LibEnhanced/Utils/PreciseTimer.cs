@@ -17,6 +17,9 @@ namespace Egg82LibEnhanced.Utils {
 
 		//constructor
 		public PreciseTimer(double interval) {
+			if (interval < 0.0d) {
+				interval = 0.0d;
+			}
 			_interval = interval;
 
 			timerThread = new Thread(delegate() {

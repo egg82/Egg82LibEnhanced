@@ -44,6 +44,7 @@ namespace Test.States {
 				sprite.ScaleX = sprite.ScaleY = MathUtil.Random(0.1d, 0.3d);
 				sprite.X = MathUtil.Random(0.0d, Window.Width - sprite.GlobalWidth);
 				sprite.Y = MathUtil.Random(0.0d, Window.Height - sprite.GlobalWidth);
+				sprite.Color = new SFML.Graphics.Color(255, 255, 255, (byte) MathUtil.FairRoundedRandom(25, 255));
 				circles.Add(sprite);
 				AddChild(sprite);
 			}

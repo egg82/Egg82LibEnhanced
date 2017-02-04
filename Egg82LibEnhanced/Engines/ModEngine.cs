@@ -1,6 +1,92 @@
-﻿using System;
+﻿using Egg82LibEnhanced.Core;
+using Egg82LibEnhanced.Utils;
+using System;
+using System.Collections.Generic;
 
 namespace Egg82LibEnhanced.Engines {
-	public class ModEngine : IModEngine {
+	public class ModEngine : IModEngine, IDisposable {
+		//vars
+		private Dictionary<string, ModContainer> mods = new Dictionary<string, ModContainer>();
+
+		//constructor
+		public ModEngine() {
+
+		}
+		~ModEngine() {
+			Dispose();
+		}
+
+		//public
+		public void LoadMod(string name, string path) {
+			if (name == null) {
+				throw new ArgumentNullException("name");
+			}
+			if (path == null) {
+				throw new ArgumentNullException("path");
+			}
+			if (!FileUtil.PathExists(path)) {
+				throw new Exception("path does not exist.");
+			}
+			if (!FileUtil.PathIsFile(path)) {
+				throw new Exception("path is not a file.");
+			}
+
+			AppDomain domain = AppDomain.CreateDomain(name);
+			Type t = typeof(IMod);
+			IMod mod = null;
+			try {
+				mod = (IMod) domain.CreateInstanceFromAndUnwrap(path, t.Name);
+			} catch (Exception ex) {
+				throw new Exception("Cannot create instance of mod.", ex);
+			}
+			if (mod == null) {
+				throw new Exception("Cannot create instance of mod.");
+			}
+
+			mod.OnLoad();
+
+			if (mods.ContainsKey(name)) {
+				mods[name].Dispose();
+				mods[name] = new ModContainer(domain, mod);
+			} else {
+				mods.Add(name, new ModContainer(domain, mod));
+			}
+		}
+		public void RemoveMod(string name) {
+			if (name == null) {
+				throw new ArgumentNullException("name");
+			}
+
+			ModContainer retVal = null;
+			if (mods.TryGetValue(name, out retVal)) {
+				retVal.Dispose();
+				mods.Remove(name);
+			}
+		}
+		public ModContainer GetMod(string name) {
+			if (name == null) {
+				throw new ArgumentNullException("name");
+			}
+
+			ModContainer retVal = null;
+			if (mods.TryGetValue(name, out retVal)) {
+				return retVal;
+			}
+			return null;
+		}
+		public int NumMods {
+			get {
+				return mods.Count;
+			}
+		}
+
+		public void Dispose() {
+			foreach (KeyValuePair<string, ModContainer> kvp in mods) {
+				kvp.Value.Dispose();
+			}
+		}
+
+		//private
+
 	}
 }

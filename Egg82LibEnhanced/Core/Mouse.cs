@@ -5,7 +5,7 @@ namespace Egg82LibEnhanced.Core {
 	public class Mouse {
 		//vars
 		private PrecisePoint _location = new PrecisePoint();
-		private int _wheelDelta = 0;
+		private double _wheelDelta = 0.0d;
 		private bool _leftButtonDown = false;
 		private bool _middleButtonDown = false;
 		private bool _rightButtonDown = false;
@@ -80,7 +80,7 @@ namespace Egg82LibEnhanced.Core {
 				_location.Y = value;
 			}
 		}
-		public int WheelDelta {
+		public double WheelDelta {
 			get {
 				return _wheelDelta;
 			}

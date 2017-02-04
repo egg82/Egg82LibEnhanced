@@ -16,7 +16,7 @@ namespace Egg82LibEnhanced.Engines {
 		public event EventHandler<ButtonEventArgs> ButtonUp = null;
 
 		public event EventHandler<MouseMoveEventArgs> MouseMove = null;
-		public event EventHandler<MouseWheelEventArgs> MouseWheel = null;
+		public event EventHandler<MouseWheelScrollEventArgs> MouseWheel = null;
 		public event EventHandler<MouseButtonEventArgs> MouseDown = null;
 		public event EventHandler<MouseButtonEventArgs> MouseUp = null;
 
@@ -39,7 +39,7 @@ namespace Egg82LibEnhanced.Engines {
 				window.KeyPressed -= onKeyDown;
 				window.KeyReleased -= onKeyUp;
 				window.MouseMoved -= onMouseMove;
-				window.MouseWheelMoved -= onMouseWheel;
+				window.MouseWheelScrolled -= onMouseWheel;
 				window.MouseButtonPressed -= onMouseDown;
 				window.MouseButtonReleased -= onMouseUp;
 			}
@@ -83,7 +83,7 @@ namespace Egg82LibEnhanced.Engines {
 			window.KeyPressed += onKeyDown;
 			window.KeyReleased += onKeyUp;
 			window.MouseMoved += onMouseMove;
-			window.MouseWheelMoved += onMouseWheel;
+			window.MouseWheelScrolled += onMouseWheel;
 			window.MouseButtonPressed += onMouseDown;
 			window.MouseButtonReleased += onMouseUp;
 		}
@@ -102,7 +102,7 @@ namespace Egg82LibEnhanced.Engines {
 			window.KeyPressed -= onKeyDown;
 			window.KeyReleased -= onKeyUp;
 			window.MouseMoved -= onMouseMove;
-			window.MouseWheelMoved -= onMouseWheel;
+			window.MouseWheelScrolled -= onMouseWheel;
 			window.MouseButtonPressed -= onMouseDown;
 			window.MouseButtonReleased -= onMouseUp;
 		}
@@ -328,9 +328,9 @@ namespace Egg82LibEnhanced.Engines {
 				MouseMove.Invoke(sender, e);
 			}
 		}
-		private void onMouseWheel(object sender, MouseWheelEventArgs e) {
+		private void onMouseWheel(object sender, MouseWheelScrollEventArgs e) {
 			_controllers.CurrentlyUsingController = false;
-			_mouse.WheelDelta = e.Delta;
+			_mouse.WheelDelta = (double) e.Delta;
 
 			if (MouseWheel != null) {
 				MouseWheel.Invoke(sender, e);

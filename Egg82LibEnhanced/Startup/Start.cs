@@ -26,7 +26,17 @@ namespace Egg82LibEnhanced.Startup {
 			ServiceLocator.ProvideService(typeof(InputEngine), false);
 			ServiceLocator.ProvideService(typeof(GameEngine), false);
 		}
-		public static void DestroyServices() {
+		public static void ProvideModServices() {
+			ServiceLocator.ProvideService(typeof(AudioEngine));
+			ServiceLocator.ProvideService(typeof(CryptoUtil));
+		}
+		public static void DestroyModServices() {
+			ServiceLocator.RemoveService(typeof(IAudioEngine));
+			ServiceLocator.RemoveService(typeof(ICryptoUtil));
+
+			GC.Collect();
+		}
+		public static void DestroyDefaultServices() {
 			ServiceLocator.RemoveService(typeof(IGameEngine));
 			ServiceLocator.RemoveService(typeof(IInputEngine));
 			ServiceLocator.RemoveService(typeof(IPhysicsEngine));

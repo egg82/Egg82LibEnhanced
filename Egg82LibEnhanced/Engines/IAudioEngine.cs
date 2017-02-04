@@ -6,9 +6,10 @@ using System.IO;
 
 namespace Egg82LibEnhanced.Engines {
 	public interface IAudioEngine {
-		//functions
+		//events
 		event EventHandler<ExceptionEventArgs> Error;
 
+		//functions
 		void AddAudio(string name, AudioType type, AudioFormat format, byte[] data);
 		void RemoveAudio(string name);
 		Audio GetAudio(string name);
