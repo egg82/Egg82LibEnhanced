@@ -42,7 +42,7 @@ namespace Egg82LibEnhanced.Startup {
 			_numWindowsOpen = 0;
 			for (int i = windows.Count - 1; i >= 0; i--) {
 				windows[i].UpdateEvents();
-				if (windows[i].IsOpen()) {
+				if (windows[i].IsOpen) {
 					_numWindowsOpen++;
 				} else {
 					windows.RemoveAt(i);

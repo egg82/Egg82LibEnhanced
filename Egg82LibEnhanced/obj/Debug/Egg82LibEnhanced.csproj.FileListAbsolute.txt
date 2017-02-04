@@ -7,9 +7,6 @@ C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\E
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\EntityFramework.SqlServer.dll
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\FarseerPhysics.dll
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\Newtonsoft.Json.dll
-C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\sfmlnet-audio-2.dll
-C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\sfmlnet-graphics-2.dll
-C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\sfmlnet-window-2.dll
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\SharpDX.dll
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\SharpDX.XInput.dll
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\System.Data.SQLite.dll
@@ -33,3 +30,13 @@ C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\N
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\NAudio.xml
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\NAudio.Vorbis.xml
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\NVorbis.xml
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\SFML.Net.dll
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\gtk-sharp.dll
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\gdk-sharp.dll
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\glib-sharp.dll
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\atk-sharp.dll
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\pango-sharp.dll
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\gdk-sharp.pdb
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\glib-sharp.pdb
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\atk-sharp.pdb
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\pango-sharp.pdb

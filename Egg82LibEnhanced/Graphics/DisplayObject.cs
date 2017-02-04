@@ -3,7 +3,7 @@ using Egg82LibEnhanced.Core;
 using Egg82LibEnhanced.Patterns.Interfaces;
 using Egg82LibEnhanced.Utils;
 using SFML.Graphics;
-using SFML.Window;
+using SFML.System;
 using System;
 
 namespace Egg82LibEnhanced.Graphics {

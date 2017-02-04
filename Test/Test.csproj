@@ -50,16 +50,8 @@
       <HintPath>..\packages\NVorbis.0.8.5.0\lib\NVorbis.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="sfmlnet-audio-2, Version=2.1.0.0, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SFML.Net.2.1.5\lib\sfmlnet-audio-2.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="sfmlnet-graphics-2, Version=2.1.0.0, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SFML.Net.2.1.5\lib\sfmlnet-graphics-2.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="sfmlnet-window-2, Version=2.1.0.0, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\SFML.Net.2.1.5\lib\sfmlnet-window-2.dll</HintPath>
+    <Reference Include="SFML.Net, Version=2.3.6239.27713, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SFML-Portable-2.3.1.1.0\lib\SFML.Net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -87,6 +79,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="SFML.Net.dll.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Egg82LibEnhanced\Egg82LibEnhanced.csproj">

@@ -1,5 +1,5 @@
 ﻿using Egg82LibEnhanced.Patterns.Prototypes;
-using SFML.Window;
+using SFML.System;
 using System;
 using System.Drawing;
 

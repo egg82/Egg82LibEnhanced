@@ -2,9 +2,6 @@ C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\Test.exe.conf
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\Test.exe
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\Test.pdb
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\Egg82LibEnhanced.dll
-C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\sfmlnet-audio-2.dll
-C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\sfmlnet-graphics-2.dll
-C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\sfmlnet-window-2.dll
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\System.Data.SQLite.dll
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\FarseerPhysics.dll
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\SharpDX.XInput.dll
@@ -29,3 +26,13 @@ C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\NVorbis.dll
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\NVorbis.xml
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\Newtonsoft.Json.dll
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\Newtonsoft.Json.xml
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\SFML.Net.dll
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\gtk-sharp.dll
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\gdk-sharp.dll
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\glib-sharp.dll
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\atk-sharp.dll
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\pango-sharp.dll
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\gdk-sharp.pdb
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\glib-sharp.pdb
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\atk-sharp.pdb
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Test\bin\Debug\pango-sharp.pdb

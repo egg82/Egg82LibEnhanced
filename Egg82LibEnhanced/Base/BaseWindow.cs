@@ -46,7 +46,7 @@ namespace Egg82LibEnhanced.Base {
 
 			SetVerticalSyncEnabled(vSync);
 			SetView(new View(new FloatRect(0.0f, 0.0f, (float) width, (float) height)));
-			_quadTree = new QuadTree<DisplayObject>(new PreciseRectangle(0.0d, 0.0d, Width, Height));
+			_quadTree = new QuadTree<DisplayObject>(new PreciseRectangle(0.0d, 0.0d, width, height));
 
 			SetActive(false);
 
