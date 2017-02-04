@@ -1,11 +1,13 @@
-﻿using Egg82LibEnhanced.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 
 namespace Egg82LibEnhanced.Utils {
 	public class FileUtil {
 		//vars
+		public static readonly string CurrentDirectory = Directory.GetCurrentDirectory();
+		public static readonly char DirectorySeparatorChar = Path.DirectorySeparatorChar;
+
 		private static Dictionary<string, FileStream> streams = new Dictionary<string, FileStream>();
 
 		//constructor

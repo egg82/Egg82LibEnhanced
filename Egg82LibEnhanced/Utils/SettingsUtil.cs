@@ -14,10 +14,17 @@ namespace Egg82LibEnhanced.Utils {
 		}
 
 		//public
-		public void Load(string path, IRegistry registry) {
+		public static void Load(string path, IRegistry registry) {
 			Load(path, registry, Encoding.UTF8);
 		}
-		public void Load(string path, IRegistry registry, Encoding enc) {
+		public static void Load(string path, IRegistry registry, Encoding enc) {
+			if (!FileUtil.PathExists(path)) {
+				throw new Exception("path does not exist.");
+			}
+			if (!FileUtil.PathIsFile(path)) {
+				throw new Exception("path is not a file.");
+			}
+
 			bool fileWasOpen = true;
 
 			if (!FileUtil.IsOpen(path)) {
@@ -43,10 +50,18 @@ namespace Egg82LibEnhanced.Utils {
 			}
 		}
 
-		public void Save(string path, IRegistry registry) {
+		public static void Save(string path, IRegistry registry) {
 			Save(path, registry, Encoding.UTF8);
 		}
-		public void Save(string path, IRegistry registry, Encoding enc) {
+		public static void Save(string path, IRegistry registry, Encoding enc) {
+			if (FileUtil.PathExists(path)) {
+				if (!FileUtil.PathIsFile(path)) {
+					throw new Exception("path is not a file.");
+				}
+			} else {
+				FileUtil.CreateFile(path);
+			}
+
 			string[] names = registry.RegistryNames;
 
 			bool fileWasOpen = true;
@@ -69,16 +84,20 @@ namespace Egg82LibEnhanced.Utils {
 			}
 		}
 
-		public void LoadSave(string path, IRegistry registry) {
+		public static void LoadSave(string path, IRegistry registry) {
 			LoadSave(path, registry, Encoding.UTF8);
 		}
-		public void LoadSave(string path, IRegistry registry, Encoding enc) {
+		public static void LoadSave(string path, IRegistry registry, Encoding enc) {
+			if (!FileUtil.PathExists(path)) {
+				FileUtil.CreateFile(path);
+			}
+
 			Load(path, registry, enc);
 			Save(path, registry, enc);
 		}
 
 		//private
-		private void setRegistry(dynamic[] json, IRegistry registry) {
+		private static void setRegistry(dynamic[] json, IRegistry registry) {
 			for (int i = 0; i < json.Length; i++) {
 				if (json[i].data.Value == null) {
 					try {
