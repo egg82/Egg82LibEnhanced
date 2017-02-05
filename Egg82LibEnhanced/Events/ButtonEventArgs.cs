@@ -1,4 +1,4 @@
-﻿using Egg82LibEnhanced.Enums.Engines;
+﻿using Egg82LibEnhanced.Enums;
 using System;
 
 namespace Egg82LibEnhanced.Events {

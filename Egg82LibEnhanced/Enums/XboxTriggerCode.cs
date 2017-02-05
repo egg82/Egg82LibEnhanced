@@ -1,8 +1,9 @@
 ﻿using System;
 
-namespace Egg82LibEnhanced.Enums.Engines {
+namespace Egg82LibEnhanced.Enums {
 	public enum XboxTriggerCode {
-		Left = 0,
-		Rright = 1
+		Left = 200,
+		Right = 201,
+		None = 202
 	}
 }

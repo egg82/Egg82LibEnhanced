@@ -11,6 +11,8 @@ namespace Egg82LibEnhanced.Engines {
 
 		event EventHandler<ButtonEventArgs> ButtonDown;
 		event EventHandler<ButtonEventArgs> ButtonUp;
+		event EventHandler<StickEventArgs> StickMoved;
+		event EventHandler<TriggerEventArgs> TriggerPressed;
 
 		event EventHandler<MouseMoveEventArgs> MouseMove;
 		event EventHandler<MouseWheelScrollEventArgs> MouseWheel;

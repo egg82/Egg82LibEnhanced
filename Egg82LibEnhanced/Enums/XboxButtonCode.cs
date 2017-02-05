@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Egg82LibEnhanced.Enums.Engines {
+namespace Egg82LibEnhanced.Enums {
 	public enum XboxButtonCode {
 		A = 0,
 		B = 1,

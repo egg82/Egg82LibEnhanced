@@ -1,6 +1,7 @@
 ﻿using Egg82LibEnhanced.Base;
-using Egg82LibEnhanced.Enums.Engines;
+using Egg82LibEnhanced.Enums;
 using Egg82LibEnhanced.Events;
+using Egg82LibEnhanced.Utils;
 using SFML.Window;
 using SharpDX.XInput;
 using System;
@@ -14,6 +15,8 @@ namespace Egg82LibEnhanced.Engines {
 
 		public event EventHandler<ButtonEventArgs> ButtonDown = null;
 		public event EventHandler<ButtonEventArgs> ButtonUp = null;
+		public event EventHandler<StickEventArgs> StickMoved = null;
+		public event EventHandler<TriggerEventArgs> TriggerPressed = null;
 
 		public event EventHandler<MouseMoveEventArgs> MouseMove = null;
 		public event EventHandler<MouseWheelScrollEventArgs> MouseWheel = null;
@@ -23,6 +26,9 @@ namespace Egg82LibEnhanced.Engines {
 		private Core.Mouse _mouse = new Core.Mouse();
 		private Core.Keyboard _keyboard = new Core.Keyboard();
 		private Core.Controllers _controllers = new Core.Controllers();
+
+		private short maxAnglePos = 8192;
+		private short maxAngleNeg = -8193;
 
 		private List<BaseWindow> windows = new List<BaseWindow>();
 		private BaseWindow _focusedWindow = null;
@@ -275,6 +281,107 @@ namespace Egg82LibEnhanced.Engines {
 					_controllers.CurrentlyUsingController = true;
 					if (ButtonUp != null) {
 						ButtonUp.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Right));
+					}
+				}
+
+				short dzPos = (short) (_controllers.StickDeadZone * 32767.0d);
+				short dzNeg = (short) (_controllers.StickDeadZone * 32768.0d * -1.0d);
+
+				if (tempState.LeftThumbY >= dzPos && Math.Abs(tempState.LeftThumbX) < maxAnglePos) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftN, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
+					}
+				} else if (tempState.LeftThumbX >= dzPos && Math.Abs(tempState.LeftThumbY) < maxAnglePos) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftE, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
+					}
+				} else if (tempState.LeftThumbY <= dzNeg && Math.Abs(tempState.LeftThumbX) < maxAnglePos) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftS, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
+					}
+				} else if (tempState.LeftThumbX <= dzNeg && Math.Abs(tempState.LeftThumbY) < maxAnglePos) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftW, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
+					}
+				} else if (tempState.LeftThumbY >= dzPos && tempState.LeftThumbX >= maxAnglePos) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftNE, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
+					}
+				} else if (tempState.LeftThumbY >= dzPos && tempState.LeftThumbX <= maxAngleNeg) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftNW, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
+					}
+				} else if (tempState.LeftThumbY <= dzNeg && tempState.LeftThumbX >= maxAnglePos) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftSE, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
+					}
+				} else if (tempState.LeftThumbY <= dzNeg && tempState.LeftThumbX <= maxAngleNeg) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftSW, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
+					}
+				}
+				if (tempState.RightThumbY >= dzPos && Math.Abs(tempState.RightThumbX) < maxAnglePos) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightN, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
+					}
+				} else if (tempState.RightThumbX >= dzPos && Math.Abs(tempState.RightThumbY) < maxAnglePos) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightE, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
+					}
+				} else if (tempState.RightThumbY <= dzNeg && Math.Abs(tempState.RightThumbX) < maxAnglePos) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightS, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
+					}
+				} else if (tempState.RightThumbX <= dzNeg && Math.Abs(tempState.RightThumbY) < maxAnglePos) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightW, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
+					}
+				} else if (tempState.RightThumbY >= dzPos && tempState.RightThumbX >= maxAnglePos) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightNE, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
+					}
+				} else if (tempState.RightThumbY >= dzPos && tempState.RightThumbX <= maxAngleNeg) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightNW, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
+					}
+				} else if (tempState.RightThumbY <= dzNeg && tempState.RightThumbX >= maxAnglePos) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightSE, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
+					}
+				} else if (tempState.RightThumbY <= dzNeg && tempState.RightThumbX <= maxAngleNeg) {
+					_controllers.CurrentlyUsingController = true;
+					if (StickMoved != null) {
+						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightSW, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
+					}
+				}
+
+				byte dzTrig = (byte) (_controllers.TriggerDeadZone * 255.0d);
+
+				if (tempState.LeftTrigger >= dzTrig) {
+					_controllers.CurrentlyUsingController = true;
+					if (TriggerPressed != null) {
+						TriggerPressed.Invoke(_focusedWindow, new TriggerEventArgs(XboxTriggerCode.Left, tempState.LeftTrigger / 255.0d));
+					}
+				}
+				if (tempState.RightTrigger >= dzTrig) {
+					_controllers.CurrentlyUsingController = true;
+					if (TriggerPressed != null) {
+						TriggerPressed.Invoke(_focusedWindow, new TriggerEventArgs(XboxTriggerCode.Right, tempState.RightTrigger / 255.0d));
 					}
 				}
 

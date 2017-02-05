@@ -4,6 +4,7 @@ namespace Egg82LibEnhanced.Enums {
 	public enum InteractableState {
 		Normal,
 		Hover,
-		Down
+		Down,
+		None
 	}
 }

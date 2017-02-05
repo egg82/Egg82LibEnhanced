@@ -29,16 +29,17 @@ namespace Egg82LibEnhanced.Core {
 			if (keyCodes == null) {
 				return true;
 			}
-			int numKeys = 0;
 			for (int i = 0; i < keyCodes.Length; i++) {
 				if (keyCodes[i] < 0 || keyCodes[i] >= keys.Length) {
 					return false;
 				}
 				if (keys[keyCodes[i]]) {
-					numKeys++;
+					continue;
+				} else {
+					return false;
 				}
 			}
-			return (numKeys == keyCodes.Length) ? true : false;
+			return true;
 		}
 
 		//private

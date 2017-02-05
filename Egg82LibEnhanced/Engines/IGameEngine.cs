@@ -7,7 +7,7 @@ namespace Egg82LibEnhanced.Engines {
 		void AddWindow(BaseWindow window);
 		void RemoveWindow(BaseWindow window);
 		int NumWindows { get; }
-		double UpdateInterval { get; }
-		double DrawInterval { get; }
+		double UpdateInterval { get; set; }
+		double DrawInterval { get; set; }
 	}
 }

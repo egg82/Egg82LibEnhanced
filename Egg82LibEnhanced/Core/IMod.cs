@@ -10,6 +10,6 @@ namespace Egg82LibEnhanced.Core {
 		//functions
 		void OnLoad();
 		void OnUnload();
-		void OnData(dynamic data);
+		void OnData(string name, Type type, dynamic data);
 	}
 }

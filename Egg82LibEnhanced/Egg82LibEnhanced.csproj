@@ -109,6 +109,8 @@
     <Compile Include="Core\IMod.cs" />
     <Compile Include="Core\ModContainer.cs" />
     <Compile Include="Events\ModDataEventArgs.cs" />
+    <Compile Include="Events\StickEventArgs.cs" />
+    <Compile Include="Events\TriggerEventArgs.cs" />
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Base\BaseState.cs" />
     <Compile Include="Core\Controllers.cs" />
@@ -147,8 +149,8 @@
     <Compile Include="Enums\AudioFormat.cs" />
     <Compile Include="Enums\AudioType.cs" />
     <Compile Include="Enums\XboxButtonCode.cs" />
+    <Compile Include="Enums\XboxStickSide.cs" />
     <Compile Include="Enums\XboxStickCode.cs" />
-    <Compile Include="Enums\XboxStickPosition.cs" />
     <Compile Include="Enums\XboxTriggerCode.cs" />
     <Compile Include="Events\ButtonEventArgs.cs" />
     <Compile Include="Events\ExceptionEventArgs.cs" />

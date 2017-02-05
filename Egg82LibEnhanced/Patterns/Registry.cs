@@ -28,13 +28,11 @@ namespace Egg82LibEnhanced.Patterns {
 				}
 			}
 
-			dynamic result = null;
-
 			if (data == null) {
 				registry.Remove(name);
 				keyCache = registry.Keys.ToArray();
 			} else {
-				if (result != null) {
+				if (registry.ContainsKey(name)) {
 					registry[name] = new Tuple<Type, dynamic>(type, data);
 				} else {
 					registry.Add(name, new Tuple<Type, dynamic>(type, data));
