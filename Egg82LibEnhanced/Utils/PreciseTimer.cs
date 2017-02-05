@@ -38,14 +38,9 @@ namespace Egg82LibEnhanced.Utils {
 					} while (_running && AutoReset);
 				} else {
 					do {
-						int loops = 0;
 						watch.Start();
 						while (watch.Elapsed.TotalMilliseconds < _interval) {
-							if (loops++ % 100 == 0) {
-								Thread.Sleep(1);
-							} else {
-								Thread.SpinWait(1000);
-							}
+							Thread.SpinWait(1);
 						}
 						if (Elapsed != null) {
 							Elapsed.Invoke(this, new PreciseElapsedEventArgs(watch.ElapsedMilliseconds));

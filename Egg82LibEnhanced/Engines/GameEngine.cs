@@ -83,7 +83,8 @@ namespace Egg82LibEnhanced.Engines {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
 					throw new InvalidOperationException("value cannot be NaN or infinity.");
 				}
-				if (value < 0.0d || value < 0.002d && value > 0.0d) {
+				value -= value * 0.145d;
+				if (value < 0.002d) {
 					targetUpdateInterval = 0.002d;
 				} else {
 					targetUpdateInterval = value;
@@ -99,7 +100,8 @@ namespace Egg82LibEnhanced.Engines {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
 					throw new InvalidOperationException("value cannot be NaN or infinity.");
 				}
-				if (value < 0.0d || value < 0.001d && value > 0.0d) {
+				value -= value * 0.12d;
+				if (value < 0.001d) {
 					drawTimer.Interval = 0.001d;
 				} else {
 					drawTimer.Interval = value;
@@ -109,25 +111,21 @@ namespace Egg82LibEnhanced.Engines {
 
 		//private
 		private void onUpdateTimer(object sender, PreciseElapsedEventArgs e) {
-			lock (updateObj) {
-				double deltaTime = e.ElapsedMilliseconds / targetUpdateInterval;
+			double deltaTime = e.ElapsedMilliseconds / targetUpdateInterval;
 
-				inputEngine.Update();
-				physicsEngine.Update(deltaTime * 0.001d);
+			inputEngine.Update();
+			physicsEngine.Update(deltaTime * 0.001d);
 
-				for (int i = 0; i < windows.Count; i++) {
-					windows[i].Update(deltaTime);
-				}
-				for (int i = 0; i < windows.Count; i++) {
-					windows[i].SwapBuffers();
-				}
+			for (int i = 0; i < windows.Count; i++) {
+				windows[i].Update(deltaTime);
+			}
+			for (int i = 0; i < windows.Count; i++) {
+				windows[i].SwapBuffers();
 			}
 		}
 		private void onDrawTimer(object sender, PreciseElapsedEventArgs e) {
-			lock (updateObj) {
-				for (int i = 0; i < windows.Count; i++) {
-					windows[i].Draw();
-				}
+			for (int i = 0; i < windows.Count; i++) {
+				windows[i].Draw();
 			}
 		}
 	}
