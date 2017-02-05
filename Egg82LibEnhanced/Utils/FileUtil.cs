@@ -92,8 +92,6 @@ namespace Egg82LibEnhanced.Utils {
 		}
 		
 		public static void Open(string path) {
-			path = path.ToLower();
-
 			if (!PathExists(path)) {
 				throw new Exception("Path does not exist.");
 			}
@@ -108,8 +106,6 @@ namespace Egg82LibEnhanced.Utils {
 			streams.Add(path, File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None));
 		}
 		public static void Close(string path) {
-			path = path.ToLower();
-
 			if (!streams.ContainsKey(path)) {
 				return;
 			}
@@ -126,14 +122,10 @@ namespace Egg82LibEnhanced.Utils {
 		}
 
 		public static bool IsOpen(string path) {
-			path = path.ToLower();
-
 			return (streams.ContainsKey(path)) ? true : false;
 		}
 
 		public static long GetTotalBytes(string path) {
-			path = path.ToLower();
-
 			if (!streams.ContainsKey(path)) {
 				return 0L;
 			}
@@ -142,8 +134,6 @@ namespace Egg82LibEnhanced.Utils {
 		}
 
 		public static byte[] Read(string path, long position, int length) {
-			path = path.ToLower();
-
 			if (!streams.ContainsKey(path)) {
 				throw new Exception("File is not open.");
 			}
@@ -160,8 +150,6 @@ namespace Egg82LibEnhanced.Utils {
 			return buffer;
 		}
 		public static void Write(string path, byte[] bytes, long position) {
-			path = path.ToLower();
-
 			if (bytes.LongLength > int.MaxValue) {
 				throw new Exception("bytes length must be an int.");
 			}
@@ -184,8 +172,6 @@ namespace Egg82LibEnhanced.Utils {
 		}
 
 		public static void Erase(string path) {
-			path = path.ToLower();
-
 			if (streams.ContainsKey(path)) {
 				streams[path].SetLength(0);
 				streams[path].Flush(true);

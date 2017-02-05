@@ -43,7 +43,7 @@ namespace Egg82LibEnhanced.Utils {
 				return;
 			}
 
-			object[] json = JsonConvert.DeserializeObject<object[]>(str);
+			dynamic[] json = JsonConvert.DeserializeObject<dynamic[]>(str);
 
 			if (json.Length > 0) {
 				setRegistry(json, registry);
@@ -71,7 +71,7 @@ namespace Egg82LibEnhanced.Utils {
 				fileWasOpen = false;
 			}
 
-			List<object> json = new List<object>();
+			List<dynamic> json = new List<dynamic>();
 			foreach (string name in names) {
 				json.Add(new { name = name, data = registry.GetRegister(name) });
 			}
@@ -101,15 +101,23 @@ namespace Egg82LibEnhanced.Utils {
 			for (int i = 0; i < json.Length; i++) {
 				if (json[i].data.Value == null) {
 					try {
-						registry.SetRegister(json[i].name.Value, JsonConvert.DeserializeObject(json[i].data.ToString()));
+						if (registry.HasRegister(json[i].name.Value)) {
+							registry.SetRegister(json[i].name.Value, registry.GetRegisterType(json[i].name.Value), JsonConvert.DeserializeObject(json[i].data.ToString()));
+						} else {
+							registry.SetRegister(json[i].name.Value, typeof(object), JsonConvert.DeserializeObject(json[i].data.ToString()));
+						}
 					} catch (Exception) {
-
+						
 					}
 				} else {
 					try {
-						registry.SetRegister(json[i].name.Value, json[i].data.Value);
+						if (registry.HasRegister(json[i].name.Value)) {
+							registry.SetRegister(json[i].name.Value, registry.GetRegisterType(json[i].name.Value), json[i].data.Value);
+						} else {
+							registry.SetRegister(json[i].name.Value, typeof(object), json[i].data.Value);
+						}
 					} catch (Exception) {
-
+						
 					}
 				}
 			}
