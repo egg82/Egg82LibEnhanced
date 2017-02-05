@@ -39,6 +39,8 @@ namespace Egg82LibEnhanced.Graphics {
 		private SpriteSkew _skew = new SpriteSkew();
 		private Vertex[] skewBox = new Vertex[4];
 
+		private Color _color = new Color(255, 255, 255, 255);
+
 		//constructor
 		public DisplayObject() {
 			_graphics.BoundsChanged += onGraphicsBoundsChanged;
@@ -72,6 +74,14 @@ namespace Egg82LibEnhanced.Graphics {
 
 			applyTransforms();
 			renderGraphics();
+
+			if (_parent != null) {
+				graphicsSprite.Color = _color * _parent.Color;
+				renderSprite.Color = _color * _parent.Color;
+			} else {
+				graphicsSprite.Color = _color;
+				renderSprite.Color = _color;
+			}
 
 			_globalTransform = parentTransform * localTransform;
 			renderState.Transform = _globalTransform;
@@ -344,16 +354,10 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 		public Color Color {
 			get {
-				return renderSprite.Color;
+				return _color;
 			}
 			set {
-				if (_parent != null) {
-					graphicsSprite.Color = value * _parent.Color;
-					renderSprite.Color = value * _parent.Color;
-				} else {
-					graphicsSprite.Color = value;
-					renderSprite.Color = value;
-				}
+				_color = value;
 			}
 		}
 		public BlendMode BlendMode {
