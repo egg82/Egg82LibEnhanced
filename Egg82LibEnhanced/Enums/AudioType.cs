@@ -7,6 +7,7 @@ namespace Egg82LibEnhanced.Enums {
 		Sfx,
 		Ui,
 		Voice,
+		Other,
 		None
 	}
 }

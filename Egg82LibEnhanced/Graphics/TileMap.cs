@@ -18,7 +18,7 @@ namespace Egg82LibEnhanced.Graphics {
 		private bool tilesChanged = false;
 
 		//constructor
-		public TileMap(BitmapAtlas atlas, int numColumns, int numRows, int tileWidth, int tileHeight) {
+		public TileMap(ref BitmapAtlas atlas, int numColumns, int numRows, int tileWidth, int tileHeight) {
 			if (atlas == null) {
 				throw new ArgumentNullException("atlas");
 			}

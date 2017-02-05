@@ -14,7 +14,7 @@ namespace Egg82LibEnhanced.Graphics {
 		private double cumulativeTime = 0.0d;
 
 		//constructor
-		public MovieClip(BitmapAtlas atlas, double frameTime) {
+		public MovieClip(ref BitmapAtlas atlas, double frameTime) {
 			this.atlas = atlas;
 			_frameTime = frameTime;
 		}
