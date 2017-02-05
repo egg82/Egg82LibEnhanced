@@ -9,26 +9,34 @@ using System.Xml;
 namespace Egg82LibEnhanced.Graphics {
 	public class TextureAtlas : IDisposable {
 		//vars
-		private Bitmap atlasTexture = null;
+		private bool fromTexture = false;
+		private Bitmap atlasBitmap = null;
+		private Dictionary<string, Bitmap> subBitmaps = new Dictionary<string, Bitmap>();
 		private Dictionary<string, Texture> subTextures = new Dictionary<string, Texture>();
 
 		//constructor
-		public TextureAtlas(Bitmap texture, XmlDocument atlasXml) {
-			if (texture == null) {
-				throw new ArgumentNullException("texture");
+		public TextureAtlas(Texture texture, XmlDocument atlasXml) : this(TextureUtil.BitmapFromTexture(texture), atlasXml) {
+			fromTexture = true;
+		}
+		public TextureAtlas(Bitmap bitmap, XmlDocument atlasXml) {
+			if (bitmap == null) {
+				throw new ArgumentNullException("bitmap");
 			}
 			if (atlasXml == null) {
 				throw new ArgumentNullException("atlasXml");
 			}
 
-			atlasTexture = texture;
+			atlasBitmap = bitmap;
 			if (atlasXml != null) {
 				ParseXml(atlasXml);
 			}
 		}
-		public TextureAtlas(Bitmap texture, int columns, int rows) {
-			if (texture == null) {
-				throw new ArgumentNullException("texture");
+		public TextureAtlas(Texture texture, int columns, int rows) : this(TextureUtil.BitmapFromTexture(texture), columns, rows) {
+			fromTexture = true;
+		}
+		public TextureAtlas(Bitmap bitmap, int columns, int rows) {
+			if (bitmap == null) {
+				throw new ArgumentNullException("bitmap");
 			}
 			if (rows <= 0) {
 				throw new Exception("rows cannot be less than or equal to zero.");
@@ -37,11 +45,11 @@ namespace Egg82LibEnhanced.Graphics {
 				throw new Exception("columns cannot be less than or equal to zero.");
 			}
 
-			atlasTexture = texture;
+			atlasBitmap = bitmap;
 
-			int width = (int) (texture.Width / columns);
-			int height = (int) (texture.Height / rows);
-			
+			int width = (int) (bitmap.Width / columns);
+			int height = (int) (bitmap.Height / rows);
+
 			for (int x = 0; x < columns; x++) {
 				for (int y = 0; y < rows; y++) {
 					Rectangle region = new Rectangle(x * width, y * height, width, height);
@@ -55,6 +63,17 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 
 		//public
+		public Bitmap GetBitmap(string name) {
+			if (name == null) {
+				throw new ArgumentNullException("name");
+			}
+
+			Bitmap retVal = null;
+			if (subBitmaps.TryGetValue(name, out retVal)) {
+				return retVal;
+			}
+			return null;
+		}
 		public Texture GetTexture(string name) {
 			if (name == null) {
 				throw new ArgumentNullException("name");
@@ -66,18 +85,32 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 			return null;
 		}
-		public bool HasTexture(string name) {
+		public bool HasValue(string name) {
 			if (name == null) {
 				throw new ArgumentNullException("name");
 			}
-			return subTextures.ContainsKey(name);
+			return subBitmaps.ContainsKey(name);
 		}
 
+		public Bitmap[] GetBitmaps(string prefix = "") {
+			if (prefix == null) {
+				throw new ArgumentNullException("prefix");
+			}
+
+			string[] names = GetNames(prefix);
+			Bitmap[] retVal = new Bitmap[names.Length];
+
+			for (int i = 0; i < names.Length; i++) {
+				retVal[i] = subBitmaps[names[i]];
+			}
+
+			return retVal;
+		}
 		public Texture[] GetTextures(string prefix = "") {
 			if (prefix == null) {
 				throw new ArgumentNullException("prefix");
 			}
-			
+
 			string[] names = GetNames(prefix);
 			Texture[] retVal = new Texture[names.Length];
 
@@ -93,11 +126,11 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 
 			if (prefix == "") {
-				return subTextures.Keys.ToArray();
+				return subBitmaps.Keys.ToArray();
 			}
 
 			List<string> names = new List<string>();
-			string[] subtextureNames = subTextures.Keys.ToArray();
+			string[] subtextureNames = subBitmaps.Keys.ToArray();
 			for (int i = 0; i < subtextureNames.Length; i++) {
 				if (subtextureNames[i].IndexOf(prefix) == 0) {
 					names.Add(subtextureNames[i]);
@@ -106,24 +139,32 @@ namespace Egg82LibEnhanced.Graphics {
 
 			return names.ToArray();
 		}
-		
+
 		public void AddRegion(string name, Rectangle region, bool rotated = false) {
 			if (name == null) {
 				throw new ArgumentNullException("name");
 			}
 
-			if (subTextures.ContainsKey(name)) {
-				subTextures[name] = TextureUtil.FromBitmap(TextureUtil.GetRegion(atlasTexture, region, (rotated) ? -90.0d : 0.0d));
+			Bitmap bitmap = TextureUtil.GetRegion(atlasBitmap, region, (rotated) ? -90.0d : 0.0d);
+
+			if (subBitmaps.ContainsKey(name)) {
+				subBitmaps[name] = bitmap;
+				subTextures[name].Dispose();
+				subTextures[name] = TextureUtil.FromBitmap(bitmap);
 			} else {
-				subTextures.Add(name, TextureUtil.FromBitmap(TextureUtil.GetRegion(atlasTexture, region, (rotated) ? -90.0d : 0.0d)));
+				subBitmaps.Add(name, bitmap);
+				subTextures.Add(name, TextureUtil.FromBitmap(bitmap));
 			}
 		}
 
 		public void Dispose() {
-			foreach (KeyValuePair<string, Texture> kvp in subTextures) {
+			foreach (KeyValuePair<string, Bitmap> kvp in subBitmaps) {
 				kvp.Value.Dispose();
+				subTextures[kvp.Key].Dispose();
 			}
-			atlasTexture.Dispose();
+			if (fromTexture) {
+				atlasBitmap.Dispose();
+			}
 		}
 
 		//private
@@ -173,7 +214,7 @@ namespace Egg82LibEnhanced.Graphics {
 			if (node.Attributes == null || node.Attributes[value] == null) {
 				return retVal;
 			}
-			
+
 			if (int.TryParse(node.Attributes[value].Value, out retVal)) {
 				if (double.IsNaN(retVal) || double.IsInfinity(retVal)) {
 					return 0;

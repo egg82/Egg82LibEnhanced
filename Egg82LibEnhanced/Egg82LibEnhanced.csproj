@@ -117,7 +117,7 @@
     <Compile Include="Core\Keyboard.cs" />
     <Compile Include="Core\Mouse.cs" />
     <Compile Include="Enums\InteractableState.cs" />
-    <Compile Include="Graphics\BitmapAtlas.cs" />
+    <Compile Include="Graphics\TextureAtlas.cs" />
     <Compile Include="Graphics\Button.cs" />
     <Compile Include="Graphics\DisplayObject.cs" />
     <Compile Include="Graphics\DisplayObjectContainer.cs" />
@@ -126,7 +126,6 @@
     <Compile Include="Graphics\TextBox.cs" />
     <Compile Include="Graphics\TileMap.cs" />
     <Compile Include="Base\BaseWindow.cs" />
-    <Compile Include="Graphics\TextureAtlas.cs" />
     <Compile Include="Core\AtkinSieve.cs" />
     <Compile Include="Core\Audio.cs" />
     <Compile Include="Core\PhysicsWorld.cs" />

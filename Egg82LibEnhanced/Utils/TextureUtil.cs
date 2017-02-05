@@ -105,6 +105,13 @@ namespace Egg82LibEnhanced.Utils {
 			return tex;
 		}
 
+		public static Bitmap BitmapFromTexture(Texture tex) {
+			SFML.Graphics.Image im = tex.CopyToImage();
+			byte[] pixels = im.Pixels;
+			im.Dispose();
+			return BitmapFromBytes(pixels);
+		}
+
 		/*public static void UpdateTextureWithBitmap(Bitmap bitmap, Texture tex) {
 			if (bitmap == null) {
 				throw new ArgumentNullException("bitmap");

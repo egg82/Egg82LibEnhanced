@@ -1,20 +1,19 @@
-﻿using Egg82LibEnhanced.Utils;
+﻿using SFML.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 
 namespace Egg82LibEnhanced.Graphics {
 	public class MovieClip : DisplayObject {
 		//vars
-		private BitmapAtlas atlas = null;
+		private TextureAtlas atlas = null;
 		private int _currentFrame = 0;
-		private List<Bitmap> frames = new List<Bitmap>();
+		private List<Texture> frames = new List<Texture>();
 
 		private double _frameTime = 0.0d;
 		private double cumulativeTime = 0.0d;
 
 		//constructor
-		public MovieClip(ref BitmapAtlas atlas, double frameTime) {
+		public MovieClip(ref TextureAtlas atlas, double frameTime) {
 			this.atlas = atlas;
 			_frameTime = frameTime;
 		}
@@ -39,10 +38,10 @@ namespace Egg82LibEnhanced.Graphics {
 			if (index < 0 || index > frames.Count) {
 				throw new IndexOutOfRangeException();
 			}
-			if (bitmapName == null || !atlas.HasBitmap(bitmapName)) {
+			if (bitmapName == null || !atlas.HasValue(bitmapName)) {
 				frames.Insert(index, null);
 			} else {
-				frames.Insert(index, atlas.GetBitmap(bitmapName));
+				frames.Insert(index, atlas.GetTexture(bitmapName));
 			}
 		}
 		public void RemoveFrame(int frame) {
@@ -91,7 +90,7 @@ namespace Egg82LibEnhanced.Graphics {
 				Texture.Dispose();
 			}
 
-			Texture = (frames[frame] == null) ? null : TextureUtil.FromBitmap(frames[frame]);
+			Texture = (frames[frame] == null) ? null : frames[frame];
 		}
 	}
 }

@@ -9,6 +9,8 @@ using System;
 namespace Egg82LibEnhanced.Graphics {
 	public abstract class DisplayObject : IUpdatable, IDrawable, IQuad {
 		//vars
+		public event EventHandler BoundsChanged = null;
+
 		public bool Visible = true;
 
 		private SpriteGraphics _graphics = new SpriteGraphics();
@@ -130,6 +132,9 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 				_bounds.X = value;
+				if (BoundsChanged != null) {
+					BoundsChanged.Invoke(this, EventArgs.Empty);
+				}
 			}
 		}
 		public double GlobalY {
@@ -146,6 +151,9 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 				_bounds.Y = value;
+				if (BoundsChanged != null) {
+					BoundsChanged.Invoke(this, EventArgs.Empty);
+				}
 			}
 		}
 		public double GlobalWidth {
@@ -167,6 +175,9 @@ namespace Egg82LibEnhanced.Graphics {
 					value *= -1;
 				}
 				_bounds.Width = value;
+				if (BoundsChanged != null) {
+					BoundsChanged.Invoke(this, EventArgs.Empty);
+				}
 			}
 		}
 		public double GlobalHeight {
@@ -188,6 +199,9 @@ namespace Egg82LibEnhanced.Graphics {
 					value *= -1;
 				}
 				_bounds.Height = value;
+				if (BoundsChanged != null) {
+					BoundsChanged.Invoke(this, EventArgs.Empty);
+				}
 			}
 		}
 
@@ -241,6 +255,11 @@ namespace Egg82LibEnhanced.Graphics {
 				}
 				applyBounds();
 				applyGlobalBounds();
+			}
+		}
+		public Texture GraphicsTexture {
+			get {
+				return graphicsSprite.Texture;
 			}
 		}
 		public double TextureBoundsX {
@@ -328,8 +347,13 @@ namespace Egg82LibEnhanced.Graphics {
 				return renderSprite.Color;
 			}
 			set {
-				graphicsSprite.Color = value;
-				renderSprite.Color = value;
+				if (_parent != null) {
+					graphicsSprite.Color = value * _parent.Color;
+					renderSprite.Color = value * _parent.Color;
+				} else {
+					graphicsSprite.Color = value;
+					renderSprite.Color = value;
+				}
 			}
 		}
 		public BlendMode BlendMode {
@@ -428,6 +452,9 @@ namespace Egg82LibEnhanced.Graphics {
 		private void applyBounds() {
 			_bounds.Width = (double) Math.Max(renderSprite.TextureRect.Width, _graphics.Bitmap.Width);
 			_bounds.Height = (double) Math.Max(renderSprite.TextureRect.Height, _graphics.Bitmap.Height);
+			if (BoundsChanged != null) {
+				BoundsChanged.Invoke(this, EventArgs.Empty);
+			}
 		}
 		private void applyGlobalBounds() {
 			_globalBounds.X = (_parent != null) ? _parent.GlobalX + _bounds.X + Math.Min(_skew.TopLeftX, _skew.BottomLeftX) : _bounds.X + Math.Min(_skew.TopLeftX, _skew.BottomLeftX);

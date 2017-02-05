@@ -8,7 +8,7 @@ namespace Egg82LibEnhanced.Graphics {
 	public class TileMap : Sprite {
 		//vars
 		private Bitmap currentBitmap = new Bitmap(1, 1);
-		private BitmapAtlas atlas = null;
+		private TextureAtlas atlas = null;
 		private Bitmap[,] bitmaps = null;
 		private string[,] bitmapNames = null;
 		private int numRows = 0;
@@ -18,7 +18,7 @@ namespace Egg82LibEnhanced.Graphics {
 		private bool tilesChanged = false;
 
 		//constructor
-		public TileMap(ref BitmapAtlas atlas, int numColumns, int numRows, int tileWidth, int tileHeight) {
+		public TileMap(ref TextureAtlas atlas, int numColumns, int numRows, int tileWidth, int tileHeight) {
 			if (atlas == null) {
 				throw new ArgumentNullException("atlas");
 			}
@@ -76,7 +76,7 @@ namespace Egg82LibEnhanced.Graphics {
 				throw new Exception("y cannot be greater than numRows.");
 			}
 
-			if (name != null && atlas.HasBitmap(name)) {
+			if (name != null && atlas.HasValue(name)) {
 				if (bitmapNames[x, y] != name) {
 					bitmaps[x, y] = atlas.GetBitmap(name);
 					bitmapNames[x, y] = name;
