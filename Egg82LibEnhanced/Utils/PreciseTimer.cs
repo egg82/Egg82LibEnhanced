@@ -40,7 +40,7 @@ namespace Egg82LibEnhanced.Utils {
 					do {
 						watch.Start();
 						while (watch.Elapsed.TotalMilliseconds < _interval) {
-							Thread.SpinWait(1);
+							Thread.SpinWait(1000);
 						}
 						if (Elapsed != null) {
 							Elapsed.Invoke(this, new PreciseElapsedEventArgs(watch.ElapsedMilliseconds));

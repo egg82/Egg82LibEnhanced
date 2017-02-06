@@ -66,7 +66,7 @@ namespace Egg82LibEnhanced.Base {
 		//public
 		public bool Valid {
 			get {
-				return _isFinalized;
+				return !_isFinalized;
 			}
 		}
 

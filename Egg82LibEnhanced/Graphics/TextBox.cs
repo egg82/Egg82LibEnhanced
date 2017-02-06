@@ -1,5 +1,4 @@
-﻿using Egg82LibEnhanced.Base;
-using Egg82LibEnhanced.Engines;
+﻿using Egg82LibEnhanced.Engines;
 using Egg82LibEnhanced.Enums;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Utils;
@@ -9,7 +8,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 
 namespace Egg82LibEnhanced.Graphics {
-	public class TextBox : Sprite, IInteractable {
+	public class TextBox : DisplayObject, IInteractable {
 		//vars
 		public event EventHandler Entered = null;
 		public event EventHandler Exited = null;

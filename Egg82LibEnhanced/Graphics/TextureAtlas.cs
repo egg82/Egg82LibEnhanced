@@ -225,7 +225,7 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 		private bool parseBool(XmlNode node, string value) {
 			if (node.Attributes == null || node.Attributes[value] == null) {
-				throw new InvalidOperationException("Could not parse bool \"" + value + "\" from given XML at: " + parseString(node, "name") + ".");
+				return false;
 			}
 
 			bool retVal = false;

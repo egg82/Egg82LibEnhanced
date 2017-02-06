@@ -16,8 +16,6 @@ namespace Egg82LibEnhanced.Engines {
 		private IInputEngine inputEngine = (IInputEngine) ServiceLocator.GetService(typeof(IInputEngine));
 		private IPhysicsEngine physicsEngine = (IPhysicsEngine) ServiceLocator.GetService(typeof(IPhysicsEngine));
 
-		private object updateObj = new object();
-
 		//constructor
 		public GameEngine() {
 			updateTimer.Elapsed += onUpdateTimer;
@@ -100,7 +98,10 @@ namespace Egg82LibEnhanced.Engines {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
 					throw new InvalidOperationException("value cannot be NaN or infinity.");
 				}
-				value -= value * 0.12d;
+				value -= value * 0.145d;
+				if (UpdateInterval % value != 0.0d) {
+					value = Math.Round((value / UpdateInterval), MidpointRounding.AwayFromZero) * UpdateInterval;
+				}
 				if (value < 0.001d) {
 					drawTimer.Interval = 0.001d;
 				} else {

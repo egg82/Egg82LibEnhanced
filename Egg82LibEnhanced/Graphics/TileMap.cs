@@ -1,11 +1,10 @@
-﻿using Egg82LibEnhanced.Base;
-using Egg82LibEnhanced.Utils;
+﻿using Egg82LibEnhanced.Utils;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
 namespace Egg82LibEnhanced.Graphics {
-	public class TileMap : Sprite {
+	public class TileMap : DisplayObject {
 		//vars
 		private Bitmap currentBitmap = new Bitmap(1, 1);
 		private TextureAtlas atlas = null;
