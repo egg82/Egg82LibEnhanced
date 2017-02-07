@@ -1,4 +1,5 @@
 ﻿using Egg82LibEnhanced.Enums;
+using Egg82LibEnhanced.Geom;
 using Egg82LibEnhanced.Utils;
 using SharpDX.XInput;
 using System;

@@ -3,7 +3,7 @@ using SFML.System;
 using System;
 using System.Drawing;
 
-namespace Egg82LibEnhanced.Utils {
+namespace Egg82LibEnhanced.Geom {
 	public class PrecisePoint : IEquatable<PrecisePoint>, IPrototype {
 		//vars
 		private double _x = 0.0d;

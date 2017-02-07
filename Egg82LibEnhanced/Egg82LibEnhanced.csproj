@@ -180,10 +180,11 @@
     <Compile Include="Startup\Start.cs" />
     <Compile Include="Utils\CryptoUtil.cs" />
     <Compile Include="Utils\FileUtil.cs" />
+    <Compile Include="Utils\FontUtil.cs" />
     <Compile Include="Utils\ICryptoUtil.cs" />
     <Compile Include="Utils\MathUtil.cs" />
-    <Compile Include="Utils\PrecisePoint.cs" />
-    <Compile Include="Utils\PreciseRectangle.cs" />
+    <Compile Include="Geom\PrecisePoint.cs" />
+    <Compile Include="Geom\PreciseRectangle.cs" />
     <Compile Include="Utils\PreciseTimer.cs" />
     <Compile Include="Utils\QuadTree.cs" />
     <Compile Include="Utils\ReflectUtil.cs" />

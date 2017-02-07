@@ -1,5 +1,5 @@
 ﻿using Egg82LibEnhanced.Enums;
-using Egg82LibEnhanced.Utils;
+using Egg82LibEnhanced.Geom;
 using System;
 
 namespace Egg82LibEnhanced.Events {

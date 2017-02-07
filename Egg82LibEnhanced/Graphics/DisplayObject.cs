@@ -1,5 +1,6 @@
 ﻿using Egg82LibEnhanced.Base;
 using Egg82LibEnhanced.Core;
+using Egg82LibEnhanced.Geom;
 using Egg82LibEnhanced.Patterns.Interfaces;
 using Egg82LibEnhanced.Utils;
 using SFML.Graphics;

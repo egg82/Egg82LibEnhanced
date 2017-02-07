@@ -3,7 +3,7 @@ using SFML.Graphics;
 using System;
 using System.Drawing;
 
-namespace Egg82LibEnhanced.Utils {
+namespace Egg82LibEnhanced.Geom {
 	public class PreciseRectangle : IEquatable<PreciseRectangle>, IPrototype {
 		//vars
 		private double _x = 0.0d;

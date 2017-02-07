@@ -1,7 +1,7 @@
 ﻿using Egg82LibEnhanced.Base;
 using Egg82LibEnhanced.Enums;
 using Egg82LibEnhanced.Events;
-using Egg82LibEnhanced.Utils;
+using Egg82LibEnhanced.Geom;
 using SFML.Window;
 using SharpDX.XInput;
 using System;
