@@ -28,7 +28,7 @@ namespace Egg82LibEnhanced.Base {
 		private bool _isFinalized = false;
 
 		//constructor
-		public BaseWindow(double width, double height, string title, Styles style, bool vSync, uint antialiasing) : base(new VideoMode((uint) width, (uint) height), title, style, new ContextSettings(0, 0, antialiasing)){
+		public BaseWindow(double width, double height, string title, Styles style, bool vSync, uint antialiasing) : base(new VideoMode((uint) width, (uint) height), title, style, new ContextSettings(24, 8, antialiasing)){
 			if (double.IsNaN(width)) {
 				throw new ArgumentNullException("width");
 			}
@@ -48,7 +48,7 @@ namespace Egg82LibEnhanced.Base {
 			SetVerticalSyncEnabled(vSync);
 			SetView(new View(new FloatRect(0.0f, 0.0f, (float) width, (float) height)));
 			_quadTree = new QuadTree<DisplayObject>(new PreciseRectangle(0.0d, 0.0d, width, height));
-
+			
 			SetActive(false);
 
 			_physicsWorld = physicsEngine.CreateWorld();
@@ -234,6 +234,10 @@ namespace Egg82LibEnhanced.Base {
 
 		//private
 		internal void Draw() {
+			if (_isFinalized || !IsOpen) {
+				return;
+			}
+
 			SetActive(true);
 			Clear(Color.Transparent);
 			for (int i = states.Count - 1; i >= 0; i--) {

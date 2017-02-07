@@ -15,7 +15,7 @@ namespace Test {
 		static void Main(string[] args) {
 			Start.ProvideDefaultServices();
 
-			graphicsWindow = new BaseWindow(1280, 720, "Graphics Test", Styles.Titlebar | Styles.Close, true, 16);
+			graphicsWindow = new BaseWindow(1280, 720, "Graphics Test", Styles.Titlebar | Styles.Close, false, 16);
 			graphicsWindow.AddState(new GraphicsTestState());
 			
 			/*physicsWindow = new BaseWindow(1280, 720, "Physics Test", Styles.Titlebar | Styles.Close, true, 16);

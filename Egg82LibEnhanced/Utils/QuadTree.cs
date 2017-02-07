@@ -618,11 +618,12 @@ namespace Egg82LibEnhanced.Utils {
 		internal void Insert(QuadTreeObject<T> item) {
 			// If this quad doesn't contain the items rectangle, do nothing, unless we are the root
 			if (!rect.Contains(item.Data.GlobalBounds)) {
-				System.Diagnostics.Debug.Assert(parent == null, "We are not the root, and this object doesn't fit here. How did we get here?");
+				//System.Diagnostics.Debug.Assert(parent == null, "We are not the root, and this object doesn't fit here. How did we get here?");
 				if (parent == null) {
 					// This object is outside of the QuadTree bounds, we should add it at the root level
 					Add(item);
 				} else {
+					parent.Insert(item);
 					return;
 				}
 			}

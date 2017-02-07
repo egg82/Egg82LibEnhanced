@@ -14,7 +14,7 @@ namespace Test.States {
 		private List<CircleSprite> circles = new List<CircleSprite>();
 
 		private string atlasPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "Images" + Path.DirectorySeparatorChar + "terrain.png";
-		private BitmapAtlas atlas = null;
+		private TextureAtlas atlas = null;
 		private TileMap background = null;
 
 		//constructor
@@ -25,9 +25,9 @@ namespace Test.States {
 		//public
 		public override void OnEnter() {
 			FileUtil.Open(atlasPath);
-			atlas = new BitmapAtlas(TextureUtil.BitmapFromBytes(FileUtil.Read(atlasPath, 0, (int) FileUtil.GetTotalBytes(atlasPath))), 32, 32);
+			atlas = new TextureAtlas(TextureUtil.BitmapFromBytes(FileUtil.Read(atlasPath, 0, (int) FileUtil.GetTotalBytes(atlasPath))), 32, 32);
 			FileUtil.Close(atlasPath);
-			background = new TileMap(atlas, 40, 23, 32, 32);
+			background = new TileMap(ref atlas, 40, 23, 32, 32);
 
 			for (int x = 0; x < 40; x++) {
 				for (int y = 0; y < 23; y++) {
@@ -56,6 +56,8 @@ namespace Test.States {
 				RemoveChild(sprite);
 				circleFactory.ReturnObject(sprite);
 			}
+			RemoveChild(background);
+			atlas.Dispose();
 		}
 
 		//private

@@ -4,6 +4,7 @@ using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Utils;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Egg82LibEnhanced.Engines {
 	public class GameEngine : IGameEngine {
@@ -81,13 +82,13 @@ namespace Egg82LibEnhanced.Engines {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
 					throw new InvalidOperationException("value cannot be NaN or infinity.");
 				}
-				value -= value * 0.145d;
 				if (value < 0.002d) {
 					targetUpdateInterval = 0.002d;
 				} else {
 					targetUpdateInterval = value;
 				}
 				updateTimer.Interval = targetUpdateInterval / 2.0d;
+				//checkDrawInterval();
 			}
 		}
 		public double DrawInterval {
@@ -98,22 +99,19 @@ namespace Egg82LibEnhanced.Engines {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
 					throw new InvalidOperationException("value cannot be NaN or infinity.");
 				}
-				value -= value * 0.145d;
-				if (UpdateInterval % value != 0.0d) {
-					value = Math.Round((value / UpdateInterval), MidpointRounding.AwayFromZero) * UpdateInterval;
-				}
 				if (value < 0.001d) {
 					drawTimer.Interval = 0.001d;
 				} else {
 					drawTimer.Interval = value;
 				}
+				//checkDrawInterval();
 			}
 		}
 
 		//private
 		private void onUpdateTimer(object sender, PreciseElapsedEventArgs e) {
-			double deltaTime = e.ElapsedMilliseconds / targetUpdateInterval;
-
+			double deltaTime = e.DeltaTime / targetUpdateInterval;
+			
 			inputEngine.Update();
 			physicsEngine.Update(deltaTime * 0.001d);
 
@@ -127,6 +125,12 @@ namespace Egg82LibEnhanced.Engines {
 		private void onDrawTimer(object sender, PreciseElapsedEventArgs e) {
 			for (int i = 0; i < windows.Count; i++) {
 				windows[i].Draw();
+			}
+		}
+
+		private void checkDrawInterval() {
+			if (targetUpdateInterval % drawTimer.Interval != 0.0d) {
+				drawTimer.Interval = Math.Round((drawTimer.Interval / targetUpdateInterval), MidpointRounding.AwayFromZero) * targetUpdateInterval;
 			}
 		}
 	}

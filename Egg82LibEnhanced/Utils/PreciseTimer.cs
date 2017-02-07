@@ -25,29 +25,35 @@ namespace Egg82LibEnhanced.Utils {
 			timerThread = new Thread(delegate() {
 				Stopwatch watch = new Stopwatch();
 
+				watch.Start();
+				double lastTime = 0.0d;
+				double ms = 0.0d;
 				if (processors <= 1) {
 					do {
-						watch.Start();
-						while (watch.Elapsed.TotalMilliseconds < _interval) {
+						while (lastTime + watch.Elapsed.TotalMilliseconds < _interval) {
 							Thread.Sleep(1);
 						}
+						ms = watch.Elapsed.TotalMilliseconds;
 						if (Elapsed != null) {
-							Elapsed.Invoke(this, new PreciseElapsedEventArgs(watch.ElapsedMilliseconds));
+							Elapsed.Invoke(this, new PreciseElapsedEventArgs(ms, lastTime + ms));
 						}
-						watch.Reset();
+						lastTime = watch.Elapsed.TotalMilliseconds;
+						watch.Restart();
 					} while (_running && AutoReset);
 				} else {
 					do {
-						watch.Start();
-						while (watch.Elapsed.TotalMilliseconds < _interval) {
+						while (lastTime + watch.Elapsed.TotalMilliseconds < _interval) {
 							Thread.SpinWait(1000);
 						}
+						ms = watch.Elapsed.TotalMilliseconds;
 						if (Elapsed != null) {
-							Elapsed.Invoke(this, new PreciseElapsedEventArgs(watch.ElapsedMilliseconds));
+							Elapsed.Invoke(this, new PreciseElapsedEventArgs(ms, lastTime + ms));
 						}
-						watch.Reset();
+						lastTime = watch.Elapsed.TotalMilliseconds;
+						watch.Restart();
 					} while (_running && AutoReset);
 				}
+				watch.Stop();
 
 				_running = false;
 			});

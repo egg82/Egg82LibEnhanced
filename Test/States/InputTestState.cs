@@ -1,8 +1,8 @@
 ﻿using Egg82LibEnhanced.Base;
 using Egg82LibEnhanced.Engines;
-using Egg82LibEnhanced.Enums.Engines;
+using Egg82LibEnhanced.Enums;
+using Egg82LibEnhanced.Geom;
 using Egg82LibEnhanced.Patterns;
-using Egg82LibEnhanced.Utils;
 using System;
 using Test.Sprites;
 using static SFML.Window.Keyboard;
@@ -28,7 +28,7 @@ namespace Test.States {
 			AddChild(sprite);
 		}
 		public override void OnExit() {
-
+			RemoveChild(sprite);
 		}
 
 		//private
@@ -42,8 +42,8 @@ namespace Test.States {
 				sprite.Rotation += sprite.Speed;
 			}
 
-			PrecisePoint stick = inputEngine.Controllers.GetStickPosition(0, XboxStickCode.Left);
-			if (stick.Length > inputEngine.Controllers.DeadZone) {
+			PrecisePoint stick = inputEngine.Controllers.GetStickPosition(0, XboxStickSide.Left);
+			if (stick.Length > inputEngine.Controllers.StickDeadZone) {
 				sprite.X += stick.X * sprite.Speed;
 				sprite.Rotation += stick.X * sprite.Speed;
 			}

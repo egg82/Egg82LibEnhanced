@@ -24,7 +24,13 @@ namespace Egg82LibEnhanced.Graphics {
 			for (int i = 0; i < children.Count; i++) {
 				children[i].Update(deltaTime);
 			}
+			if (!_flattened) {
+				getNewBounds();
+			}
 			base.Update(deltaTime);
+			if (!_flattened) {
+				getNewBounds();
+			}
 		}
 		public new void SwapBuffers() {
 			for (int i = 0; i < children.Count; i++) {
@@ -36,7 +42,7 @@ namespace Egg82LibEnhanced.Graphics {
 			base.Draw(target, parentTransform);
 
 			for (int i = children.Count - 1; i >= 0; i--) {
-				children[i].Draw(target, GlobalTransform);
+				children[i].Draw(target, globalTransform);
 			}
 		}
 
@@ -62,8 +68,7 @@ namespace Egg82LibEnhanced.Graphics {
 				Unflatten();
 				Flatten();
 			}
-
-			obj.BoundsChanged += onBoundsChanged;
+			
 			getNewBounds();
 
 			children.Insert(index, obj);
@@ -84,8 +89,7 @@ namespace Egg82LibEnhanced.Graphics {
 				Unflatten();
 				Flatten();
 			}
-
-			obj.BoundsChanged -= onBoundsChanged;
+			
 			getNewBounds();
 
 			children.RemoveAt(index);
@@ -136,7 +140,9 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 			set {
 				base.X = value;
-				getNewBounds();
+				if (!_flattened) {
+					getNewBounds();
+				}
 			}
 		}
 		public new double Y {
@@ -145,7 +151,9 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 			set {
 				base.Y = value;
-				getNewBounds();
+				if (!_flattened) {
+					getNewBounds();
+				}
 			}
 		}
 		public new double Width {
@@ -154,7 +162,9 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 			set {
 				base.Width = value;
-				getNewBounds();
+				if (!_flattened) {
+					getNewBounds();
+				}
 			}
 		}
 		public new double Height {
@@ -163,7 +173,9 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 			set {
 				base.Height = value;
-				getNewBounds();
+				if (!_flattened) {
+					getNewBounds();
+				}
 			}
 		}
 

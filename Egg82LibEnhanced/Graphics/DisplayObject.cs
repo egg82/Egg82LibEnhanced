@@ -34,7 +34,7 @@ namespace Egg82LibEnhanced.Graphics {
 		private PreciseRectangle _textureBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
 
 		private PrecisePoint _transformOriginOffset = new PrecisePoint(0.0d, 0.0d);
-		private Transform _globalTransform = Transform.Identity;
+		internal Transform globalTransform = Transform.Identity;
 		private Transform localTransform = Transform.Identity;
 
 		private SpriteSkew _skew = new SpriteSkew();
@@ -72,6 +72,9 @@ namespace Egg82LibEnhanced.Graphics {
 			if (!Visible) {
 				return;
 			}
+			if (_globalBounds.X > target.Size.X || _globalBounds.Y > target.Size.Y || _globalBounds.X + _globalBounds.Width < 0 || _globalBounds.Y + _globalBounds.Height < 0) {
+				return;
+			}
 
 			applyTransforms();
 			renderGraphics();
@@ -84,8 +87,8 @@ namespace Egg82LibEnhanced.Graphics {
 				renderSprite.Color = _color;
 			}
 
-			_globalTransform = parentTransform * localTransform;
-			renderState.Transform = _globalTransform;
+			globalTransform = parentTransform * localTransform;
+			renderState.Transform = globalTransform;
 			target.Draw(graphicsSprite, renderState);
 			target.Draw(renderSprite, renderState);
 		}
@@ -391,12 +394,6 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 
 		//private
-		protected Transform GlobalTransform {
-			get {
-				return _globalTransform;
-			}
-		}
-
 		protected abstract void OnUpdate(double deltaTime);
 		virtual protected void OnSwapBuffers() {
 

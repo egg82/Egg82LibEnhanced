@@ -210,12 +210,12 @@ namespace Egg82LibEnhanced.Core {
 
 			return (triggerCode == XboxTriggerCode.Left) ? states[controller].LeftTrigger / 255.0d : states[controller].RightTrigger / 255.0d;
 		}
-		public PrecisePoint GetStickPosition(int controller, XboxStickSide stickCode) {
+		public PrecisePoint GetStickPosition(int controller, XboxStickSide stickSide) {
 			if (controller < 0 || controller >= states.Length || !controllers[controller].IsConnected) {
 				return new PrecisePoint();
 			}
 
-			return (stickCode == XboxStickSide.Left) ? new PrecisePoint((states[controller].LeftThumbX < 0) ? states[controller].LeftThumbX / 32768.0d : states[controller].LeftThumbX / 32767.0d, (states[controller].LeftThumbY < 0) ? states[controller].LeftThumbY / 32768.0d : states[controller].LeftThumbY / 32767.0d) : new PrecisePoint((states[controller].RightThumbX < 0) ? states[controller].RightThumbX / 32768.0d : states[controller].RightThumbX / 32767.0d, (states[controller].RightThumbY < 0) ? states[controller].RightThumbY / 32768.0d : states[controller].RightThumbY / 32767.0d);
+			return (stickSide == XboxStickSide.Left) ? new PrecisePoint((states[controller].LeftThumbX < 0) ? states[controller].LeftThumbX / 32768.0d : states[controller].LeftThumbX / 32767.0d, (states[controller].LeftThumbY < 0) ? states[controller].LeftThumbY / 32768.0d : states[controller].LeftThumbY / 32767.0d) : new PrecisePoint((states[controller].RightThumbX < 0) ? states[controller].RightThumbX / 32768.0d : states[controller].RightThumbX / 32767.0d, (states[controller].RightThumbY < 0) ? states[controller].RightThumbY / 32768.0d : states[controller].RightThumbY / 32767.0d);
 		}
 
 		public bool CurrentlyUsingController {
