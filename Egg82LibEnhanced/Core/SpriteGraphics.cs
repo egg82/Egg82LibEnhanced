@@ -43,7 +43,7 @@ namespace Egg82LibEnhanced.Core {
 
 		public void DrawArc(Pen pen, double x, double y, double width, double height, double startAngle, double sweepAngle) {
 			if (x + width + pen.Width > graphicsBitmap.Width || y + height + pen.Width > graphicsBitmap.Height) {
-				Bitmap newBitmap = new Bitmap((int) (x + width + pen.Width), (int) (y + height + pen.Width));
+				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, graphicsBitmap.Width), (int) Math.Max(y + height + pen.Width, graphicsBitmap.Height));
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -63,8 +63,8 @@ namespace Egg82LibEnhanced.Core {
 			_changed = true;
 		}
 		public void DrawBezier(Pen pen, double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
-			int maxX = (int) Math.Max(Math.Max(Math.Max(x1 + pen.Width, x2 + pen.Width), x3 + pen.Width), x4 + pen.Width);
-			int maxY = (int) Math.Max(Math.Max(Math.Max(y1 + pen.Width, y2 + pen.Width), y3 + pen.Width), y4 + pen.Width);
+			int maxX = (int) Math.Max(Math.Max(Math.Max(Math.Max(x1 + pen.Width, x2 + pen.Width), x3 + pen.Width), x4 + pen.Width), graphicsBitmap.Width);
+			int maxY = (int) Math.Max(Math.Max(Math.Max(Math.Max(y1 + pen.Width, y2 + pen.Width), y3 + pen.Width), y4 + pen.Width), graphicsBitmap.Height);
 			if (maxX > graphicsBitmap.Width || maxY > graphicsBitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
@@ -86,8 +86,8 @@ namespace Egg82LibEnhanced.Core {
 			_changed = true;
 		}
 		public void DrawBeziers(Pen pen, PrecisePoint[] points) {
-			int maxX = 0;
-			int maxY = 0;
+			int maxX = graphicsBitmap.Width;
+			int maxY = graphicsBitmap.Height;
 
 			for (int i = 0; i < points.Length; i++) {
 				if (points[i].X + pen.Width > maxX) {
@@ -119,8 +119,8 @@ namespace Egg82LibEnhanced.Core {
 			_changed = true;
 		}
 		public void DrawClosedCurve(Pen pen, PrecisePoint[] points, double tension, FillMode fillMode) {
-			int maxX = 0;
-			int maxY = 0;
+			int maxX = graphicsBitmap.Width;
+			int maxY = graphicsBitmap.Height;
 
 			for (int i = 0; i < points.Length; i++) {
 				if ((points[i].X * tension) + pen.Width > maxX) {
@@ -152,8 +152,8 @@ namespace Egg82LibEnhanced.Core {
 			_changed = true;
 		}
 		public void DrawCurve(Pen pen, PrecisePoint[] points, double offset, int numberOfSegments, double tension) {
-			int maxX = 0;
-			int maxY = 0;
+			int maxX = graphicsBitmap.Width;
+			int maxY = graphicsBitmap.Height;
 
 			for (int i = 0; i < points.Length; i++) {
 				if (((points[i].X + offset) * tension) + pen.Width > maxX) {
@@ -186,7 +186,7 @@ namespace Egg82LibEnhanced.Core {
 		}
 		public void DrawEllipse(Pen pen, double x, double y, double width, double height) {
 			if (x + width + pen.Width > graphicsBitmap.Width || y + height + pen.Width > graphicsBitmap.Height) {
-				Bitmap newBitmap = new Bitmap((int) (x + width + pen.Width), (int) (y + height + pen.Width));
+				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, graphicsBitmap.Width), (int) Math.Max(y + height + pen.Width, graphicsBitmap.Height));
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -206,8 +206,8 @@ namespace Egg82LibEnhanced.Core {
 			_changed = true;
 		}
 		public void DrawLine(Pen pen, double x1, double y1, double x2, double y2) {
-			int maxX = (int) Math.Max(x1 + pen.Width, x2 + pen.Width);
-			int maxY = (int) Math.Max(y1 + pen.Width, y2 + pen.Width);
+			int maxX = (int) Math.Max(Math.Max(x1 + pen.Width, x2 + pen.Width), graphicsBitmap.Width);
+			int maxY = (int) Math.Max(Math.Max(y1 + pen.Width, y2 + pen.Width), graphicsBitmap.Height);
 
 			if (maxX > graphicsBitmap.Width || maxY > graphicsBitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
@@ -230,8 +230,8 @@ namespace Egg82LibEnhanced.Core {
 			_changed = true;
 		}
 		public void DrawLines(Pen pen, PrecisePoint[] points) {
-			int maxX = 0;
-			int maxY = 0;
+			int maxX = graphicsBitmap.Width;
+			int maxY = graphicsBitmap.Height;
 
 			for (int i = 0; i < points.Length; i++) {
 				if (points[i].X + pen.Width > maxX) {
@@ -264,7 +264,7 @@ namespace Egg82LibEnhanced.Core {
 		}
 		public void DrawPie(Pen pen, double x, double y, double width, double height, double startAngle, double sweepAngle) {
 			if (x + width + pen.Width > graphicsBitmap.Width || y + height + pen.Width > graphicsBitmap.Height) {
-				Bitmap newBitmap = new Bitmap((int) (x + width + pen.Width), (int) (y + height + pen.Width));
+				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, graphicsBitmap.Width), (int) Math.Max(y + height + pen.Width, graphicsBitmap.Height));
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -284,8 +284,8 @@ namespace Egg82LibEnhanced.Core {
 			_changed = true;
 		}
 		public void DrawPolygon(Pen pen, PrecisePoint[] points) {
-			int maxX = 0;
-			int maxY = 0;
+			int maxX = graphicsBitmap.Width;
+			int maxY = graphicsBitmap.Height;
 
 			for (int i = 0; i < points.Length; i++) {
 				if (points[i].X + pen.Width > maxX) {
@@ -318,7 +318,7 @@ namespace Egg82LibEnhanced.Core {
 		}
 		public void DrawRectangle(Pen pen, double x, double y, double width, double height) {
 			if (x + width + pen.Width > graphicsBitmap.Width || y + height + pen.Width > graphicsBitmap.Height) {
-				Bitmap newBitmap = new Bitmap((int) (x + width + pen.Width), (int) (y + height + pen.Width));
+				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, graphicsBitmap.Width), (int) Math.Max(y + height + pen.Width, graphicsBitmap.Height));
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -338,8 +338,8 @@ namespace Egg82LibEnhanced.Core {
 			_changed = true;
 		}
 		public void DrawRectangles(Pen pen, PreciseRectangle[] rects) {
-			int maxWidth = 0;
-			int maxHeight = 0;
+			int maxWidth = graphicsBitmap.Width;
+			int maxHeight = graphicsBitmap.Height;
 
 			for (int i = 0; i < rects.Length; i++) {
 				if (rects[i].X + rects[i].Width + pen.Width > maxWidth) {
@@ -371,8 +371,8 @@ namespace Egg82LibEnhanced.Core {
 			_changed = true;
 		}
 		public void FillClosedCurve(Pen pen, PrecisePoint[] points, FillMode fillMode, double tension) {
-			int maxX = 0;
-			int maxY = 0;
+			int maxX = graphicsBitmap.Width;
+			int maxY = graphicsBitmap.Height;
 
 			for (int i = 0; i < points.Length; i++) {
 				if ((points[i].X * tension) + pen.Width > maxX) {
@@ -405,7 +405,7 @@ namespace Egg82LibEnhanced.Core {
 		}
 		public void FillEllipse(Pen pen, double x, double y, double width, double height) {
 			if (x + width + pen.Width > graphicsBitmap.Width || y + height + pen.Width > graphicsBitmap.Height) {
-				Bitmap newBitmap = new Bitmap((int) (x + width + pen.Width), (int) (y + height + pen.Width));
+				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, graphicsBitmap.Width), (int) Math.Max(y + height + pen.Width, graphicsBitmap.Height));
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -426,7 +426,7 @@ namespace Egg82LibEnhanced.Core {
 		}
 		public void FillPie(Pen pen, double x, double y, double width, double height, double startAngle, double sweepAngle) {
 			if (x + width + pen.Width > graphicsBitmap.Width || y + height + pen.Width > graphicsBitmap.Height) {
-				Bitmap newBitmap = new Bitmap((int) (x + width + pen.Width), (int) (y + height + pen.Width));
+				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, graphicsBitmap.Width), (int) Math.Max(y + height + pen.Width, graphicsBitmap.Height));
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -446,8 +446,8 @@ namespace Egg82LibEnhanced.Core {
 			_changed = true;
 		}
 		public void FillPolygon(Pen pen, PrecisePoint[] points, FillMode fillMode) {
-			int maxX = 0;
-			int maxY = 0;
+			int maxX = graphicsBitmap.Width;
+			int maxY = graphicsBitmap.Height;
 
 			for (int i = 0; i < points.Length; i++) {
 				if (points[i].X + pen.Width > maxX) {
@@ -480,7 +480,7 @@ namespace Egg82LibEnhanced.Core {
 		}
 		public void FillRectangle(Pen pen, double x, double y, double width, double height) {
 			if (x + width + pen.Width > graphicsBitmap.Width || y + height + pen.Width > graphicsBitmap.Height) {
-				Bitmap newBitmap = new Bitmap((int) (x + width + pen.Width), (int) (y + height + pen.Width));
+				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, graphicsBitmap.Width), (int) Math.Max(y + height + pen.Width, graphicsBitmap.Height));
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -500,8 +500,8 @@ namespace Egg82LibEnhanced.Core {
 			_changed = true;
 		}
 		public void FillRectangles(Pen pen, PreciseRectangle[] rects) {
-			int maxWidth = 0;
-			int maxHeight = 0;
+			int maxWidth = graphicsBitmap.Width;
+			int maxHeight = graphicsBitmap.Height;
 
 			for (int i = 0; i < rects.Length; i++) {
 				if (rects[i].X + rects[i].Width + pen.Width > maxWidth) {

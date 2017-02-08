@@ -122,7 +122,9 @@ namespace Egg82LibEnhanced.Base {
 		}
 		public void SwapBuffers() {
 			for (int i = 0; i < states.Count; i++) {
-				states[i].SwapBuffers();
+				if (states[i].Ready) {
+					states[i].SwapBuffers();
+				}
 			}
 		}
 		
@@ -244,7 +246,9 @@ namespace Egg82LibEnhanced.Base {
 			SetActive(true);
 			Clear(Color.Transparent);
 			for (int i = states.Count - 1; i >= 0; i--) {
-				states[i].Draw(this, Transform.Identity);
+				if (states[i].Ready) {
+					states[i].Draw(this, Transform.Identity);
+				}
 			}
 			Display();
 			SetActive(false);

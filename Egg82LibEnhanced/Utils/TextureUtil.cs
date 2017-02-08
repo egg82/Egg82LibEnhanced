@@ -106,10 +106,21 @@ namespace Egg82LibEnhanced.Utils {
 		}
 
 		public static Bitmap BitmapFromTexture(Texture tex) {
+			if (tex == null) {
+				throw new ArgumentNullException("tex");
+			}
+
 			SFML.Graphics.Image im = tex.CopyToImage();
-			byte[] pixels = im.Pixels;
+			Bitmap bitmap = new Bitmap((int) im.Size.X, (int) im.Size.Y);
+			for (uint x = 0; x < im.Size.X; x++) {
+				for (uint y = 0; y < im.Size.Y; y++) {
+					SFML.Graphics.Color c = im.GetPixel(x, y);
+					bitmap.SetPixel((int) x, (int) y, System.Drawing.Color.FromArgb(c.A, c.R, c.G, c.B));
+				}
+			}
+
 			im.Dispose();
-			return BitmapFromBytes(pixels);
+			return bitmap;
 		}
 
 		/*public static void UpdateTextureWithBitmap(Bitmap bitmap, Texture tex) {

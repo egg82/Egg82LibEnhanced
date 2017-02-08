@@ -10,8 +10,6 @@ using System;
 namespace Egg82LibEnhanced.Graphics {
 	public abstract class DisplayObject : IUpdatable, IDrawable, IQuad {
 		//vars
-		public event EventHandler BoundsChanged = null;
-
 		public bool Visible = true;
 
 		private SpriteGraphics _graphics = new SpriteGraphics();
@@ -32,6 +30,7 @@ namespace Egg82LibEnhanced.Graphics {
 		private PreciseRectangle _globalBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
 		private PreciseRectangle previousTextureBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
 		private PreciseRectangle _textureBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
+		private bool _textureSmoothing = true;
 
 		private PrecisePoint _transformOriginOffset = new PrecisePoint(0.0d, 0.0d);
 		internal Transform globalTransform = Transform.Identity;
@@ -54,8 +53,10 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 
 		//public
-		public void Update(double deltaTime) {
+		public virtual void Update(double deltaTime) {
+			applyGlobalBounds();
 			OnUpdate(deltaTime);
+			applyGlobalBounds();
 
 			if (previousGlobalBounds.X != _globalBounds.X || previousGlobalBounds.Y != _globalBounds.Y) {
 				previousGlobalBounds.X = _globalBounds.X;
@@ -65,10 +66,10 @@ namespace Egg82LibEnhanced.Graphics {
 				}
 			}
 		}
-		public void SwapBuffers() {
+		public virtual void SwapBuffers() {
 			OnSwapBuffers();
 		}
-		public void Draw(RenderTarget target, Transform parentTransform) {
+		public virtual void Draw(RenderTarget target, Transform parentTransform) {
 			if (!Visible) {
 				return;
 			}
@@ -93,7 +94,7 @@ namespace Egg82LibEnhanced.Graphics {
 			target.Draw(renderSprite, renderState);
 		}
 
-		public PreciseRectangle LocalBounds {
+		public virtual PreciseRectangle LocalBounds {
 			get {
 				return (PreciseRectangle) _bounds.Clone();
 			}
@@ -137,7 +138,7 @@ namespace Egg82LibEnhanced.Graphics {
 				return _globalBounds.X;
 			}
 		}
-		public double X {
+		public virtual double X {
 			get {
 				return _bounds.X;
 			}
@@ -146,9 +147,6 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 				_bounds.X = value;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
 			}
 		}
 		public double GlobalY {
@@ -156,7 +154,7 @@ namespace Egg82LibEnhanced.Graphics {
 				return _globalBounds.Y;
 			}
 		}
-		public double Y {
+		public virtual double Y {
 			get {
 				return _bounds.Y;
 			}
@@ -165,9 +163,6 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 				_bounds.Y = value;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
 			}
 		}
 		public double GlobalWidth {
@@ -175,7 +170,7 @@ namespace Egg82LibEnhanced.Graphics {
 				return _globalBounds.Width;
 			}
 		}
-		public double Width {
+		public virtual double Width {
 			get {
 				return _bounds.Width;
 			}
@@ -189,9 +184,6 @@ namespace Egg82LibEnhanced.Graphics {
 					value *= -1;
 				}
 				_bounds.Width = value;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
 			}
 		}
 		public double GlobalHeight {
@@ -199,7 +191,7 @@ namespace Egg82LibEnhanced.Graphics {
 				return _globalBounds.Height;
 			}
 		}
-		public double Height {
+		public virtual double Height {
 			get {
 				return _bounds.Height;
 			}
@@ -213,9 +205,6 @@ namespace Egg82LibEnhanced.Graphics {
 					value *= -1;
 				}
 				_bounds.Height = value;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
 			}
 		}
 
@@ -259,6 +248,8 @@ namespace Egg82LibEnhanced.Graphics {
 					_textureBounds.Width = 0.0d;
 					_textureBounds.Height = 0.0d;
 				} else {
+					value.Smooth = _textureSmoothing;
+
 					if (renderSprite.Texture == null || (_textureBounds.X == 0.0d && _textureBounds.Y == 0.0d && _textureBounds.Width == renderSprite.TextureRect.Width && _textureBounds.Height == renderSprite.TextureRect.Height)) {
 						_textureBounds.Width = value.Size.X;
 						_textureBounds.Height = value.Size.Y;
@@ -269,6 +260,19 @@ namespace Egg82LibEnhanced.Graphics {
 				}
 				applyBounds();
 				applyGlobalBounds();
+			}
+		}
+		public bool TextureSmoothing {
+			get {
+				return _textureSmoothing;
+			}
+			set {
+				if (value == _textureSmoothing) {
+					return;
+				}
+				_textureSmoothing = value;
+				renderSprite.Texture.Smooth = _textureSmoothing;
+				graphicsSprite.Texture.Smooth = _textureSmoothing;
 			}
 		}
 		public Texture GraphicsTexture {
@@ -454,13 +458,10 @@ namespace Egg82LibEnhanced.Graphics {
 		private void applyBounds() {
 			_bounds.Width = (double) Math.Max(renderSprite.TextureRect.Width, _graphics.Bitmap.Width);
 			_bounds.Height = (double) Math.Max(renderSprite.TextureRect.Height, _graphics.Bitmap.Height);
-			if (BoundsChanged != null) {
-				BoundsChanged.Invoke(this, EventArgs.Empty);
-			}
 		}
 		private void applyGlobalBounds() {
-			_globalBounds.X = (_parent != null) ? _parent.GlobalX + _bounds.X + Math.Min(_skew.TopLeftX, _skew.BottomLeftX) : _bounds.X + Math.Min(_skew.TopLeftX, _skew.BottomLeftX);
-			_globalBounds.Y = (_parent != null) ? _parent.GlobalY + _bounds.Y + Math.Min(_skew.TopLeftY, _skew.TopRightY) : _bounds.Y + Math.Min(_skew.TopLeftY, _skew.TopRightY);
+			_globalBounds.X = (_parent != null) ? _parent.GlobalX + _bounds.X - _transformOriginOffset.X + Math.Min(_skew.TopLeftX, _skew.BottomLeftX) : _bounds.X - _transformOriginOffset.X + Math.Min(_skew.TopLeftX, _skew.BottomLeftX);
+			_globalBounds.Y = (_parent != null) ? _parent.GlobalY + _bounds.Y - _transformOriginOffset.Y + Math.Min(_skew.TopLeftY, _skew.TopRightY) : _bounds.Y - _transformOriginOffset.Y + Math.Min(_skew.TopLeftY, _skew.TopRightY);
 			_globalBounds.Width = (_textureBounds.Width * _scale.X) + Math.Max(_skew.TopRightX, _skew.BottomRightX);
 			_globalBounds.Height = (_textureBounds.Height * _scale.Y) + Math.Max(_skew.BottomLeftY, _skew.BottomRightY);
 		}
@@ -471,7 +472,9 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 
 			graphicsSprite.Texture.Dispose();
-			graphicsSprite.Texture = TextureUtil.FromBitmap(_graphics.Bitmap);
+			Texture tex = TextureUtil.FromBitmap(_graphics.Bitmap);
+			tex.Smooth = _textureSmoothing;
+			graphicsSprite.Texture = tex;
 			graphicsSprite.TextureRect = new IntRect(0, 0, _graphics.Bitmap.Width, _graphics.Bitmap.Height);
 			//TextureUtil.UpdateTextureWithBitmap(_graphics.Bitmap, graphicsSprite.Texture);
 

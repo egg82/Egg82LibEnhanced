@@ -18,7 +18,7 @@ namespace Egg82LibEnhanced.Graphics {
 		private Bitmap fontBitmap = new Bitmap(1, 1);
 		private Font _font = null;
 		private string _text = null;
-		private bool _antialiasing = true;
+		private bool _antiAliasing = true;
 		private Color _color = System.Drawing.Color.White;
 
 		private InteractableState _state = InteractableState.Normal;
@@ -36,17 +36,22 @@ namespace Egg82LibEnhanced.Graphics {
 
 			drawString();
 		}
+		~TextBox() {
+			if (Texture != null) {
+				Texture.Dispose();
+			}
+		}
 
 		//public
-		public bool Antialiasing {
+		public bool AntiAliasing {
 			get {
-				return _antialiasing;
+				return _antiAliasing;
 			}
 			set {
-				if (value == _antialiasing) {
+				if (value == _antiAliasing) {
 					return;
 				}
-				_antialiasing = value;
+				_antiAliasing = value;
 				drawString();
 			}
 		}
@@ -142,8 +147,8 @@ namespace Egg82LibEnhanced.Graphics {
 
 			SizeF size = new SizeF();
 			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(fontBitmap)) {
-				g.TextRenderingHint = (_antialiasing) ? TextRenderingHint.AntiAliasGridFit : TextRenderingHint.SingleBitPerPixel;
-				g.SmoothingMode = (_antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
+				g.TextRenderingHint = (_antiAliasing) ? TextRenderingHint.AntiAliasGridFit : TextRenderingHint.SingleBitPerPixel;
+				g.SmoothingMode = (_antiAliasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 				size = g.MeasureString(_text, _font);
 				if (size.Width == fontBitmap.Width && size.Height == fontBitmap.Height) {
 					g.Clear(System.Drawing.Color.Transparent);
@@ -155,8 +160,8 @@ namespace Egg82LibEnhanced.Graphics {
 				fontBitmap.Dispose();
 				fontBitmap = new Bitmap((int) size.Width, (int) size.Height);
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(fontBitmap)) {
-					g.TextRenderingHint = (_antialiasing) ? TextRenderingHint.AntiAliasGridFit : TextRenderingHint.SingleBitPerPixel;
-					g.SmoothingMode = (_antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
+					g.TextRenderingHint = (_antiAliasing) ? TextRenderingHint.AntiAliasGridFit : TextRenderingHint.SingleBitPerPixel;
+					g.SmoothingMode = (_antiAliasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.Clear(System.Drawing.Color.Transparent);
 					g.DrawString(_text, _font, new Pen(_color).Brush, 0.0f, 0.0f);
 				}

@@ -133,7 +133,10 @@ namespace Egg82LibEnhanced.Utils {
 			return streams[path].Length;
 		}
 
-		public static byte[] Read(string path, long position, int length) {
+		public static byte[] Read(string path, long position, long length = -1) {
+			if (path == null) {
+				throw new ArgumentNullException("path");
+			}
 			if (!streams.ContainsKey(path)) {
 				throw new Exception("File is not open.");
 			}
@@ -141,11 +144,20 @@ namespace Egg82LibEnhanced.Utils {
 			if (position < 0) {
 				position = 0;
 			}
+			long totalBytes = GetTotalBytes(path);
+			if (length < 0 || length > totalBytes - position) {
+				length = totalBytes - position;
+			}
 
 			byte[] buffer = new byte[Math.Min(length, streams[path].Length - position)];
 			
 			streams[path].Position = position;
-			streams[path].Read(buffer, 0, length);
+			while (length > int.MaxValue) {
+				streams[path].Read(buffer, 0, int.MaxValue);
+				length -= int.MaxValue;
+				streams[path].Position += int.MaxValue;
+			}
+			streams[path].Read(buffer, 0, (int) length);
 
 			return buffer;
 		}
@@ -167,13 +179,19 @@ namespace Egg82LibEnhanced.Utils {
 			}
 			
 			streams[path].Position = position;
-			streams[path].Write(bytes, 0, bytes.Length);
+			long length = bytes.LongLength;
+			while (length > int.MaxValue) {
+				streams[path].Write(bytes, 0, int.MaxValue);
+				length -= int.MaxValue;
+				streams[path].Position += int.MaxValue;
+			}
+			streams[path].Write(bytes, 0, (int) length);
 			streams[path].Flush(true);
 		}
 
 		public static void Erase(string path) {
 			if (streams.ContainsKey(path)) {
-				streams[path].SetLength(0);
+				streams[path].SetLength(0L);
 				streams[path].Flush(true);
 			} else {
 				DeleteFile(path);
