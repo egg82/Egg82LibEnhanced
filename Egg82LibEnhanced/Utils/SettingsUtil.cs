@@ -1,5 +1,6 @@
 ﻿using Egg82LibEnhanced.Patterns;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -99,25 +100,37 @@ namespace Egg82LibEnhanced.Utils {
 		//private
 		private static void setRegistry(dynamic[] json, IRegistry registry) {
 			for (int i = 0; i < json.Length; i++) {
-				if (json[i].data.Value == null) {
+				if (json[i].data.Type == JTokenType.Array) {
 					try {
 						if (registry.HasRegister(json[i].name.Value)) {
-							registry.SetRegister(json[i].name.Value, registry.GetRegisterType(json[i].name.Value), JsonConvert.DeserializeObject(json[i].data.ToString()));
+							registry.SetRegister(json[i].name.Value, registry.GetRegisterType(json[i].name.Value), json[i].data.ToObject(registry.GetRegisterType(json[i].name.Value)));
 						} else {
-							registry.SetRegister(json[i].name.Value, typeof(object), JsonConvert.DeserializeObject(json[i].data.ToString()));
+							registry.SetRegister(json[i].name.Value, typeof(object[]), json[i].data.ToObject(registry.GetRegisterType(json[i].name.Value)));
 						}
 					} catch (Exception) {
 						
 					}
 				} else {
-					try {
-						if (registry.HasRegister(json[i].name.Value)) {
-							registry.SetRegister(json[i].name.Value, registry.GetRegisterType(json[i].name.Value), json[i].data.Value);
-						} else {
-							registry.SetRegister(json[i].name.Value, typeof(object), json[i].data.Value);
+					if (json[i].data.Value == null) {
+						try {
+							if (registry.HasRegister(json[i].name.Value)) {
+								registry.SetRegister(json[i].name.Value, registry.GetRegisterType(json[i].name.Value), JsonConvert.DeserializeObject(json[i].data.ToString()));
+							} else {
+								registry.SetRegister(json[i].name.Value, typeof(object), JsonConvert.DeserializeObject(json[i].data.ToString()));
+							}
+						} catch (Exception) {
+
 						}
-					} catch (Exception) {
-						
+					} else {
+						try {
+							if (registry.HasRegister(json[i].name.Value)) {
+								registry.SetRegister(json[i].name.Value, registry.GetRegisterType(json[i].name.Value), json[i].data.Value);
+							} else {
+								registry.SetRegister(json[i].name.Value, typeof(object), json[i].data.Value);
+							}
+						} catch (Exception) {
+
+						}
 					}
 				}
 			}

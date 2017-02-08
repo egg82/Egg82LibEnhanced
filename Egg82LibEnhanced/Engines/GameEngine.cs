@@ -4,21 +4,24 @@ using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Utils;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace Egg82LibEnhanced.Engines {
 	public class GameEngine : IGameEngine {
 		//vars
+		public bool DrawSync { get; set; }
+		
 		private List<BaseWindow> windows = new List<BaseWindow>();
 		private PreciseTimer updateTimer = new PreciseTimer((1.0d / 120.0d) * 1000.0d);
 		private double targetUpdateInterval = (1.0d / 60.0d) * 1000.0d;
 		private PreciseTimer drawTimer = new PreciseTimer((1.0d / 60.0d) * 1000.0d);
+		private object drawLock = new object();
 
 		private IInputEngine inputEngine = (IInputEngine) ServiceLocator.GetService(typeof(IInputEngine));
 		private IPhysicsEngine physicsEngine = (IPhysicsEngine) ServiceLocator.GetService(typeof(IPhysicsEngine));
 
 		//constructor
 		public GameEngine() {
+			DrawSync = true;
 			updateTimer.Elapsed += onUpdateTimer;
 			updateTimer.AutoReset = true;
 
@@ -88,7 +91,9 @@ namespace Egg82LibEnhanced.Engines {
 					targetUpdateInterval = value;
 				}
 				updateTimer.Interval = targetUpdateInterval / 2.0d;
-				//checkDrawInterval();
+				if (DrawSync) {
+					checkDrawInterval();
+				}
 			}
 		}
 		public double DrawInterval {
@@ -104,14 +109,25 @@ namespace Egg82LibEnhanced.Engines {
 				} else {
 					drawTimer.Interval = value;
 				}
-				//checkDrawInterval();
+				if (DrawSync) {
+					checkDrawInterval();
+				}
 			}
 		}
 
 		//private
 		private void onUpdateTimer(object sender, PreciseElapsedEventArgs e) {
+			if (DrawSync) {
+				lock (drawLock) {
+					update(e);
+				}
+			} else {
+				update(e);
+			}
+		}
+		private void update(PreciseElapsedEventArgs e) {
 			double deltaTime = e.DeltaTime / targetUpdateInterval;
-			
+
 			inputEngine.Update();
 			physicsEngine.Update(deltaTime * 0.001d);
 
@@ -123,8 +139,21 @@ namespace Egg82LibEnhanced.Engines {
 			}
 		}
 		private void onDrawTimer(object sender, PreciseElapsedEventArgs e) {
-			for (int i = 0; i < windows.Count; i++) {
-				windows[i].Draw();
+			if (DrawSync) {
+				lock (drawLock) {
+					draw();
+				}
+			} else {
+				draw();
+			}
+		}
+		private void draw() {
+			try {
+				for (int i = 0; i < windows.Count; i++) {
+					windows[i].Draw();
+				}
+			} catch (Exception) {
+				
 			}
 		}
 

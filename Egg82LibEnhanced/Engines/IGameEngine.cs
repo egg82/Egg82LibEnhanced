@@ -9,5 +9,6 @@ namespace Egg82LibEnhanced.Engines {
 		int NumWindows { get; }
 		double UpdateInterval { get; set; }
 		double DrawInterval { get; set; }
+		bool DrawSync { get; set; }
 	}
 }

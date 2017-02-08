@@ -83,8 +83,7 @@ namespace Egg82LibEnhanced.Engines {
 			if (windows.Contains(window)) {
 				return;
 			}
-
-			windows.Add(window);
+			
 			window.GainedFocus += onFocused;
 			window.KeyPressed += onKeyDown;
 			window.KeyReleased += onKeyUp;
@@ -92,6 +91,7 @@ namespace Egg82LibEnhanced.Engines {
 			window.MouseWheelScrolled += onMouseWheel;
 			window.MouseButtonPressed += onMouseDown;
 			window.MouseButtonReleased += onMouseUp;
+			windows.Add(window);
 		}
 		public void RemoveWindow(BaseWindow window) {
 			if (window == null) {

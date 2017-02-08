@@ -14,23 +14,25 @@ namespace Egg82LibEnhanced.Graphics {
 		
 		private IInputEngine inputEngine = ServiceLocator.GetService(typeof(IInputEngine));
 
-		private Texture normalTexture = null;
-		private Texture downTexture = null;
-		private Texture hoverTexture = null;
+		private TextureAtlas atlas = null;
+		private string _normalTexture = null;
+		private string _downTexture = null;
+		private string _hoverTexture = null;
 
 		private InteractableState _state = InteractableState.Normal;
 
 		//constructor
-		public Button(Texture normalTexture, Texture downTexture = null, Texture hoverTexture = null) {
+		public Button(ref TextureAtlas atlas, string normalTexture, string downTexture = null, string hoverTexture = null) {
 			if (normalTexture == null) {
 				throw new ArgumentNullException("normalTexture");
 			}
 
-			this.normalTexture = normalTexture;
-			this.downTexture = downTexture;
-			this.hoverTexture = hoverTexture;
+			this.atlas = atlas;
+			_normalTexture = normalTexture;
+			_downTexture = downTexture;
+			_hoverTexture = hoverTexture;
 
-			Texture = normalTexture;
+			Texture = atlas.GetTexture(normalTexture);
 		}
 
 		//public
@@ -40,13 +42,56 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 		}
 
+		public string NormalTexture {
+			get {
+				return _normalTexture;
+			}
+			set {
+				if (value == null || value == _normalTexture) {
+					return;
+				}
+				_normalTexture = value;
+				if (_state == InteractableState.Normal) {
+					Texture = atlas.GetTexture(_normalTexture);
+				}
+			}
+		}
+		public string DownTexture {
+			get {
+				return _downTexture;
+			}
+			set {
+				if (value == _downTexture) {
+					return;
+				}
+				_downTexture = value;
+				if (_state == InteractableState.Down) {
+					Texture = atlas.GetTexture(_downTexture);
+				}
+			}
+		}
+		public string HoverTexture {
+			get {
+				return _hoverTexture;
+			}
+			set {
+				if (value == _hoverTexture) {
+					return;
+				}
+				_hoverTexture = value;
+				if (_state == InteractableState.Hover) {
+					Texture = atlas.GetTexture(_hoverTexture);
+				}
+			}
+		}
+
 		//private
 		protected override void OnUpdate(double deltaTime) {
 			if (inputEngine.Mouse.X >= GlobalX && inputEngine.Mouse.X <= GlobalX + GlobalWidth && inputEngine.Mouse.Y >= GlobalY && inputEngine.Mouse.Y <= GlobalY + GlobalHeight) {
 				if (inputEngine.Mouse.LeftButtonDown) {
 					if (_state != InteractableState.Down) {
-						if (downTexture != null) {
-							Texture = downTexture;
+						if (_downTexture != null) {
+							Texture = atlas.GetTexture(_downTexture);
 						}
 						_state = InteractableState.Down;
 						if (Pressed != null) {
@@ -60,8 +105,8 @@ namespace Egg82LibEnhanced.Graphics {
 						}
 					}
 					if (_state != InteractableState.Hover) {
-						if (hoverTexture != null) {
-							Texture = hoverTexture;
+						if (_hoverTexture != null) {
+							Texture = atlas.GetTexture(_hoverTexture);
 						}
 						_state = InteractableState.Hover;
 						if (Entered != null) {
@@ -71,7 +116,7 @@ namespace Egg82LibEnhanced.Graphics {
 				}
 			} else {
 				if (_state != InteractableState.Normal) {
-					Texture = normalTexture;
+					Texture = atlas.GetTexture(_normalTexture);
 					_state = InteractableState.Normal;
 					if (Exited != null) {
 						Exited.Invoke(this, EventArgs.Empty);

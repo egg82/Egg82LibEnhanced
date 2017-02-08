@@ -20,7 +20,6 @@ namespace Egg82LibEnhanced.Graphics {
 		private string _text = null;
 		private bool _antialiasing = true;
 		private Color _color = System.Drawing.Color.White;
-		private bool dirty = false;
 
 		private InteractableState _state = InteractableState.Normal;
 
@@ -48,7 +47,7 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 				_antialiasing = value;
-				dirty = true;
+				drawString();
 			}
 		}
 
@@ -57,11 +56,11 @@ namespace Egg82LibEnhanced.Graphics {
 				return _font;
 			}
 			set {
-				if (value == null) {
-					throw new ArgumentNullException("value");
+				if (value == null || value == _font) {
+					return;
 				}
 				_font = value;
-				dirty = true;
+				drawString();
 			}
 		}
 		public Color TextColor {
@@ -69,11 +68,11 @@ namespace Egg82LibEnhanced.Graphics {
 				return _color;
 			}
 			set {
-				if (value == null) {
-					throw new ArgumentNullException("value");
+				if (value == null || value == _color) {
+					return;
 				}
 				_color = value;
-				dirty = true;
+				drawString();
 			}
 		}
 		public string Text {
@@ -81,8 +80,11 @@ namespace Egg82LibEnhanced.Graphics {
 				return _text;
 			}
 			set {
+				if (value == _text) {
+					return;
+				}
 				_text = value;
-				dirty = true;
+				drawString();
 			}
 		}
 
@@ -94,12 +96,6 @@ namespace Egg82LibEnhanced.Graphics {
 
 		//private
 		protected override void OnUpdate(double deltaTime) {
-			if (!dirty) {
-				return;
-			}
-			drawString();
-			dirty = false;
-
 			if (inputEngine.Mouse.X >= GlobalX && inputEngine.Mouse.X <= GlobalX + GlobalWidth && inputEngine.Mouse.Y >= GlobalY && inputEngine.Mouse.Y <= GlobalY + GlobalHeight) {
 				if (inputEngine.Mouse.LeftButtonDown) {
 					if (_state != InteractableState.Down) {

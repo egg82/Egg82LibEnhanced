@@ -115,7 +115,9 @@ namespace Egg82LibEnhanced.Base {
 
 		public void Update(double deltaTime) {
 			for (int i = 0; i < states.Count; i++) {
-				states[i].Update(deltaTime);
+				if (states[i].Ready) {
+					states[i].Update(deltaTime);
+				}
 			}
 		}
 		public void SwapBuffers() {
@@ -138,9 +140,10 @@ namespace Egg82LibEnhanced.Base {
 				index = 0;
 			}
 
-			states.Insert(index, state);
 			state.Window = this;
+			states.Insert(index, state);
 			state.OnEnter();
+			state.Ready = true;
 		}
 		public void RemoveState(BaseState state) {
 			if (state == null) {
@@ -151,14 +154,16 @@ namespace Egg82LibEnhanced.Base {
 				return;
 			}
 
-			states.RemoveAt(index);
+			state.Ready = false;
 			state.OnExit();
+			states.RemoveAt(index);
 			state.Window = null;
 		}
 		public BaseState GetStateAt(int index) {
 			if (index < 0 || index >= states.Count) {
 				return null;
 			}
+
 			return states[index];
 		}
 		public int IndexOf(BaseState state) {
@@ -201,11 +206,13 @@ namespace Egg82LibEnhanced.Base {
 				return false;
 			}
 
+			oldState.Ready = false;
 			oldState.OnExit();
 			oldState.Window = null;
-			states[index] = newState;
 			newState.Window = this;
+			states[index] = newState;
 			newState.OnEnter();
+			newState.Ready = true;
 			return true;
 		}
 
@@ -234,10 +241,6 @@ namespace Egg82LibEnhanced.Base {
 
 		//private
 		internal void Draw() {
-			if (_isFinalized || !IsOpen) {
-				return;
-			}
-
 			SetActive(true);
 			Clear(Color.Transparent);
 			for (int i = states.Count - 1; i >= 0; i--) {

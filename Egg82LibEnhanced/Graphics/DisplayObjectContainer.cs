@@ -64,16 +64,16 @@ namespace Egg82LibEnhanced.Graphics {
 				index = 0;
 			}
 
+			obj.Parent = this;
+			obj.Window = Window;
+			children.Insert(index, obj);
+
 			if (_flattened) {
 				Unflatten();
 				Flatten();
 			}
 			
 			getNewBounds();
-
-			children.Insert(index, obj);
-			obj.Parent = this;
-			obj.Window = Window;
 		}
 		public void RemoveChild(DisplayObject obj) {
 			if (obj == null) {
@@ -85,21 +85,22 @@ namespace Egg82LibEnhanced.Graphics {
 				throw new Exception("object is not a child of this object.");
 			}
 
+			children.RemoveAt(index);
+			obj.Parent = null;
+			obj.Window = null;
+
 			if (_flattened) {
 				Unflatten();
 				Flatten();
 			}
 			
 			getNewBounds();
-
-			children.RemoveAt(index);
-			obj.Parent = null;
-			obj.Window = null;
 		}
 		public DisplayObject GetChildAt(int index) {
 			if (index < 0 || index >= children.Count) {
 				throw new IndexOutOfRangeException();
 			}
+
 			return children[index];
 		}
 		public int GetChildIndex(DisplayObject child) {
@@ -125,13 +126,13 @@ namespace Egg82LibEnhanced.Graphics {
 				return;
 			}
 
+			children.RemoveAt(currentIndex);
+			children.Insert(index, child);
+
 			if (_flattened) {
 				Unflatten();
 				Flatten();
 			}
-
-			children.RemoveAt(currentIndex);
-			children.Insert(index, child);
 		}
 
 		public new double X {
