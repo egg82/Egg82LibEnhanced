@@ -11,7 +11,7 @@ namespace Test.States {
 	public class AudioTestState : BaseState {
 		//vars
 		private IAudioEngine audioEngine = ServiceLocator.GetService(typeof(IAudioEngine));
-		private string ambientPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "Audio" + Path.DirectorySeparatorChar + "725191_Subwoofer-Lullaby.mp3";
+		private string ambientPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + ".."  + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Asstes" + Path.DirectorySeparatorChar + "Audio" + Path.DirectorySeparatorChar + "725191_Subwoofer-Lullaby.mp3";
 
 		//constructor
 		public AudioTestState() {

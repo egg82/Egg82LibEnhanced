@@ -14,7 +14,7 @@ namespace Test.Sprites {
 			if (tex != null) {
 				Texture = tex;
 			} else {
-				Texture = new Texture(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "Images" + Path.DirectorySeparatorChar + "ball.png");
+				Texture = new Texture(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + ".."  + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Asstes" + Path.DirectorySeparatorChar + "Images" + Path.DirectorySeparatorChar + "ball.png");
 				Texture.Smooth = true;
 			}
 		}

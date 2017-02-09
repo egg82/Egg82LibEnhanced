@@ -13,7 +13,7 @@ namespace Test.States {
 		private ObjectPool<CircleSprite> circleFactory = new ObjectPool<CircleSprite>(new CircleSprite(), 1000);
 		private List<CircleSprite> circles = new List<CircleSprite>();
 
-		private string atlasPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "Images" + Path.DirectorySeparatorChar + "terrain.png";
+		private string atlasPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + ".."  + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Asstes" + Path.DirectorySeparatorChar + "Images" + Path.DirectorySeparatorChar + "terrain.png";
 		private TextureAtlas atlas = null;
 		private TileMap background = null;
 
