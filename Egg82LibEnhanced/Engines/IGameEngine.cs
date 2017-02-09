@@ -8,8 +8,8 @@ namespace Egg82LibEnhanced.Engines {
 		void RemoveWindow(BaseWindow window);
 		int NumWindows { get; }
 		double UpdateInterval { get; set; }
+		double TargetUpdateInterval { get; set; }
 		double DrawInterval { get; set; }
 		bool DrawSync { get; set; }
-		bool UpdateTwice { get; set; }
 	}
 }
