@@ -39,3 +39,4 @@ C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\a
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\pango-sharp.pdb
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\obj\Debug\Egg82LibEnhanced.dll
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\obj\Debug\Egg82LibEnhanced.pdb
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\obj\Debug\Egg82LibEnhanced.csprojResolveAssemblyReference.cache
