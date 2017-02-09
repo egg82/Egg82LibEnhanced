@@ -6,7 +6,7 @@ namespace Egg82LibEnhanced.Base {
 	public abstract class BaseState : DisplayObjectContainer {
 		//vars
 		private List<Type> exitStates = new List<Type>();
-		internal bool Ready = false;
+		internal volatile bool Ready = false;
 
 		//constructor
 		public BaseState() {

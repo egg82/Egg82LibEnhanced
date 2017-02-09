@@ -477,8 +477,8 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 		}
 		private void applyGlobalBounds() {
-			_globalBounds.X = (_parent != null) ? _parent.GlobalX + _bounds.X - _transformOriginOffset.X + Math.Min(_skew.TopLeftX, _skew.BottomLeftX) : _bounds.X - _transformOriginOffset.X + Math.Min(_skew.TopLeftX, _skew.BottomLeftX);
-			_globalBounds.Y = (_parent != null) ? _parent.GlobalY + _bounds.Y - _transformOriginOffset.Y + Math.Min(_skew.TopLeftY, _skew.TopRightY) : _bounds.Y - _transformOriginOffset.Y + Math.Min(_skew.TopLeftY, _skew.TopRightY);
+			_globalBounds.X = (_parent != null) ? _parent.GlobalX + _bounds.X - (_transformOriginOffset.X / 2.0d) + Math.Min(_skew.TopLeftX, _skew.BottomLeftX) : _bounds.X - (_transformOriginOffset.X / 2.0d) + Math.Min(_skew.TopLeftX, _skew.BottomLeftX);
+			_globalBounds.Y = (_parent != null) ? _parent.GlobalY + _bounds.Y - (_transformOriginOffset.Y / 2.0d) + Math.Min(_skew.TopLeftY, _skew.TopRightY) : _bounds.Y - (_transformOriginOffset.Y / 2.0d) + Math.Min(_skew.TopLeftY, _skew.TopRightY);
 			_globalBounds.Width = (_textureBounds.Width * _scale.X) + Math.Max(_skew.TopRightX, _skew.BottomRightX);
 			_globalBounds.Height = (_textureBounds.Height * _scale.Y) + Math.Max(_skew.BottomLeftY, _skew.BottomRightY);
 		}

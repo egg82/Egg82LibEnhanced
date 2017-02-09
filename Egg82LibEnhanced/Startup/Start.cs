@@ -56,7 +56,7 @@ namespace Egg82LibEnhanced.Startup {
 		public static void UpdateEvents() {
 			_numWindowsOpen = 0;
 			for (int i = windows.Count - 1; i >= 0; i--) {
-				windows[i].UpdateEvents();
+				windows[i].DispatchEvents();
 				if (windows[i].IsOpen) {
 					_numWindowsOpen++;
 				} else {

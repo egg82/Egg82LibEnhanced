@@ -71,27 +71,6 @@ namespace Egg82LibEnhanced.Base {
 			}
 		}
 
-		public void UpdateEvents() {
-			/*Event e;
-			while (PollEvent(out e)) {
-				if (e.Type == EventType.Closed) {
-					while (states.Count > 0) {
-						BaseState state = states[0];
-						states.RemoveAt(0);
-						state.OnExit();
-						state.Window = null;
-					}
-					gameEngine.RemoveWindow(this);
-					inputEngine.RemoveWindow(this);
-					physicsEngine.RemoveWorld(_physicsWorld);
-					Close();
-				} else if (e.Type == EventType.Resized) {
-					onResize();
-				}
-			}*/
-			DispatchEvents();
-		}
-
 		public double X {
 			get {
 				return (double) Position.X;
