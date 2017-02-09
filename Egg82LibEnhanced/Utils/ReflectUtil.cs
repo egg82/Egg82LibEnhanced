@@ -24,6 +24,13 @@ namespace Egg82LibEnhanced.Utils {
 			return classToTest == baseClass || classToTest.IsSubclassOf(baseClass) || classToTest.IsAssignableFrom(baseClass);
 		}
 
+		public static Func<T> FunctionFromPropertyGetter<T>(object obj, string propertyName) {
+			return (Func<T>) Delegate.CreateDelegate(typeof(Func<T>), obj, obj.GetType().GetProperty(propertyName).GetGetMethod());
+		}
+		public static Action<T> ActionFromPropertySetter<T>(object obj, string propertyName) {
+			return (Action<T>) Delegate.CreateDelegate(typeof(Action<T>), obj, obj.GetType().GetProperty(propertyName).GetSetMethod());
+		}
+
 		//private
 
 	}

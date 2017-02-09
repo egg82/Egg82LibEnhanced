@@ -111,9 +111,13 @@
   <ItemGroup>
     <Compile Include="Core\IMod.cs" />
     <Compile Include="Core\ModContainer.cs" />
+    <Compile Include="Engines\Nulls\NullAudioEngine.cs" />
+    <Compile Include="Engines\Nulls\NullPhysicsEngine.cs" />
+    <Compile Include="Enums\EasingType.cs" />
     <Compile Include="Events\ModDataEventArgs.cs" />
     <Compile Include="Events\StickEventArgs.cs" />
     <Compile Include="Events\TriggerEventArgs.cs" />
+    <Compile Include="Utils\Easing.cs" />
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Base\BaseState.cs" />
     <Compile Include="Core\Controllers.cs" />
@@ -194,6 +198,7 @@
     <Compile Include="Utils\SettingsUtil.cs" />
     <Compile Include="Utils\SQLite.cs" />
     <Compile Include="Utils\TextureUtil.cs" />
+    <Compile Include="Utils\Tween.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

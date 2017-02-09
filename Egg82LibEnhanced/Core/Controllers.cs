@@ -10,6 +10,7 @@ namespace Egg82LibEnhanced.Core {
 		private bool _currentlyUsingController = false;
 		internal Controller[] controllers = new Controller[4];
 		internal Gamepad[] states = new Gamepad[4];
+		internal int[] stateNumbers = new int[4];
 		private double _stickDeadZone = 0.05d;
 		private double _triggerDeadZone = 0.1d;
 		private int _numControllers = 0;

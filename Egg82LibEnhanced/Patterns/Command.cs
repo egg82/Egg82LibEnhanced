@@ -53,7 +53,7 @@ namespace Egg82LibEnhanced.Patterns {
 			onExecute(MathUtil.TicksToMilliseconds(e.SignalTime.Ticks) - startTime);
 		}
 		private void onPreciseElapsed(object sender, PreciseElapsedEventArgs e) {
-			onExecute(e.ElapsedMilliseconds);
+			onExecute(e.TotalMilliseconds);
 		}
 	}
 }

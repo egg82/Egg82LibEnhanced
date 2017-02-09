@@ -9,6 +9,7 @@ namespace Egg82LibEnhanced.Engines {
 	public class GameEngine : IGameEngine {
 		//vars
 		public bool DrawSync { get; set; }
+		public bool UpdateTwice { get; set; }
 		
 		private List<BaseWindow> windows = new List<BaseWindow>();
 		private PreciseTimer updateTimer = new PreciseTimer((1.0d / 120.0d) * 1000.0d);
@@ -22,6 +23,7 @@ namespace Egg82LibEnhanced.Engines {
 		//constructor
 		public GameEngine() {
 			DrawSync = true;
+			UpdateTwice = true;
 			updateTimer.Elapsed += onUpdateTimer;
 			updateTimer.AutoReset = true;
 
@@ -90,7 +92,11 @@ namespace Egg82LibEnhanced.Engines {
 				} else {
 					targetUpdateInterval = value;
 				}
-				updateTimer.Interval = targetUpdateInterval / 2.0d;
+				if (UpdateTwice) {
+					updateTimer.Interval = targetUpdateInterval / 2.0d;
+				} else {
+					updateTimer.Interval = targetUpdateInterval;
+				}
 				if (DrawSync) {
 					checkDrawInterval();
 				}

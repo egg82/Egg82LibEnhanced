@@ -37,6 +37,7 @@ C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\g
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\glib-sharp.pdb
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\atk-sharp.pdb
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\pango-sharp.pdb
-C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\obj\Debug\Egg82LibEnhanced.csprojResolveAssemblyReference.cache
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\obj\Debug\Egg82LibEnhanced.dll
 C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\obj\Debug\Egg82LibEnhanced.pdb
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\Egg82LibEnhanced.dll.CodeAnalysisLog.xml
+C:\Users\eggys\Dropbox\C# Projects\Egg82LibEnhanced\Egg82LibEnhanced\bin\Debug\Egg82LibEnhanced.dll.lastcodeanalysissucceeded

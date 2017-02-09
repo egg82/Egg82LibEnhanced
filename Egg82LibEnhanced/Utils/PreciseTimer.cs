@@ -10,54 +10,25 @@ namespace Egg82LibEnhanced.Utils {
 		public bool AutoReset = false;
 
 		private double _interval = 0.0d;
-		private bool _running = false;
+		private volatile bool _running = false;
 		private int processors = Environment.ProcessorCount;
 
 		private Thread timerThread = null;
 
 		//constructor
-		public PreciseTimer(double interval) {
+		public PreciseTimer(double interval, bool autoStart = false, bool autoReset = false) {
 			if (interval < 0.0d) {
 				interval = 0.0d;
 			}
 			_interval = interval;
 
-			timerThread = new Thread(delegate() {
-				Stopwatch watch = new Stopwatch();
+			AutoReset = autoReset;
 
-				watch.Start();
-				double lastTime = 0.0d;
-				double ms = 0.0d;
-				if (processors <= 1) {
-					do {
-						while (lastTime + watch.Elapsed.TotalMilliseconds < _interval) {
-							Thread.Sleep(1);
-						}
-						ms = watch.Elapsed.TotalMilliseconds;
-						if (Elapsed != null) {
-							Elapsed.Invoke(this, new PreciseElapsedEventArgs(ms, lastTime + ms));
-						}
-						lastTime = watch.Elapsed.TotalMilliseconds;
-						watch.Restart();
-					} while (_running && AutoReset);
-				} else {
-					do {
-						while (lastTime + watch.Elapsed.TotalMilliseconds < _interval) {
-							Thread.SpinWait(1000);
-						}
-						ms = watch.Elapsed.TotalMilliseconds;
-						if (Elapsed != null) {
-							Elapsed.Invoke(this, new PreciseElapsedEventArgs(ms, lastTime + ms));
-						}
-						lastTime = watch.Elapsed.TotalMilliseconds;
-						watch.Restart();
-					} while (_running && AutoReset);
-				}
-				watch.Stop();
-
-				_running = false;
-			});
-			timerThread.Priority = ThreadPriority.AboveNormal;
+			setThread();
+			if (autoStart) {
+				_running = true;
+				timerThread.Start();
+			}
 		}
 		~PreciseTimer() {
 			Stop();
@@ -69,15 +40,17 @@ namespace Egg82LibEnhanced.Utils {
 			if (_running || _interval == 0.0d) {
 				return;
 			}
-			
-			timerThread.Start();
 			_running = true;
+
+			try {
+				timerThread.Abort();
+				setThread();
+				timerThread.Start();
+			} catch (Exception) {
+
+			}
 		}
 		public void Stop() {
-			if (!_running) {
-				return;
-			}
-			
 			_running = false;
 		}
 
@@ -100,6 +73,42 @@ namespace Egg82LibEnhanced.Utils {
 		}
 
 		//private
+		private void setThread() {
+			timerThread = new Thread(delegate () {
+				Stopwatch watch = new Stopwatch();
 
+				watch.Start();
+				double lastTime = 0.0d;
+				if (processors <= 1) {
+					do {
+						while (lastTime + watch.Elapsed.TotalMilliseconds < _interval) {
+							Thread.Sleep(1);
+						}
+						double ms = watch.Elapsed.TotalMilliseconds;
+						double dt = ms - lastTime;
+						lastTime = ms;
+						if (Elapsed != null) {
+							Elapsed.Invoke(this, new PreciseElapsedEventArgs(ms, dt));
+						}
+					} while (_running && AutoReset);
+				} else {
+					do {
+						while (lastTime + watch.Elapsed.TotalMilliseconds < _interval) {
+							Thread.SpinWait(1000);
+						}
+						double ms = watch.Elapsed.TotalMilliseconds;
+						double dt = ms - lastTime;
+						lastTime = ms;
+						if (Elapsed != null) {
+							Elapsed.Invoke(this, new PreciseElapsedEventArgs(ms, dt));
+						}
+					} while (_running && AutoReset);
+				}
+				watch.Stop();
+
+				_running = false;
+			});
+			timerThread.Priority = ThreadPriority.AboveNormal;
+		}
 	}
 }

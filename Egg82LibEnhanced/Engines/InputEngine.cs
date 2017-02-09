@@ -122,8 +122,15 @@ namespace Egg82LibEnhanced.Engines {
 					continue;
 				}
 
-				Gamepad tempState = _controllers.controllers[i].GetState().Gamepad;
 				_controllers.NumControllers++;
+
+				State s = _controllers.controllers[i].GetState();
+				if (s.PacketNumber == _controllers.stateNumbers[i]) {
+					continue;
+				}
+				_controllers.stateNumbers[i] = s.PacketNumber;
+
+				Gamepad tempState = s.Gamepad;
 
 				if ((tempState.Buttons & GamepadButtonFlags.A) != GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.A) == GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;

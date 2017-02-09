@@ -4,20 +4,20 @@ namespace Egg82LibEnhanced.Events {
 	public class PreciseElapsedEventArgs : EventArgs {
 		//vars
 		public static readonly new PreciseElapsedEventArgs Empty = new PreciseElapsedEventArgs(0.0d, 0.0d);
-
-		private double _elapsedMilliseconds = 0.0d;
+		
+		private double _totalMilliseconds = 0.0d;
 		private double _deltaTime = 0.0d;
 
 		//constructor
-		public PreciseElapsedEventArgs(double elapsedMilliseconds, double deltaTime) {
-			_elapsedMilliseconds = elapsedMilliseconds;
+		public PreciseElapsedEventArgs(double totalMilliseconds, double deltaTime) {
+			_totalMilliseconds = totalMilliseconds;
 			_deltaTime = deltaTime;
 		}
 
 		//public
-		public double ElapsedMilliseconds {
+		public double TotalMilliseconds {
 			get {
-				return _elapsedMilliseconds;
+				return _totalMilliseconds;
 			}
 		}
 		public double DeltaTime {

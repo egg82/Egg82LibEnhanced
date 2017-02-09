@@ -1,5 +1,6 @@
 ﻿using Egg82LibEnhanced.Base;
 using Egg82LibEnhanced.Engines;
+using Egg82LibEnhanced.Engines.Nulls;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Utils;
 using System;
@@ -17,12 +18,16 @@ namespace Egg82LibEnhanced.Startup {
 		}
 
 		//public
-		public static void ProvideDefaultServices() {
+		public static void ProvideDefaultServices(bool physics = false) {
 			ServiceLocator.ProvideService(typeof(AudioEngine));
 			ServiceLocator.ProvideService(typeof(ModEngine));
 			ServiceLocator.ProvideService(typeof(CryptoUtil));
 
-			ServiceLocator.ProvideService(typeof(PhysicsEngine), false);
+			if (physics) {
+				ServiceLocator.ProvideService(typeof(PhysicsEngine), false);
+			} else {
+				ServiceLocator.ProvideService(typeof(NullPhysicsEngine), false);
+			}
 			ServiceLocator.ProvideService(typeof(InputEngine), false);
 			ServiceLocator.ProvideService(typeof(GameEngine), false);
 		}

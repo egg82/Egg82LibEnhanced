@@ -86,7 +86,9 @@ namespace Egg82LibEnhanced.Engines {
 
 			float dt = (float) (deltaTime * _speed);
 			for (int i = 0; i < worlds.Count; i++) {
-				worlds[i].Step(dt);
+				if (worlds[i].BodyList.Count > 0 || worlds[i].BreakableBodyList.Count > 0) {
+					worlds[i].Step(dt);
+				}
 			}
 		}
 

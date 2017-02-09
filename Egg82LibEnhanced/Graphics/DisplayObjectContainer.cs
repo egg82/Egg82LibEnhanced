@@ -11,6 +11,7 @@ namespace Egg82LibEnhanced.Graphics {
 		private List<DisplayObject> children = new List<DisplayObject>();
 		private bool _flattened = false;
 		private PreciseRectangle _childrenBoundsRect = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
+		private bool boundsChanged = false;
 		private Bitmap flattenedBitmap = null;
 		private Texture oldTexture = null;
 
@@ -18,10 +19,18 @@ namespace Egg82LibEnhanced.Graphics {
 		public DisplayObjectContainer() {
 			Graphics.BoundsChanged += onBoundsChanged;
 		}
+		~DisplayObjectContainer() {
+			for (int i = 0; i < children.Count; i++) {
+				children[i].BoundsChanged -= onBoundsChanged;
+			}
+		}
 
 		//public
 		public override PreciseRectangle LocalBounds {
 			get {
+				if (boundsChanged && !_flattened) {
+					getNewBounds();
+				}
 				return (PreciseRectangle) _childrenBoundsRect.Clone();
 			}
 		}
@@ -30,11 +39,11 @@ namespace Egg82LibEnhanced.Graphics {
 			for (int i = 0; i < children.Count; i++) {
 				children[i].Update(deltaTime);
 			}
-			if (!_flattened) {
+			if (boundsChanged && !_flattened) {
 				getNewBounds();
 			}
 			base.Update(deltaTime);
-			if (!_flattened) {
+			if (boundsChanged && !_flattened) {
 				getNewBounds();
 			}
 		}
@@ -70,6 +79,7 @@ namespace Egg82LibEnhanced.Graphics {
 				index = 0;
 			}
 
+			obj.BoundsChanged += onBoundsChanged;
 			obj.Parent = this;
 			obj.Window = Window;
 			children.Insert(index, obj);
@@ -78,8 +88,8 @@ namespace Egg82LibEnhanced.Graphics {
 				Unflatten();
 				Flatten();
 			}
-			
-			getNewBounds();
+
+			boundsChanged = true;
 		}
 		public void RemoveChild(DisplayObject obj) {
 			if (obj == null) {
@@ -91,6 +101,7 @@ namespace Egg82LibEnhanced.Graphics {
 				throw new Exception("object is not a child of this object.");
 			}
 
+			obj.BoundsChanged -= onBoundsChanged;
 			children.RemoveAt(index);
 			obj.Parent = null;
 			obj.Window = null;
@@ -99,8 +110,8 @@ namespace Egg82LibEnhanced.Graphics {
 				Unflatten();
 				Flatten();
 			}
-			
-			getNewBounds();
+
+			boundsChanged = true;
 		}
 		public DisplayObject GetChildAt(int index) {
 			if (index < 0 || index >= children.Count) {
@@ -148,46 +159,50 @@ namespace Egg82LibEnhanced.Graphics {
 
 		public override double X {
 			get {
+				if (boundsChanged && !_flattened) {
+					getNewBounds();
+				}
 				return base.X + _childrenBoundsRect.X;
 			}
 			set {
 				base.X = value - _childrenBoundsRect.X;
-				if (!_flattened) {
-					getNewBounds();
-				}
+				boundsChanged = true;
 			}
 		}
 		public override double Y {
 			get {
+				if (boundsChanged && !_flattened) {
+					getNewBounds();
+				}
 				return base.Y + _childrenBoundsRect.Y;
 			}
 			set {
 				base.Y = value - _childrenBoundsRect.Y;
-				if (!_flattened) {
-					getNewBounds();
-				}
+				boundsChanged = true;
 			}
 		}
 		public override double Width {
 			get {
+				if (boundsChanged && !_flattened) {
+					getNewBounds();
+				}
 				return Math.Max(base.Width, _childrenBoundsRect.Width);
 			}
 			set {
 				base.Width = value - _childrenBoundsRect.Width;
-				if (!_flattened) {
-					getNewBounds();
-				}
+				boundsChanged = true;
 			}
 		}
 		public override double Height {
 			get {
+				if (boundsChanged && !_flattened) {
+					getNewBounds();
+				}
 				return Math.Max(base.Height, _childrenBoundsRect.Height);
 			}
 			set {
 				base.Height = value - _childrenBoundsRect.Height;
-				if (!_flattened) {
-					getNewBounds();
-				}
+				boundsChanged = true;
 			}
 		}
 
@@ -224,6 +239,10 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 
 		public Bitmap GetFlattenedBitmap() {
+			if (boundsChanged && !_flattened) {
+				getNewBounds();
+			}
+
 			Bitmap retVal = new Bitmap((int) _childrenBoundsRect.Width, (int) _childrenBoundsRect.Height);
 
 			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(retVal)) {
@@ -272,11 +291,11 @@ namespace Egg82LibEnhanced.Graphics {
 			_childrenBoundsRect.Y = minY;
 			_childrenBoundsRect.Width = maxWidth;
 			_childrenBoundsRect.Height = maxHeight;
+
+			boundsChanged = false;
 		}
 		private void onBoundsChanged(object sender, EventArgs e) {
-			if (!_flattened) {
-				getNewBounds();
-			}
+			boundsChanged = true;
 		}
 	}
 }

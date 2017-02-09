@@ -10,5 +10,6 @@ namespace Egg82LibEnhanced.Engines {
 		double UpdateInterval { get; set; }
 		double DrawInterval { get; set; }
 		bool DrawSync { get; set; }
+		bool UpdateTwice { get; set; }
 	}
 }

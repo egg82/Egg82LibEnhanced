@@ -12,6 +12,8 @@ namespace Egg82LibEnhanced.Graphics {
 		//vars
 		public bool Visible = true;
 
+		public event EventHandler BoundsChanged = null;
+
 		private SpriteGraphics _graphics = new SpriteGraphics();
 		private SFML.Graphics.Sprite graphicsSprite = new SFML.Graphics.Sprite();
 		private RenderStates renderState = RenderStates.Default;
@@ -147,6 +149,9 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 				_bounds.X = value;
+				if (BoundsChanged != null) {
+					BoundsChanged.Invoke(this, EventArgs.Empty);
+				}
 			}
 		}
 		public double GlobalY {
@@ -163,6 +168,9 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 				_bounds.Y = value;
+				if (BoundsChanged != null) {
+					BoundsChanged.Invoke(this, EventArgs.Empty);
+				}
 			}
 		}
 		public double GlobalWidth {
@@ -184,6 +192,9 @@ namespace Egg82LibEnhanced.Graphics {
 					value *= -1;
 				}
 				_bounds.Width = value;
+				if (BoundsChanged != null) {
+					BoundsChanged.Invoke(this, EventArgs.Empty);
+				}
 			}
 		}
 		public double GlobalHeight {
@@ -205,6 +216,9 @@ namespace Egg82LibEnhanced.Graphics {
 					value *= -1;
 				}
 				_bounds.Height = value;
+				if (BoundsChanged != null) {
+					BoundsChanged.Invoke(this, EventArgs.Empty);
+				}
 			}
 		}
 
@@ -458,6 +472,9 @@ namespace Egg82LibEnhanced.Graphics {
 		private void applyBounds() {
 			_bounds.Width = (double) Math.Max(renderSprite.TextureRect.Width, _graphics.Bitmap.Width);
 			_bounds.Height = (double) Math.Max(renderSprite.TextureRect.Height, _graphics.Bitmap.Height);
+			if (BoundsChanged != null) {
+				BoundsChanged.Invoke(this, EventArgs.Empty);
+			}
 		}
 		private void applyGlobalBounds() {
 			_globalBounds.X = (_parent != null) ? _parent.GlobalX + _bounds.X - _transformOriginOffset.X + Math.Min(_skew.TopLeftX, _skew.BottomLeftX) : _bounds.X - _transformOriginOffset.X + Math.Min(_skew.TopLeftX, _skew.BottomLeftX);
