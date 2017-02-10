@@ -58,9 +58,7 @@ namespace Egg82LibEnhanced.Utils {
 			}
 
 			if (running) {
-				if (Complete != null) {
-					Complete.Invoke(this, EventArgs.Empty);
-				}
+				Complete?.Invoke(this, EventArgs.Empty);
 			}
 		}
 
@@ -142,9 +140,7 @@ namespace Egg82LibEnhanced.Utils {
 				tweens.Remove(this);
 			}
 			totalMillis = 0.0d;
-			if (Complete != null) {
-				Complete.Invoke(this, EventArgs.Empty);
-			}
+			Complete?.Invoke(this, EventArgs.Empty);
 		}
 		public void Start() {
 			lock (listLock) {
@@ -164,9 +160,7 @@ namespace Egg82LibEnhanced.Utils {
 				lock (listLock) {
 					tweens.Remove(this);
 				}
-				if (Complete != null) {
-					Complete.Invoke(this, EventArgs.Empty);
-				}
+				Complete?.Invoke(this, EventArgs.Empty);
 			}
 		}
 	}

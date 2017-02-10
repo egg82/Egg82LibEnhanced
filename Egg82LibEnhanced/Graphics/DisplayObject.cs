@@ -75,9 +75,6 @@ namespace Egg82LibEnhanced.Graphics {
 			if (!Visible) {
 				return;
 			}
-			if (_globalBounds.X > target.Size.X || _globalBounds.Y > target.Size.Y || _globalBounds.X + _globalBounds.Width < 0 || _globalBounds.Y + _globalBounds.Height < 0) {
-				return;
-			}
 
 			applyTransforms();
 			renderGraphics();
@@ -149,6 +146,7 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 				_bounds.X = value;
+				applyGlobalBounds();
 				if (BoundsChanged != null) {
 					BoundsChanged.Invoke(this, EventArgs.Empty);
 				}
@@ -168,6 +166,7 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 				_bounds.Y = value;
+				applyGlobalBounds();
 				if (BoundsChanged != null) {
 					BoundsChanged.Invoke(this, EventArgs.Empty);
 				}
@@ -192,6 +191,7 @@ namespace Egg82LibEnhanced.Graphics {
 					value *= -1;
 				}
 				_bounds.Width = value;
+				applyGlobalBounds();
 				if (BoundsChanged != null) {
 					BoundsChanged.Invoke(this, EventArgs.Empty);
 				}
@@ -216,6 +216,7 @@ namespace Egg82LibEnhanced.Graphics {
 					value *= -1;
 				}
 				_bounds.Height = value;
+				applyGlobalBounds();
 				if (BoundsChanged != null) {
 					BoundsChanged.Invoke(this, EventArgs.Empty);
 				}
@@ -232,6 +233,7 @@ namespace Egg82LibEnhanced.Graphics {
 				}
 				applyTransforms();
 				_transformOriginOffset.X = value;
+				applyGlobalBounds();
 				graphicsSprite.Origin = new Vector2f((float) _transformOriginOffset.X, (float) _transformOriginOffset.Y);
 				renderSprite.Origin = new Vector2f((float) _transformOriginOffset.X, (float) _transformOriginOffset.Y);
 			}
@@ -246,6 +248,7 @@ namespace Egg82LibEnhanced.Graphics {
 				}
 				applyTransforms();
 				_transformOriginOffset.Y = value;
+				applyGlobalBounds();
 				graphicsSprite.Origin = new Vector2f((float) _transformOriginOffset.X, (float) _transformOriginOffset.Y);
 				renderSprite.Origin = new Vector2f((float) _transformOriginOffset.X, (float) _transformOriginOffset.Y);
 			}
@@ -372,6 +375,7 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 				_rotation = value;
+				applyGlobalBounds();
 			}
 		}
 		public Color Color {
@@ -472,6 +476,7 @@ namespace Egg82LibEnhanced.Graphics {
 		private void applyBounds() {
 			_bounds.Width = (double) Math.Max(renderSprite.TextureRect.Width, _graphics.Bitmap.Width);
 			_bounds.Height = (double) Math.Max(renderSprite.TextureRect.Height, _graphics.Bitmap.Height);
+			applyGlobalBounds();
 			if (BoundsChanged != null) {
 				BoundsChanged.Invoke(this, EventArgs.Empty);
 			}
@@ -487,6 +492,7 @@ namespace Egg82LibEnhanced.Graphics {
 			if (!_graphics.Changed) {
 				return;
 			}
+			_graphics.Changed = false;
 
 			graphicsSprite.Texture.Dispose();
 			Texture tex = TextureUtil.FromBitmap(_graphics.Bitmap);
@@ -494,8 +500,6 @@ namespace Egg82LibEnhanced.Graphics {
 			graphicsSprite.Texture = tex;
 			graphicsSprite.TextureRect = new IntRect(0, 0, _graphics.Bitmap.Width, _graphics.Bitmap.Height);
 			//TextureUtil.UpdateTextureWithBitmap(_graphics.Bitmap, graphicsSprite.Texture);
-
-			_graphics.Changed = false;
 		}
 		private void onGraphicsBoundsChanged(object sender, EventArgs e) {
 			applyBounds();

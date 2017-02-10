@@ -95,7 +95,8 @@ namespace Egg82LibEnhanced.Graphics {
 			if (!tilesChanged) {
 				return;
 			}
-			
+			tilesChanged = false;
+
 			currentBitmap.Dispose();
 			Texture.Dispose();
 
@@ -111,9 +112,8 @@ namespace Egg82LibEnhanced.Graphics {
 					}
 				}
 			}
-			
+
 			Texture = TextureUtil.FromBitmap(currentBitmap);
-			tilesChanged = false;
 		}
 	}
 }

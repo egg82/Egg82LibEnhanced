@@ -87,9 +87,7 @@ namespace Egg82LibEnhanced.Utils {
 						double ms = watch.Elapsed.TotalMilliseconds;
 						double dt = ms - lastTime;
 						lastTime = ms;
-						if (Elapsed != null) {
-							Elapsed.Invoke(this, new PreciseElapsedEventArgs(ms, dt));
-						}
+						Elapsed?.Invoke(this, new PreciseElapsedEventArgs(ms, dt));
 					} while (_running && AutoReset);
 				} else {
 					do {
@@ -99,9 +97,7 @@ namespace Egg82LibEnhanced.Utils {
 						double ms = watch.Elapsed.TotalMilliseconds;
 						double dt = ms - lastTime;
 						lastTime = ms;
-						if (Elapsed != null) {
-							Elapsed.Invoke(this, new PreciseElapsedEventArgs(ms, dt));
-						}
+						Elapsed?.Invoke(this, new PreciseElapsedEventArgs(ms, dt));
 					} while (_running && AutoReset);
 				}
 				watch.Stop();

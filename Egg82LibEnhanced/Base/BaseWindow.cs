@@ -106,7 +106,7 @@ namespace Egg82LibEnhanced.Base {
 				}
 			}
 		}
-		
+
 		public void AddState(BaseState state, int index = 0) {
 			if (state == null) {
 				throw new ArgumentNullException("state");

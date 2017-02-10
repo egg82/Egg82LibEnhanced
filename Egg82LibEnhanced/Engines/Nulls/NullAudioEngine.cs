@@ -8,7 +8,7 @@ using System.IO;
 namespace Egg82LibEnhanced.Engines.Nulls {
 	public class NullAudioEngine : IAudioEngine {
 		//vars
-		public event EventHandler<ExceptionEventArgs> Error;
+		public event EventHandler<ExceptionEventArgs> Error = null;
 
 		//constructor
 		public NullAudioEngine() {
