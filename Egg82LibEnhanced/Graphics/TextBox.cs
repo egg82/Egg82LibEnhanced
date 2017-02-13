@@ -1,7 +1,9 @@
 ﻿using Egg82LibEnhanced.Engines;
 using Egg82LibEnhanced.Enums;
+using Egg82LibEnhanced.Geom;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Utils;
+using SFML.Window;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -14,16 +16,18 @@ namespace Egg82LibEnhanced.Graphics {
 		public event EventHandler Exited = null;
 		public event EventHandler Pressed = null;
 		public event EventHandler Released = null;
+		public event EventHandler ReleasedOutside = null;
+
+		private IInputEngine inputEngine = ServiceLocator.GetService(typeof(IInputEngine));
 
 		private Bitmap fontBitmap = new Bitmap(1, 1);
 		private Font _font = null;
 		private string _text = null;
 		private bool _antiAliasing = true;
 		private Color _color = System.Drawing.Color.White;
+		private PreciseRectangle _hitBox = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
 
 		private InteractableState _state = InteractableState.Normal;
-
-		private IInputEngine inputEngine = ServiceLocator.GetService(typeof(IInputEngine));
 
 		//constructor
 		public TextBox(Font font, string text = null) {
@@ -31,18 +35,76 @@ namespace Egg82LibEnhanced.Graphics {
 				throw new ArgumentNullException("font");
 			}
 
+			inputEngine.MouseDown += onMouseDown;
+			inputEngine.MouseUp += onMouseUp;
+			inputEngine.MouseMove += onMouseMove;
+
 			_font = font;
 			_text = text;
 
 			drawString();
 		}
 		~TextBox() {
+			inputEngine.MouseDown -= onMouseDown;
+			inputEngine.MouseUp -= onMouseUp;
+			inputEngine.MouseMove -= onMouseMove;
+
 			if (Texture != null) {
 				Texture.Dispose();
 			}
 		}
 
 		//public
+		public PreciseRectangle HitBox {
+			get {
+				return (PreciseRectangle) _hitBox.Clone();
+			}
+		}
+		public double HitX {
+			get {
+				return _hitBox.X;
+			}
+			set {
+				if (double.IsNaN(value) || double.IsInfinity(value)) {
+					return;
+				}
+				_hitBox.X = value;
+			}
+		}
+		public double HitY {
+			get {
+				return _hitBox.Y;
+			}
+			set {
+				if (double.IsNaN(value) || double.IsInfinity(value)) {
+					return;
+				}
+				_hitBox.Y = value;
+			}
+		}
+		public double HitWidth {
+			get {
+				return _hitBox.Width;
+			}
+			set {
+				if (double.IsNaN(value) || double.IsInfinity(value)) {
+					return;
+				}
+				_hitBox.Width = value;
+			}
+		}
+		public double HitHeight {
+			get {
+				return _hitBox.Height;
+			}
+			set {
+				if (double.IsNaN(value) || double.IsInfinity(value)) {
+					return;
+				}
+				_hitBox.Height = value;
+			}
+		}
+
 		public bool AntiAliasing {
 			get {
 				return _antiAliasing;
@@ -101,33 +163,38 @@ namespace Egg82LibEnhanced.Graphics {
 
 		//private
 		protected override void OnUpdate(double deltaTime) {
-			if (inputEngine.Mouse.X >= GlobalX && inputEngine.Mouse.X <= GlobalX + GlobalWidth && inputEngine.Mouse.Y >= GlobalY && inputEngine.Mouse.Y <= GlobalY + GlobalHeight) {
-				if (inputEngine.Mouse.LeftButtonDown) {
-					if (_state != InteractableState.Down) {
-						_state = InteractableState.Down;
-						if (Pressed != null) {
-							Pressed.Invoke(this, EventArgs.Empty);
-						}
-					}
+			
+		}
+
+		private void onMouseDown(object sender, MouseButtonEventArgs e) {
+			if (e.Button == Mouse.Button.Left && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
+				if (_state != InteractableState.Down) {
+					_state = InteractableState.Down;
+					Pressed?.Invoke(this, EventArgs.Empty);
+				}
+			}
+		}
+		private void onMouseUp(object sender, MouseButtonEventArgs e) {
+			if (e.Button == Mouse.Button.Left && _state == InteractableState.Down) {
+				if (e.X >= _hitBox.X && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
+					_state = InteractableState.Hover;
+					Released?.Invoke(this, EventArgs.Empty);
 				} else {
-					if (_state == InteractableState.Down) {
-						if (Released != null) {
-							Released.Invoke(this, EventArgs.Empty);
-						}
-					}
-					if (_state != InteractableState.Hover) {
-						_state = InteractableState.Hover;
-						if (Entered != null) {
-							Entered.Invoke(this, EventArgs.Empty);
-						}
-					}
+					_state = InteractableState.Normal;
+					ReleasedOutside?.Invoke(this, EventArgs.Empty);
+				}
+			}
+		}
+		private void onMouseMove(object sender, MouseMoveEventArgs e) {
+			if (e.X >= _hitBox.X && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
+				if (_state == InteractableState.Normal) {
+					_state = InteractableState.Hover;
+					Entered?.Invoke(this, EventArgs.Empty);
 				}
 			} else {
-				if (_state != InteractableState.Normal) {
+				if (_state == InteractableState.Hover) {
 					_state = InteractableState.Normal;
-					if (Exited != null) {
-						Exited.Invoke(this, EventArgs.Empty);
-					}
+					Exited?.Invoke(this, EventArgs.Empty);
 				}
 			}
 		}
@@ -166,8 +233,16 @@ namespace Egg82LibEnhanced.Graphics {
 					g.DrawString(_text, _font, new Pen(_color).Brush, 0.0f, 0.0f);
 				}
 			}
-
+			
+			bool update = false;
+			if (_hitBox.X == X && _hitBox.Y == Y && _hitBox.Width == Width && _hitBox.Height == Height) {
+				update = true;
+			}
 			Texture = TextureUtil.FromBitmap(fontBitmap);
+			if (update) {
+				_hitBox.Width = Width;
+				_hitBox.Height = Height;
+			}
 		}
 	}
 }

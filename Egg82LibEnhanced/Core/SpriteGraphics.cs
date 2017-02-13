@@ -19,9 +19,6 @@ namespace Egg82LibEnhanced.Core {
 				g.Clear(Color.Transparent);
 			}
 		}
-		~SpriteGraphics() {
-			
-		}
 
 		//public
 		public bool Changed {
@@ -50,9 +47,7 @@ namespace Egg82LibEnhanced.Core {
 					g.DrawArc(pen, (float) x, (float) y, (float) width, (float) height, (float) startAngle, (float) sweepAngle);
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -73,9 +68,7 @@ namespace Egg82LibEnhanced.Core {
 					g.DrawBezier(pen, (float) x1, (float) y1, (float) x2, (float) y2, (float) x3, (float) y3, (float) x4, (float) y4);
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -106,9 +99,7 @@ namespace Egg82LibEnhanced.Core {
 					g.DrawBeziers(pen, precisePointArrayToPointFArray(points));
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -139,9 +130,7 @@ namespace Egg82LibEnhanced.Core {
 					g.DrawClosedCurve(pen, precisePointArrayToPointFArray(points), (float) tension, fillMode);
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -172,9 +161,7 @@ namespace Egg82LibEnhanced.Core {
 					g.DrawCurve(pen, precisePointArrayToPointFArray(points), (int) offset, numberOfSegments, (float) tension);
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -193,9 +180,7 @@ namespace Egg82LibEnhanced.Core {
 					g.DrawEllipse(pen, (float) x, (float) y, (float) width, (float) height);
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -217,9 +202,7 @@ namespace Egg82LibEnhanced.Core {
 					g.DrawLine(pen, (float) x1, (float) y1, (float) x2, (float) y2);
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -250,9 +233,7 @@ namespace Egg82LibEnhanced.Core {
 					g.DrawLines(pen, precisePointArrayToPointFArray(points));
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -271,9 +252,7 @@ namespace Egg82LibEnhanced.Core {
 					g.DrawPie(pen, (float) x, (float) y, (float) width, (float) height, (float) startAngle, (float) sweepAngle);
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -304,9 +283,7 @@ namespace Egg82LibEnhanced.Core {
 					g.DrawPolygon(pen, precisePointArrayToPointFArray(points));
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -325,9 +302,7 @@ namespace Egg82LibEnhanced.Core {
 					g.DrawRectangle(pen, (float) x, (float) y, (float) width, (float) height);
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -358,9 +333,7 @@ namespace Egg82LibEnhanced.Core {
 					g.DrawRectangles(pen, preciseRectangleArrayToRectangleFArray(rects));
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -391,9 +364,7 @@ namespace Egg82LibEnhanced.Core {
 					g.FillClosedCurve(pen.Brush, precisePointArrayToPointFArray(points), fillMode, (float) tension);
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -412,9 +383,7 @@ namespace Egg82LibEnhanced.Core {
 					g.FillEllipse(pen.Brush, (float) x, (float) y, (float) width, (float) height);
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -433,9 +402,7 @@ namespace Egg82LibEnhanced.Core {
 					g.FillPie(pen.Brush, (float) x, (float) y, (float) width, (float) height, (float) startAngle, (float) sweepAngle);
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -466,9 +433,7 @@ namespace Egg82LibEnhanced.Core {
 					g.FillPolygon(pen.Brush, precisePointArrayToPointFArray(points), fillMode);
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -487,9 +452,7 @@ namespace Egg82LibEnhanced.Core {
 					g.FillRectangle(pen.Brush, (float) x, (float) y, (float) width, (float) height);
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -520,9 +483,7 @@ namespace Egg82LibEnhanced.Core {
 					g.FillRectangles(pen.Brush, preciseRectangleArrayToRectangleFArray(rects));
 				}
 				graphicsBitmap = newBitmap;
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
@@ -544,9 +505,7 @@ namespace Egg82LibEnhanced.Core {
 			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
 				g.Clear(Color.Transparent);
 			}
-			if (BoundsChanged != null) {
-				BoundsChanged.Invoke(this, EventArgs.Empty);
-			}
+			BoundsChanged?.Invoke(this, EventArgs.Empty);
 			_changed = true;
 		}
 

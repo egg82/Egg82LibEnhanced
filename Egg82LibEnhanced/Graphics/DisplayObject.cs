@@ -26,12 +26,12 @@ namespace Egg82LibEnhanced.Graphics {
 		private PrecisePoint _scale = new PrecisePoint(1.0d, 1.0d);
 		private double previousRotation = 0.0d;
 		private double _rotation = 0.0d;
-		private PreciseRectangle previousBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
-		private PreciseRectangle _bounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
+		private PrecisePoint previousXY = new PrecisePoint();
+		private PreciseRectangle _localBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
+		//private FloatRect localBoundsCache = new FloatRect(0.0f, 0.0f, 1.0f, 1.0f);
 		private PreciseRectangle previousGlobalBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
 		private PreciseRectangle _globalBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
-		private PreciseRectangle previousTextureBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
-		private PreciseRectangle _textureBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
+		private PreciseRectangle _localTextureBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
 		private bool _textureSmoothing = true;
 
 		private PrecisePoint _transformOriginOffset = new PrecisePoint(0.0d, 0.0d);
@@ -52,6 +52,9 @@ namespace Egg82LibEnhanced.Graphics {
 			if (_window != null) {
 				_window.QuadTree.Remove(this);
 			}
+			_graphics.BoundsChanged -= onGraphicsBoundsChanged;
+			graphicsSprite.Texture.Dispose();
+			_graphics.Dispose();
 		}
 
 		//public
@@ -59,14 +62,6 @@ namespace Egg82LibEnhanced.Graphics {
 			applyGlobalBounds();
 			OnUpdate(deltaTime);
 			applyGlobalBounds();
-
-			if (previousGlobalBounds.X != _globalBounds.X || previousGlobalBounds.Y != _globalBounds.Y) {
-				previousGlobalBounds.X = _globalBounds.X;
-				previousGlobalBounds.Y = _globalBounds.Y;
-				if (_window != null) {
-					_window.QuadTree.Move(this);
-				}
-			}
 		}
 		public virtual void SwapBuffers() {
 			OnSwapBuffers();
@@ -75,8 +70,7 @@ namespace Egg82LibEnhanced.Graphics {
 			if (!Visible) {
 				return;
 			}
-
-			applyTransforms();
+			
 			renderGraphics();
 
 			if (_parent != null) {
@@ -95,12 +89,17 @@ namespace Egg82LibEnhanced.Graphics {
 
 		public virtual PreciseRectangle LocalBounds {
 			get {
-				return (PreciseRectangle) _bounds.Clone();
+				return (PreciseRectangle) _localBounds.Clone();
 			}
 		}
 		public PreciseRectangle GlobalBounds {
 			get {
 				return (PreciseRectangle) _globalBounds.Clone();
+			}
+		}
+		public PreciseRectangle extureBounds {
+			get {
+				return (PreciseRectangle) _localTextureBounds.Clone();
 			}
 		}
 
@@ -110,6 +109,9 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 			internal set {
 				_parent = value;
+				if (value == null) {
+					globalTransform = Transform.Identity;
+				}
 				applyGlobalBounds();
 			}
 		}
@@ -139,17 +141,15 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 		public virtual double X {
 			get {
-				return _bounds.X;
+				return _localBounds.X;
 			}
 			set {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
-				_bounds.X = value;
-				applyGlobalBounds();
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				_localBounds.X = value;
+				applyLocation();
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double GlobalY {
@@ -159,17 +159,15 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 		public virtual double Y {
 			get {
-				return _bounds.Y;
+				return _localBounds.Y;
 			}
 			set {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
-				_bounds.Y = value;
-				applyGlobalBounds();
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				_localBounds.Y = value;
+				applyLocation();
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double GlobalWidth {
@@ -179,7 +177,7 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 		public virtual double Width {
 			get {
-				return _bounds.Width;
+				return _localBounds.Width;
 			}
 			set {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
@@ -190,11 +188,9 @@ namespace Egg82LibEnhanced.Graphics {
 				} else if (value < 0.0d) {
 					value *= -1;
 				}
-				_bounds.Width = value;
-				applyGlobalBounds();
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				_localBounds.Width = value;
+				applyLocalBounds();
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double GlobalHeight {
@@ -204,7 +200,7 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 		public virtual double Height {
 			get {
-				return _bounds.Height;
+				return _localBounds.Height;
 			}
 			set {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
@@ -215,11 +211,9 @@ namespace Egg82LibEnhanced.Graphics {
 				} else if (value < 0.0d) {
 					value *= -1;
 				}
-				_bounds.Height = value;
-				applyGlobalBounds();
-				if (BoundsChanged != null) {
-					BoundsChanged.Invoke(this, EventArgs.Empty);
-				}
+				_localBounds.Height = value;
+				applyLocalBounds();
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 
@@ -231,11 +225,7 @@ namespace Egg82LibEnhanced.Graphics {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
-				applyTransforms();
 				_transformOriginOffset.X = value;
-				applyGlobalBounds();
-				graphicsSprite.Origin = new Vector2f((float) _transformOriginOffset.X, (float) _transformOriginOffset.Y);
-				renderSprite.Origin = new Vector2f((float) _transformOriginOffset.X, (float) _transformOriginOffset.Y);
 			}
 		}
 		public double TransformOriginY {
@@ -246,11 +236,7 @@ namespace Egg82LibEnhanced.Graphics {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
-				applyTransforms();
 				_transformOriginOffset.Y = value;
-				applyGlobalBounds();
-				graphicsSprite.Origin = new Vector2f((float) _transformOriginOffset.X, (float) _transformOriginOffset.Y);
-				renderSprite.Origin = new Vector2f((float) _transformOriginOffset.X, (float) _transformOriginOffset.Y);
 			}
 		}
 
@@ -262,21 +248,21 @@ namespace Egg82LibEnhanced.Graphics {
 				if (value == null) {
 					renderSprite.TextureRect = new IntRect(0, 0, 0, 0);
 					renderSprite.Texture = null;
-					_textureBounds.Width = 0.0d;
-					_textureBounds.Height = 0.0d;
+					_localTextureBounds.Width = 0.0d;
+					_localTextureBounds.Height = 0.0d;
 				} else {
 					value.Smooth = _textureSmoothing;
 
-					if (renderSprite.Texture == null || (_textureBounds.X == 0.0d && _textureBounds.Y == 0.0d && _textureBounds.Width == renderSprite.TextureRect.Width && _textureBounds.Height == renderSprite.TextureRect.Height)) {
-						_textureBounds.Width = value.Size.X;
-						_textureBounds.Height = value.Size.Y;
+					if (renderSprite.Texture == null || (_localTextureBounds.X == renderSprite.TextureRect.Left && _localTextureBounds.Y == renderSprite.TextureRect.Top && _localTextureBounds.Width == renderSprite.TextureRect.Width && _localTextureBounds.Height == renderSprite.TextureRect.Height)) {
+						_localTextureBounds.Width = value.Size.X;
+						_localTextureBounds.Height = value.Size.Y;
+						applyTextureBounds();
+						applyLocalBounds();
 					}
 
 					renderSprite.Texture = value;
-					renderSprite.TextureRect = new IntRect(0, 0, (int) _textureBounds.Width, (int) _textureBounds.Height);
+					renderSprite.TextureRect = new IntRect((int) _localTextureBounds.X, (int) _localTextureBounds.Y, (int) _localTextureBounds.Width, (int) _localTextureBounds.Height);
 				}
-				applyBounds();
-				applyGlobalBounds();
 			}
 		}
 		public bool TextureSmoothing {
@@ -297,48 +283,54 @@ namespace Egg82LibEnhanced.Graphics {
 				return graphicsSprite.Texture;
 			}
 		}
-		public double TextureBoundsX {
+		public double TextureX {
 			get {
-				return _textureBounds.X;
+				return _localTextureBounds.X;
 			}
 			set {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
-				_textureBounds.X = value;
+				_localTextureBounds.X = value;
+				applyTextureBounds();
 			}
 		}
-		public double TextureBoundsY {
+		public double TextureY {
 			get {
-				return _textureBounds.Y;
+				return _localTextureBounds.Y;
 			}
 			set {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
-				_textureBounds.Y = value;
+				_localTextureBounds.Y = value;
+				applyTextureBounds();
 			}
 		}
-		public double TextureBoundsWidth {
+		public double TextureWidth {
 			get {
-				return _textureBounds.Width;
+				return _localTextureBounds.Width;
 			}
 			set {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
-				_textureBounds.Width = value;
+				_localTextureBounds.Width = value;
+				applyTextureBounds();
+				applyLocalBounds();
 			}
 		}
-		public double TextureBoundsHeight {
+		public double TextureHeight {
 			get {
-				return _textureBounds.Height;
+				return _localTextureBounds.Height;
 			}
 			set {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
-				_textureBounds.Height = value;
+				_localTextureBounds.Height = value;
+				applyTextureBounds();
+				applyLocalBounds();
 			}
 		}
 
@@ -375,9 +367,10 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 				_rotation = value;
-				applyGlobalBounds();
+				applyRotation();
 			}
 		}
+
 		public Color Color {
 			get {
 				return _color;
@@ -386,6 +379,55 @@ namespace Egg82LibEnhanced.Graphics {
 				_color = value;
 			}
 		}
+		public double ColorR {
+			get {
+				return (double) (_color.R / 255.0d);
+			}
+			set {
+				if (double.IsNaN(value) || double.IsInfinity(value)) {
+					return;
+				}
+				value = MathUtil.Clamp(0.0d, 255.0d, value);
+				_color.R = (byte) (value * 255.0d);
+			}
+		}
+		public double ColorG {
+			get {
+				return (double) (_color.G / 255.0d);
+			}
+			set {
+				if (double.IsNaN(value) || double.IsInfinity(value)) {
+					return;
+				}
+				value = MathUtil.Clamp(0.0d, 255.0d, value);
+				_color.G = (byte) (value * 255.0d);
+			}
+		}
+		public double ColorB {
+			get {
+				return (double) (_color.B / 255.0d);
+			}
+			set {
+				if (double.IsNaN(value) || double.IsInfinity(value)) {
+					return;
+				}
+				value = MathUtil.Clamp(0.0d, 255.0d, value);
+				_color.B = (byte) (value * 255.0d);
+			}
+		}
+		public double ColorA {
+			get {
+				return (double) (_color.A / 255.0d);
+			}
+			set {
+				if (double.IsNaN(value) || double.IsInfinity(value)) {
+					return;
+				}
+				value = MathUtil.Clamp(0.0d, 255.0d, value);
+				_color.A = (byte) (value * 255.0d);
+			}
+		}
+
 		public BlendMode BlendMode {
 			get {
 				return renderState.BlendMode;
@@ -409,11 +451,24 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 		}
 
-		public SpriteSkew Skew {
+		public PrecisePoint LocalToGlobal(PrecisePoint point) {
+			return PrecisePoint.FromVector2f(globalTransform.TransformPoint((float) point.X, (float) point.Y));
+		}
+		public PreciseRectangle LocalToGlobal(PreciseRectangle rect) {
+			return PreciseRectangle.FromFloatRect(globalTransform.TransformRect(new FloatRect((float) rect.X, (float) rect.Y, (float) rect.Width, (float) rect.Height)));
+		}
+		public PrecisePoint GlobalToLocal(PrecisePoint point) {
+			return PrecisePoint.FromVector2f(localTransform.TransformPoint((float) point.X, (float) point.Y));
+		}
+		public PreciseRectangle GlobalToLocal(PreciseRectangle rect) {
+			return PreciseRectangle.FromFloatRect(localTransform.TransformRect(new FloatRect((float) rect.X, (float) rect.Y, (float) rect.Width, (float) rect.Height)));
+		}
+
+		/*public SpriteSkew Skew {
 			get {
 				return _skew;
 			}
-		}
+		}*/
 
 		//private
 		protected abstract void OnUpdate(double deltaTime);
@@ -421,71 +476,74 @@ namespace Egg82LibEnhanced.Graphics {
 
 		}
 
-		private void applyTransforms() {
-			bool globalBoundsChanged = false;
-
-			if (previousBounds.X != _bounds.X || previousBounds.Y != _bounds.Y) {
-				localTransform.Translate((float) (_bounds.X - previousBounds.X), (float) (_bounds.Y - previousBounds.Y));
-				previousBounds.X = _bounds.X;
-				previousBounds.Y = _bounds.Y;
-				globalBoundsChanged = true;
+		private void applyLocation() {
+			if (previousXY.X != _localBounds.X || previousXY.Y != _localBounds.Y) {
+				localTransform.Translate((float) (_localBounds.X - previousXY.X), (float) (_localBounds.Y - previousXY.Y));
+				previousXY.X = _localBounds.X;
+				previousXY.Y = _localBounds.Y;
+				//localBoundsCache.Left = (float) _localBounds.X;
+				//localBoundsCache.Top = (float) _localBounds.Y;
+				applyGlobalBounds();
 			}
-			if (_rotation != previousRotation) {
+		}
+		private void applyRotation() {
+			if (previousRotation != _rotation) {
+				localTransform.Rotate((float) (_rotation - previousRotation), (float) _transformOriginOffset.X, (float) _transformOriginOffset.Y);
 				previousRotation = _rotation;
-				graphicsSprite.Rotation = (float) _rotation;
-				renderSprite.Rotation = (float) _rotation;
-			}
-			applyScale();
-			if (previousBounds.Width != _bounds.Width || previousBounds.Height != _bounds.Height) {
-				previousBounds.Width = _bounds.Width;
-				previousBounds.Height = _bounds.Height;
-				globalBoundsChanged = true;
-			}
-			if (_skew.Changed) {
-				skewBox[0] = new Vertex(new Vector2f(0.0f, 0.0f), new Vector2f((float) _skew.TopLeftX, (float) _skew.TopLeftY));
-				skewBox[1] = new Vertex(new Vector2f(0.0f, (float) _bounds.Height), new Vector2f((float) _skew.BottomLeftX, (float) (_bounds.Height + _skew.BottomLeftY)));
-				skewBox[2] = new Vertex(new Vector2f((float) _bounds.Height, (float) _bounds.Width), new Vector2f((float) (_bounds.Width + _skew.BottomRightX), (float) (_bounds.Height + _skew.BottomRightY)));
-				skewBox[3] = new Vertex(new Vector2f((float) _bounds.Width, 0.0f), new Vector2f((float) (_bounds.Width + _skew.TopRightX), (float) _skew.TopRightY));
-				globalBoundsChanged = true;
-				_skew.Changed = false;
-			}
-			if (previousTextureBounds.X != _textureBounds.X || previousTextureBounds.Y != _textureBounds.Y || previousTextureBounds.Width != _textureBounds.Width || previousTextureBounds.Height != _textureBounds.Height) {
-				if (previousTextureBounds.Width != _textureBounds.Width || previousTextureBounds.Height != _textureBounds.Height) {
-					globalBoundsChanged = true;
-				}
-				previousTextureBounds.X = _textureBounds.X;
-				previousTextureBounds.Y = _textureBounds.Y;
-				previousTextureBounds.Width = _textureBounds.Width;
-				previousTextureBounds.Height = _textureBounds.Height;
-				renderSprite.TextureRect = new IntRect(0, 0, (int) _textureBounds.Width, (int) _textureBounds.Height);
-			}
-
-			if (globalBoundsChanged) {
 				applyGlobalBounds();
 			}
 		}
 		private void applyScale() {
-			if (_scale.X != previousScale.X || _scale.Y != previousScale.Y) {
+			if (previousScale.X != _scale.X || previousScale.Y != _scale.Y) {
+				localTransform.Scale((float) (1.0d / previousScale.X), (float) (1.0d / previousScale.Y), (float) _transformOriginOffset.X, (float) _transformOriginOffset.Y);
+				localTransform.Scale((float) _scale.X, (float) _scale.Y, (float) _transformOriginOffset.X, (float) _transformOriginOffset.Y);
 				previousScale.X = _scale.X;
 				previousScale.Y = _scale.Y;
 				applyGlobalBounds();
-				graphicsSprite.Scale = new Vector2f((float) _scale.X, (float) _scale.Y);
-				renderSprite.Scale = new Vector2f((float) _scale.X, (float) _scale.Y);
 			}
 		}
-		private void applyBounds() {
-			_bounds.Width = (double) Math.Max(renderSprite.TextureRect.Width, _graphics.Bitmap.Width);
-			_bounds.Height = (double) Math.Max(renderSprite.TextureRect.Height, _graphics.Bitmap.Height);
+		private void applySkew() {
+			skewBox[0] = new Vertex(new Vector2f(0.0f, 0.0f), new Vector2f((float) _skew.TopLeftX, (float) _skew.TopLeftY));
+			skewBox[1] = new Vertex(new Vector2f(0.0f, (float) _localBounds.Height), new Vector2f((float) _skew.BottomLeftX, (float) (_localBounds.Height + _skew.BottomLeftY)));
+			skewBox[2] = new Vertex(new Vector2f((float) _localBounds.Height, (float) _localBounds.Width), new Vector2f((float) (_localBounds.Width + _skew.BottomRightX), (float) (_localBounds.Height + _skew.BottomRightY)));
+			skewBox[3] = new Vertex(new Vector2f((float) _localBounds.Width, 0.0f), new Vector2f((float) (_localBounds.Width + _skew.TopRightX), (float) _skew.TopRightY));
 			applyGlobalBounds();
-			if (BoundsChanged != null) {
-				BoundsChanged.Invoke(this, EventArgs.Empty);
-			}
 		}
+		private void applyTextureBounds() {
+			renderSprite.TextureRect = new IntRect((int) _localTextureBounds.X, (int) _localTextureBounds.Y, (int) _localTextureBounds.Width, (int) _localTextureBounds.Height);
+			applyGlobalBounds();
+		}
+		private void applyLocalBounds() {
+			_localBounds.Width = (double) Math.Max(_localTextureBounds.Width, _graphics.Bitmap.Width);
+			_localBounds.Height = (double) Math.Max(_localTextureBounds.Height, _graphics.Bitmap.Height);
+			//localBoundsCache.Width = (float) _localBounds.Width;
+			//localBoundsCache.Height = (float) _localBounds.Height;
+			applyGlobalBounds();
+		}
+
 		private void applyGlobalBounds() {
-			_globalBounds.X = (_parent != null) ? _parent.GlobalX + _bounds.X - (_transformOriginOffset.X / 2.0d) + Math.Min(_skew.TopLeftX, _skew.BottomLeftX) : _bounds.X - (_transformOriginOffset.X / 2.0d) + Math.Min(_skew.TopLeftX, _skew.BottomLeftX);
-			_globalBounds.Y = (_parent != null) ? _parent.GlobalY + _bounds.Y - (_transformOriginOffset.Y / 2.0d) + Math.Min(_skew.TopLeftY, _skew.TopRightY) : _bounds.Y - (_transformOriginOffset.Y / 2.0d) + Math.Min(_skew.TopLeftY, _skew.TopRightY);
-			_globalBounds.Width = (_textureBounds.Width * _scale.X) + Math.Max(_skew.TopRightX, _skew.BottomRightX);
-			_globalBounds.Height = (_textureBounds.Height * _scale.Y) + Math.Max(_skew.BottomLeftY, _skew.BottomRightY);
+			/*FloatRect r = globalTransform.TransformRect(localBoundsCache);
+			_globalBounds.X = r.Left;
+			_globalBounds.Y = r.Top;
+			_globalBounds.Width = r.Width;
+			_globalBounds.Height = r.Height;*/
+
+			_globalBounds.X = (_parent != null) ? _parent.GlobalX + _localBounds.X : _localBounds.X;
+			_globalBounds.Y = (_parent != null) ? _parent.GlobalY + _localBounds.Y : _localBounds.Y;
+			//_globalBounds.X = (_parent != null) ? _parent.GlobalX + _localBounds.X - (_transformOriginOffset.X / 2.0d) + Math.Min(_skew.TopLeftX, _skew.BottomLeftX) : _localBounds.X - (_transformOriginOffset.X / 2.0d) + Math.Min(_skew.TopLeftX, _skew.BottomLeftX);
+			//_globalBounds.Y = (_parent != null) ? _parent.GlobalY + _localBounds.Y - (_transformOriginOffset.Y / 2.0d) + Math.Min(_skew.TopLeftY, _skew.TopRightY) : _localBounds.Y - (_transformOriginOffset.Y / 2.0d) + Math.Min(_skew.TopLeftY, _skew.TopRightY);
+			_globalBounds.Width = (_localTextureBounds.Width * _scale.X);
+			_globalBounds.Height = (_localTextureBounds.Height * _scale.Y);
+			//_globalBounds.Width = (_textureBounds.Width * _scale.X) + Math.Max(_skew.TopRightX, _skew.BottomRightX);
+			//_globalBounds.Height = (_textureBounds.Height * _scale.Y) + Math.Max(_skew.BottomLeftY, _skew.BottomRightY);
+
+			if (previousGlobalBounds.X != _globalBounds.X || previousGlobalBounds.Y != _globalBounds.Y) {
+				previousGlobalBounds.X = _globalBounds.X;
+				previousGlobalBounds.Y = _globalBounds.Y;
+				if (_window != null) {
+					_window.QuadTree.Move(this);
+				}
+			}
 		}
 
 		private void renderGraphics() {
@@ -502,8 +560,10 @@ namespace Egg82LibEnhanced.Graphics {
 			//TextureUtil.UpdateTextureWithBitmap(_graphics.Bitmap, graphicsSprite.Texture);
 		}
 		private void onGraphicsBoundsChanged(object sender, EventArgs e) {
-			applyBounds();
-			applyGlobalBounds();
+			applyLocalBounds();
+		}
+		private void onSkewChanged(object sender, EventArgs e) {
+			applySkew();
 		}
 	}
 }

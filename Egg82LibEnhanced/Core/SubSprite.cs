@@ -9,10 +9,10 @@ namespace Egg82LibEnhanced.Core {
 		//constructor
 		public SubSprite(Texture texture, Rectangle region, bool rotated) {
 			Texture = texture;
-			TextureBoundsX = region.X;
-			TextureBoundsY = region.Y;
-			TextureBoundsWidth = region.Width;
-			TextureBoundsHeight = region.Height;
+			TextureX = region.X;
+			TextureY = region.Y;
+			TextureWidth = region.Width;
+			TextureHeight = region.Height;
 			if (rotated) {
 				Rotation = -90.0d;
 			}

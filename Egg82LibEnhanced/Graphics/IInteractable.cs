@@ -1,4 +1,5 @@
 ﻿using Egg82LibEnhanced.Enums;
+using Egg82LibEnhanced.Geom;
 using System;
 
 namespace Egg82LibEnhanced.Graphics {
@@ -11,5 +12,11 @@ namespace Egg82LibEnhanced.Graphics {
 
 		//functions
 		InteractableState State { get; }
+
+		PreciseRectangle HitBox { get; }
+		double HitX { get; set; }
+		double HitY { get; set; }
+		double HitWidth { get; set; }
+		double HitHeight { get; set; }
 	}
 }

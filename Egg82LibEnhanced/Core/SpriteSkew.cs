@@ -9,23 +9,12 @@ namespace Egg82LibEnhanced.Core {
 		private PrecisePoint _bottomLeft = new PrecisePoint();
 		private PrecisePoint _bottomRight = new PrecisePoint();
 
-		private bool _changed = false;
-
 		//constructor
 		public SpriteSkew() {
 
 		}
 
 		//public
-		public bool Changed {
-			get {
-				return _changed;
-			}
-			internal set {
-				_changed = value;
-			}
-		}
-
 		public double TopLeftX {
 			get {
 				return _topLeft.X;
@@ -35,7 +24,6 @@ namespace Egg82LibEnhanced.Core {
 					return;
 				}
 				_topLeft.X = value;
-				_changed = true;
 			}
 		}
 		public double TopLeftY {
@@ -47,7 +35,6 @@ namespace Egg82LibEnhanced.Core {
 					return;
 				}
 				_topRight.Y = value;
-				_changed = true;
 			}
 		}
 		public double TopRightX {
@@ -59,7 +46,6 @@ namespace Egg82LibEnhanced.Core {
 					return;
 				}
 				_topRight.X = value;
-				_changed = true;
 			}
 		}
 		public double TopRightY {
@@ -71,7 +57,6 @@ namespace Egg82LibEnhanced.Core {
 					return;
 				}
 				_topRight.Y = value;
-				_changed = true;
 			}
 		}
 		public double BottomLeftX {
@@ -83,7 +68,6 @@ namespace Egg82LibEnhanced.Core {
 					return;
 				}
 				_bottomLeft.X = value;
-				_changed = true;
 			}
 		}
 		public double BottomLeftY {
@@ -95,7 +79,6 @@ namespace Egg82LibEnhanced.Core {
 					return;
 				}
 				_bottomLeft.Y = value;
-				_changed = true;
 			}
 		}
 		public double BottomRightX {
@@ -107,7 +90,6 @@ namespace Egg82LibEnhanced.Core {
 					return;
 				}
 				_bottomRight.X = value;
-				_changed = true;
 			}
 		}
 		public double BottomRightY {
@@ -119,7 +101,6 @@ namespace Egg82LibEnhanced.Core {
 					return;
 				}
 				_bottomRight.Y = value;
-				_changed = true;
 			}
 		}
 

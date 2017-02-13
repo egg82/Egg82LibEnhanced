@@ -10,7 +10,7 @@ namespace Egg82LibEnhanced.Graphics {
 		//vars
 		private List<DisplayObject> children = new List<DisplayObject>();
 		private bool _flattened = false;
-		private PreciseRectangle _childrenBoundsRect = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
+		private PreciseRectangle _childrenBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
 		private bool boundsChanged = false;
 		private Bitmap flattenedBitmap = null;
 		private Texture oldTexture = null;
@@ -29,9 +29,9 @@ namespace Egg82LibEnhanced.Graphics {
 		public override PreciseRectangle LocalBounds {
 			get {
 				if (boundsChanged && !_flattened) {
-					getNewBounds();
+					applyBounds();
 				}
-				return (PreciseRectangle) _childrenBoundsRect.Clone();
+				return (PreciseRectangle) _childrenBounds.Clone();
 			}
 		}
 
@@ -40,11 +40,11 @@ namespace Egg82LibEnhanced.Graphics {
 				children[i].Update(deltaTime);
 			}
 			if (boundsChanged && !_flattened) {
-				getNewBounds();
+				applyBounds();
 			}
 			base.Update(deltaTime);
 			if (boundsChanged && !_flattened) {
-				getNewBounds();
+				applyBounds();
 			}
 		}
 		public override void SwapBuffers() {
@@ -156,52 +156,64 @@ namespace Egg82LibEnhanced.Graphics {
 				return children.Count;
 			}
 		}
-
+		
 		public override double X {
 			get {
 				if (boundsChanged && !_flattened) {
-					getNewBounds();
+					applyBounds();
 				}
-				return base.X + _childrenBoundsRect.X;
+				return base.X + _childrenBounds.X;
 			}
 			set {
-				base.X = value - _childrenBoundsRect.X;
+				if (boundsChanged && !_flattened) {
+					applyBounds();
+				}
+				base.X = value - _childrenBounds.X;
 				boundsChanged = true;
 			}
 		}
 		public override double Y {
 			get {
 				if (boundsChanged && !_flattened) {
-					getNewBounds();
+					applyBounds();
 				}
-				return base.Y + _childrenBoundsRect.Y;
+				return base.Y + _childrenBounds.Y;
 			}
 			set {
-				base.Y = value - _childrenBoundsRect.Y;
+				if (boundsChanged && !_flattened) {
+					applyBounds();
+				}
+				base.Y = value - _childrenBounds.Y;
 				boundsChanged = true;
 			}
 		}
 		public override double Width {
 			get {
 				if (boundsChanged && !_flattened) {
-					getNewBounds();
+					applyBounds();
 				}
-				return Math.Max(base.Width, _childrenBoundsRect.Width);
+				return Math.Max(base.Width, _childrenBounds.Width);
 			}
 			set {
-				base.Width = value - _childrenBoundsRect.Width;
+				if (boundsChanged && !_flattened) {
+					applyBounds();
+				}
+				base.Width = value - _childrenBounds.Width;
 				boundsChanged = true;
 			}
 		}
 		public override double Height {
 			get {
 				if (boundsChanged && !_flattened) {
-					getNewBounds();
+					applyBounds();
 				}
-				return Math.Max(base.Height, _childrenBoundsRect.Height);
+				return Math.Max(base.Height, _childrenBounds.Height);
 			}
 			set {
-				base.Height = value - _childrenBoundsRect.Height;
+				if (boundsChanged && !_flattened) {
+					applyBounds();
+				}
+				base.Height = value - _childrenBounds.Height;
 				boundsChanged = true;
 			}
 		}
@@ -215,10 +227,10 @@ namespace Egg82LibEnhanced.Graphics {
 
 			oldTexture = Texture;
 			Texture = TextureUtil.FromBitmap(flattenedBitmap);
-			TextureBoundsWidth = flattenedBitmap.Width;
-			TextureBoundsHeight = flattenedBitmap.Height;
-			X += _childrenBoundsRect.X;
-			Y += _childrenBoundsRect.Y;
+			TextureWidth = flattenedBitmap.Width;
+			TextureHeight = flattenedBitmap.Height;
+			X += _childrenBounds.X;
+			Y += _childrenBounds.Y;
 		}
 		public void Unflatten() {
 			if (!_flattened) {
@@ -229,8 +241,8 @@ namespace Egg82LibEnhanced.Graphics {
 			flattenedBitmap.Dispose();
 			Texture = oldTexture;
 			flattenedBitmap = null;
-			X -= _childrenBoundsRect.X;
-			Y -= _childrenBoundsRect.Y;
+			X -= _childrenBounds.X;
+			Y -= _childrenBounds.Y;
 		}
 		public bool Flattened {
 			get {
@@ -240,31 +252,31 @@ namespace Egg82LibEnhanced.Graphics {
 
 		public Bitmap GetFlattenedBitmap() {
 			if (boundsChanged && !_flattened) {
-				getNewBounds();
+				applyBounds();
 			}
 
-			Bitmap retVal = new Bitmap((int) _childrenBoundsRect.Width, (int) _childrenBoundsRect.Height);
+			Bitmap retVal = new Bitmap((int) _childrenBounds.Width, (int) _childrenBounds.Height);
 
 			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(retVal)) {
 				g.Clear(System.Drawing.Color.Transparent);
 
 				Bitmap graphics = TextureUtil.BitmapFromTexture(GraphicsTexture);
-				g.DrawImage(graphics, new Rectangle((int) (_childrenBoundsRect.X * -1.0d), (int) (_childrenBoundsRect.Y * -1.0d), graphics.Width, graphics.Height));
+				g.DrawImage(graphics, new Rectangle((int) (_childrenBounds.X * -1.0d), (int) (_childrenBounds.Y * -1.0d), graphics.Width, graphics.Height));
 				graphics.Dispose();
 				if (Texture != null) {
 					Bitmap texture = TextureUtil.BitmapFromTexture(Texture);
-					g.DrawImage(texture, new Rectangle((int) (_childrenBoundsRect.X * -1.0d), (int) (_childrenBoundsRect.Y * -1.0d), texture.Width, texture.Height));
+					g.DrawImage(texture, new Rectangle((int) (_childrenBounds.X * -1.0d), (int) (_childrenBounds.Y * -1.0d), texture.Width, texture.Height));
 					texture.Dispose();
 				}
 
 				for (int i = children.Count - 1; i >= 0; i--) {
 					Bitmap childGraphics = TextureUtil.BitmapFromTexture(children[i].GraphicsTexture);
-					g.DrawImage(childGraphics, new Rectangle((int) (_childrenBoundsRect.X * -1.0d + children[i].X), (int) (_childrenBoundsRect.Y * -1.0d + children[i].Y), childGraphics.Width, childGraphics.Height));
+					g.DrawImage(childGraphics, new Rectangle((int) (_childrenBounds.X * -1.0d + children[i].X), (int) (_childrenBounds.Y * -1.0d + children[i].Y), childGraphics.Width, childGraphics.Height));
 					childGraphics.Dispose();
 
 					if (children[i].Texture != null) {
 						Bitmap childTexture = TextureUtil.BitmapFromTexture(children[i].Texture);
-						g.DrawImage(childTexture, new Rectangle((int) (_childrenBoundsRect.X * -1.0d + children[i].X), (int) (_childrenBoundsRect.Y * -1.0d + children[i].Y), childTexture.Width, childTexture.Height));
+						g.DrawImage(childTexture, new Rectangle((int) (_childrenBounds.X * -1.0d + children[i].X), (int) (_childrenBounds.Y * -1.0d + children[i].Y), childTexture.Width, childTexture.Height));
 						childTexture.Dispose();
 					}
 				}
@@ -274,7 +286,7 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 
 		//private
-		private void getNewBounds() {
+		private void applyBounds() {
 			double minX = base.X;
 			double minY = base.Y;
 			double maxWidth = base.Width;
@@ -287,10 +299,10 @@ namespace Egg82LibEnhanced.Graphics {
 				maxHeight = Math.Max(maxHeight, children[i].Y + children[i].Height);
 			}
 
-			_childrenBoundsRect.X = minX;
-			_childrenBoundsRect.Y = minY;
-			_childrenBoundsRect.Width = maxWidth;
-			_childrenBoundsRect.Height = maxHeight;
+			_childrenBounds.X = minX;
+			_childrenBounds.Y = minY;
+			_childrenBounds.Width = maxWidth;
+			_childrenBounds.Height = maxHeight;
 
 			boundsChanged = false;
 		}
