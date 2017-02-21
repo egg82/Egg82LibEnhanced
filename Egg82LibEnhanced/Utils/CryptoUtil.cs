@@ -20,7 +20,9 @@ namespace Egg82LibEnhanced.Utils {
 		private SHA256 sha256 = SHA256.Create();
 		private SHA512 sha512 = SHA512.Create();
 
-		private AesManaged aes = new AesManaged();
+		private object aesLock = new object();
+		private AesCryptoServiceProvider aes = new AesCryptoServiceProvider();
+		private object triDesLock = new object();
 		private TripleDES tripleDes = TripleDES.Create();
 
 		private ECDiffieHellmanCng dh = new ECDiffieHellmanCng(4096);
@@ -80,15 +82,15 @@ namespace Egg82LibEnhanced.Utils {
 			return Convert.FromBase64String(encoding.GetString(input));
 		}
 
-		/**
-		 * Provided for compatibility reasons. PLEASE don't use MD5 unless you absolutely need to. Seriously.
-		 */
+		///<summary>
+		///Provided for compatibility reasons. PLEASE don't use MD5 unless you absolutely need to. Seriously.
+		///</summary>
 		public byte[] HashMd5(byte[] input) {
 			return md5.ComputeHash(input);
 		}
-		/**
-		 * Provided for compatibility reasons. PLEASE don't use SHA1 unless you absolutely need to. Seriously.
-		 */
+		///<summary>
+		///Provided for compatibility reasons. PLEASE don't use SHA1 unless you absolutely need to. Seriously.
+		///</summary>
 		public byte[] HashSha1(byte[] input) {
 			return sha1.ComputeHash(input);
 		}
@@ -99,78 +101,97 @@ namespace Egg82LibEnhanced.Utils {
 			return sha512.ComputeHash(input);
 		}
 
-		/**
-		 * Use this for password hashing only is scrypt is unavailable as an option.
-		 */
+		///<summary>
+		///Use this for password hashing only is scrypt is unavailable as an option.
+		///</summary>
 		public byte[] Bcrypt(byte[] input, byte[] salt) {
 			return ToBytes(Crypter.Blowfish.Crypt(input, ToString(salt)));
 		}
-		/**
-		 * Use this for password hashing as your first option.
-		 */
+		///<summary>
+		///Use this for password hashing as your first option.
+		///</summary>
 		public byte[] Scrypt(byte[] input, byte[] salt, int cost = 262144) {
 			return CryptSharp.Utility.SCrypt.ComputeDerivedKey(input, salt, cost, 8, 1, null, 128);
 		}
 
-		/**
-		 * Provided for compatibility reasons. PLEASE don't use PHPass unless you absolutely need to. Seriously.
-		 */
+		///<summary>
+		///Provided for compatibility reasons. PLEASE don't use PHPass unless you absolutely need to. Seriously.
+		///</summary>
 		public byte[] Phpass(byte[] input) {
 			return ToBytes(Crypter.Phpass.Crypt(input));
 		}
 
-		/**
-		 * This is provided as secure-by-default. Use this as your first option, and try not to change mode or padding if you can avoid it.
-		 */
-		public byte[] EncryptAes(byte[] input, byte[] key, byte[] iv, CipherMode mode = CipherMode.CFB, PaddingMode padding = PaddingMode.PKCS7) {
-			aes.Mode = mode;
-			aes.Padding = padding;
+		///<summary>
+		///The easiest way of encrypting/decrypting, provided as secure-by-default for lazy people.
+		///</summary>
+		public byte[] EasyEncrypt256(byte[] input, byte[] key) {
+			key = HashSha256(key);
+			byte[] iv = GetRandomBytes(32);
+			byte[] encrypted = EncryptAes(input, key, iv);
+			byte[] combined = Combine(iv, encrypted);
+			byte[] hmac = Hmac256(combined, key);
+			return Combine(hmac, combined);
+		}
+		public byte[] EasyDecrypt256(byte[] input, byte[] key) {
+			byte[] newInput = GetPartial(input, input.Length - 64, 64);
+			key = HashSha256(key);
+			byte[] iv = GetPartial(input, 32, 32);
+			byte[] hmac = GetPartial(input, 32);
+			byte[] combined = GetPartial(input, input.Length - 32, 32);
 
-			ICryptoTransform cryptor = aes.CreateEncryptor(key, iv);
-			byte[] retVal = cryptor.TransformFinalBlock(input, 0, input.Length);
-			cryptor.Dispose();
-			return retVal;
+			if (!ByteArraysAreEqual(Hmac256(combined, key), hmac)) {
+				throw new Exception("HMAC validation failed.");
+			}
+			
+			return DecryptAes(newInput, key, iv);
+		}
+
+		///<summary>
+		///This is provided as secure-by-default. Use this as your first option, and try not to change mode or padding if you can avoid it.
+		///</summary>
+		public byte[] EncryptAes(byte[] input, byte[] key, byte[] iv, CipherMode mode = CipherMode.CFB, PaddingMode padding = PaddingMode.PKCS7) {
+			lock (aesLock) {
+				aes.Mode = mode;
+				aes.Padding = padding;
+				ICryptoTransform cryptor = aes.CreateEncryptor(key, iv);
+				byte[] retVal = cryptor.TransformFinalBlock(input, 0, input.Length);
+				cryptor.Dispose();
+				return retVal;
+			}
 		}
 		public byte[] DecryptAes(byte[] input, byte[] key, byte[] iv, CipherMode mode = CipherMode.CFB, PaddingMode padding = PaddingMode.PKCS7) {
-			aes.Mode = mode;
-			aes.Padding = padding;
-
-			ICryptoTransform cryptor = aes.CreateDecryptor(key, iv);
-			byte[] retVal = cryptor.TransformFinalBlock(input, 0, input.Length);
-			cryptor.Dispose();
-			return retVal;
+			lock (aesLock) {
+				aes.Mode = mode;
+				aes.Padding = padding;
+				ICryptoTransform cryptor = aes.CreateDecryptor(key, iv);
+				byte[] retVal = cryptor.TransformFinalBlock(input, 0, input.Length);
+				cryptor.Dispose();
+				return retVal;
+			}
 		}
 
-		/**
-		 * This is weak and you should try to use AES if possible. Also, try not to change mode or padding if you can avoid it.
-		 */
+		///<summary>
+		///This is weak and you should try to use AES if possible. Also, try not to change mode or padding if you can avoid it.
+		///</summary>
 		public byte[] EncryptTripleDes(byte[] input, byte[] key, byte[] iv, CipherMode mode = CipherMode.CFB, PaddingMode padding = PaddingMode.PKCS7) {
-			tripleDes.Mode = mode;
-			tripleDes.Padding = padding;
-
-			ICryptoTransform cryptor = tripleDes.CreateEncryptor(key, iv);
-			byte[] retVal = cryptor.TransformFinalBlock(input, 0, input.Length);
-			cryptor.Dispose();
-			return retVal;
+			lock (triDesLock) {
+				tripleDes.Mode = mode;
+				tripleDes.Padding = padding;
+				ICryptoTransform cryptor = tripleDes.CreateEncryptor(key, iv);
+				byte[] retVal = cryptor.TransformFinalBlock(input, 0, input.Length);
+				cryptor.Dispose();
+				return retVal;
+			}
 		}
 		public byte[] DecryptTripleDes(byte[] input, byte[] key, byte[] iv, CipherMode mode = CipherMode.CFB, PaddingMode padding = PaddingMode.PKCS7) {
-			tripleDes.Mode = mode;
-			tripleDes.Padding = padding;
-
-			ICryptoTransform cryptor = tripleDes.CreateDecryptor(key, iv);
-			byte[] retVal = cryptor.TransformFinalBlock(input, 0, input.Length);
-			cryptor.Dispose();
-			return retVal;
-		}
-
-		/**
-		 * PLEASE use this in conjunction with ciphertext. This is for validation. Just append this to the end of the byte array and check on the other side. It's a hashing algorithm, treat it as one.
-		 */
-		public byte[] Hmac256(byte[] input, byte[] key) {
-			HMACSHA256 hmac = new HMACSHA256(key);
-			byte[] retVal = hmac.ComputeHash(input);
-			hmac.Dispose();
-			return retVal;
+			lock (triDesLock) {
+				tripleDes.Mode = mode;
+				tripleDes.Padding = padding;
+				ICryptoTransform cryptor = tripleDes.CreateDecryptor(key, iv);
+				byte[] retVal = cryptor.TransformFinalBlock(input, 0, input.Length);
+				cryptor.Dispose();
+				return retVal;
+			}
 		}
 
 		public void AddPgpPublicKey(string name, byte[] publicKey) {
@@ -201,10 +222,10 @@ namespace Egg82LibEnhanced.Utils {
 
 			throw new Exception("publicKey is not a valid PGP public key.");
 		}
-		/**
-		 * Use addPgpPublicKey() to add the public key to the cache first.
-		 */
-		/*public byte[] EncryptPgp(string name, byte[] input) {
+		/*///<summary>
+		///Use AddPgpPublicKey() to add the public key to the cache first.
+		///</summary>
+		public byte[] EncryptPgp(string name, byte[] input) {
 			if (name == null) {
 				throw new ArgumentNullException("name");
 			}
@@ -217,11 +238,11 @@ namespace Egg82LibEnhanced.Utils {
 				
 			}
 			return null;
-		}*/
-		/**
-		 * Use addPgpPublicKey() to add the public key to the cache first.
-		 */
-		/*public bool VerifyPgp(string name, byte[] input, byte[] signature) {
+		}
+		///<summary>
+		///Use AddPgpPublicKey() to add the public key to the cache first.
+		///</summary>
+		public bool VerifyPgp(string name, byte[] input, byte[] signature) {
 
 		}
 		public byte[] DecryptPgp(byte[] input) {
@@ -236,17 +257,17 @@ namespace Egg82LibEnhanced.Utils {
 		}
 		public byte[] GetPgpPublicKey() {
 			
-		}*/
-		/**
-		 * A keypair is automatically generated, but you can use this if you need to.
-		 */
-		/*public void ImportPgpPrivateKeyPair(byte[] keyPair) {
+		}
+		///<summary>
+		///A keypair is automatically generated, but you can use this if you need to.
+		///</summary>
+		public void ImportPgpPrivateKeyPair(byte[] keyPair) {
 			
-		}*/
-		/**
-		 * A keypair is automatically generated, but you can use this if you need to.
-		 */
-		/*public void ImportPgpPrivateKeyPair(string absoluteFilePath) {
+		}
+		///<summary>
+		///A keypair is automatically generated, but you can use this if you need to.
+		///</summary>
+		public void ImportPgpPrivateKeyPair(string absoluteFilePath) {
 			
 		}*/
 
@@ -266,9 +287,9 @@ namespace Egg82LibEnhanced.Utils {
 				rsaCache.Add(name, provider);
 			}
 		}
-		/**
-		 * Use addRsaPublicKey() to add the public key to the cache first.
-		 */
+		///<summary>
+		///Use AddRsaPublicKey() to add the public key to the cache first.
+		///</summary>
 		public byte[] EncryptRsa(string name, byte[] input, bool useLegacyPadding = false) {
 			if (name == null) {
 				throw new ArgumentNullException("name");
@@ -299,17 +320,17 @@ namespace Egg82LibEnhanced.Utils {
 			}
 			return (byte[]) rsaPublicKey.Clone();
 		}
-		/**
-		 * A keypair is automatically generated, but you can use this if you need to.
-		 */
+		///<summary>
+		///A keypair is automatically generated, but you can use this if you need to.
+		///</summary>
 		public void ImportRsaPrivateKeyPair(byte[] keyPair) {
 			rsa = (RSACryptoServiceProvider) new X509Certificate2(keyPair).PrivateKey;
 			rsaPrivateKey = encodeRsaPrivateKey(rsa.ExportParameters(true));
 			rsaPublicKey = encodeRsaPublicKey(rsa.ExportParameters(false));
 		}
-		/**
-		 * A keypair is automatically generated, but you can use this if you need to.
-		 */
+		///<summary>
+		///A keypair is automatically generated, but you can use this if you need to.
+		///</summary>
 		public void ImportRsaPrivateKeyPair(string absoluteFilePath) {
 			rsa = (RSACryptoServiceProvider) new X509Certificate2(absoluteFilePath).PrivateKey;
 			rsaPrivateKey = encodeRsaPrivateKey(rsa.ExportParameters(true));
@@ -325,44 +346,75 @@ namespace Egg82LibEnhanced.Utils {
 			}
 			return (byte[]) dhKey.Clone();
 		}
-		/**
-		 * Here's how this works:
-		 *   A sends B their public key. B calls this function with A's public key.
-		 *   B sends A their public key. A calls this function with B's public key.
-		 *   Finally, both A and B can use getDHKey() as their shared secret.
-		 */
+		///<summary>
+		///Here's how this works:
+		///  A sends B their public key from GetDHPublicKey(). B calls this function with A's public key.
+		///  B sends A their public key from GetDHPublicKey(). A calls this function with B's public key.
+		///  Finally, both A and B can use getDHKey() as their shared secret.
+		///</summary>
 		public void DeriveDHKey(byte[] publicKey) {
 			dhKey = dh.DeriveKeyMaterial(CngKey.Import(publicKey, CngKeyBlobFormat.EccPublicBlob));
 		}
 
-		/**
-		 * Use for IVs, salts, and possibly keys.
-		 */
+		///<summary>
+		///PLEASE use this in conjunction with ciphertext. This is for validation. Just append this to the end of the byte array and check on the other side. It's a hashing algorithm, treat it as one.
+		///</summary>
+		public byte[] Hmac256(byte[] input, byte[] key) {
+			HMACSHA256 hmac = new HMACSHA256(key);
+			byte[] retVal = hmac.ComputeHash(input);
+			hmac.Dispose();
+			return retVal;
+		}
+
+		///<summary>
+		///Use for IVs and salts. You can also use for keys if you can figure out a way to securely implement key storage.
+		///</summary>
 		public byte[] GetRandomBytes(int length) {
 			byte[] retVal = new byte[length];
 			rng.GetBytes(retVal);
 			return retVal;
 		}
+		///<summary>
+		///Slow, but secure. Use if you need it, but outside of crypto you probably don't.
+		///</summary>
+		///<returns>
+		///A double between -1.0d and 1.0d, inclusive.
+		///</returns>
 		public double GetRandomDouble() {
 			byte[] retVal = new byte[8];
 			rng.GetBytes(retVal);
 			return BitConverter.ToDouble(retVal, 0) / double.MaxValue;
 		}
+		/// <summary>
+		/// Returns a byte array of specified index and length from the input array. Think "Substring" but for byte arrays.
+		/// </summary>
+		public byte[] GetPartial(byte[] input, int length, int index = 0) {
+			byte[] retVal = new byte[length];
+			Array.Copy(input, index, retVal, 0, length);
+			return retVal;
+		}
+		public byte[] Combine(byte[] a, byte[] b) {
+			byte[] retVal = new byte[a.Length + b.Length];
+			Array.Copy(a, 0, retVal, 0, a.Length);
+			Array.Copy(b, 0, retVal, a.Length, b.Length);
+			return retVal;
+		}
 
-		//private
-		private bool areByteArraysEqual(byte[] one, byte[] two) {
-			if (one.Length != two.Length) {
+		public bool ByteArraysAreEqual(byte[] a, byte[] b) {
+			if (a.Length != b.Length) {
 				return false;
 			}
 
-			for (int i = 0; i < one.Length; i++) {
-				if (one[i] != two[i]) {
+			for (int i = 0; i < a.Length; i++) {
+				if (a[i] != b[i]) {
 					return false;
 				}
 			}
+
 			return true;
 		}
-		
+
+		//private
 		private byte[] encodeRsaPrivateKey(RSAParameters p) {
 			byte[] retVal = null;
 
