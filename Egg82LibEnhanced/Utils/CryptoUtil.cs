@@ -124,7 +124,16 @@ namespace Egg82LibEnhanced.Utils {
 		///<summary>
 		///The easiest way of encrypting/decrypting, provided as secure-by-default for lazy people.
 		///</summary>
-		public byte[] EasyEncrypt256(byte[] input, byte[] key) {
+		///<param name="input">
+		///Plaintext to encrypt. Can be any length.
+		///</param>
+		///<param name="key">
+		///Key to encrypt plaintext with. Can be any length.
+		///</param>
+		///<returns>
+		///256-bit ciphertext.
+		///</returns>
+		public byte[] EasyEncrypt(byte[] input, byte[] key) {
 			key = HashSha256(key);
 			byte[] iv = GetRandomBytes(32);
 			byte[] encrypted = EncryptAes(input, key, iv);
@@ -132,7 +141,7 @@ namespace Egg82LibEnhanced.Utils {
 			byte[] hmac = Hmac256(combined, key);
 			return Combine(hmac, combined);
 		}
-		public byte[] EasyDecrypt256(byte[] input, byte[] key) {
+		public byte[] EasyDecrypt(byte[] input, byte[] key) {
 			byte[] newInput = GetPartial(input, input.Length - 64, 64);
 			key = HashSha256(key);
 			byte[] iv = GetPartial(input, 32, 32);

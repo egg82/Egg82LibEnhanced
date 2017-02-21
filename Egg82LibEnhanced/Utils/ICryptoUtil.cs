@@ -41,8 +41,17 @@ namespace Egg82LibEnhanced.Utils {
 		///<summary>
 		///The easiest way of encrypting/decrypting, provided as secure-by-default for lazy people.
 		///</summary>
-		byte[] EasyEncrypt256(byte[] input, byte[] key);
-		byte[] EasyDecrypt256(byte[] input, byte[] key);
+		///<param name="input">
+		///Plaintext to encrypt. Can be any length.
+		///</param>
+		///<param name="key">
+		///Key to encrypt plaintext with. Can be any length.
+		///</param>
+		///<returns>
+		///256-bit ciphertext.
+		///</returns>
+		byte[] EasyEncrypt(byte[] input, byte[] key);
+		byte[] EasyDecrypt(byte[] input, byte[] key);
 
 		///<summary>
 		///This is provided as secure-by-default. Use this as your first option, and try not to change mode or padding if you can avoid it.
