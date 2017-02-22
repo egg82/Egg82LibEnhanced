@@ -18,20 +18,20 @@ namespace Test.States {
 
 		//constructor
 		public InputTestState() {
-
+			
 		}
 
 		//public
-		public override void OnEnter() {
+
+		//private
+		protected override void OnEnter() {
 			sprite.X = Window.Width / 2.0d;
 			sprite.Y = Window.Height / 2.0d;
 			AddChild(sprite);
 		}
-		public override void OnExit() {
+		protected override void OnExit() {
 			RemoveChild(sprite);
 		}
-
-		//private
 		protected override void OnUpdate(double deltaTime) {
 			if (inputEngine.Keyboard.IsAnyKeyDown(leftKeys)) {
 				sprite.X -= sprite.Speed;
@@ -42,11 +42,15 @@ namespace Test.States {
 				sprite.Rotation += sprite.Speed;
 			}
 
-			PrecisePoint stick = inputEngine.Controllers.GetStickPosition(0, XboxStickSide.Left);
-			if (stick.Length > inputEngine.Controllers.StickDeadZone) {
-				sprite.X += stick.X * sprite.Speed;
-				sprite.Rotation += stick.X * sprite.Speed;
+			if (inputEngine.Controllers.NumControllers > 0) {
+				PrecisePoint left = inputEngine.Controllers.GetStickPosition(0, XboxStickSide.Left);
+				if (left.Length > inputEngine.Controllers.StickDeadZone) {
+					sprite.X += left.X * sprite.Speed;
+					sprite.Rotation += left.X * sprite.Speed;
+				}
 			}
+
+			//Console.WriteLine(sprite.X + ", " + sprite.GlobalX + ", " + sprite.Rotation);
 		}
 	}
 }

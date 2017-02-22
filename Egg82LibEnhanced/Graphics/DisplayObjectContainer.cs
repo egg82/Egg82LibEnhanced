@@ -10,57 +10,19 @@ namespace Egg82LibEnhanced.Graphics {
 		//vars
 		private List<DisplayObject> children = new List<DisplayObject>();
 		private bool _flattened = false;
-		private PreciseRectangle _childrenBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
-		private bool boundsChanged = false;
 		private Bitmap flattenedBitmap = null;
 		private Texture oldTexture = null;
 
 		//constructor
 		public DisplayObjectContainer() {
-			Graphics.BoundsChanged += onBoundsChanged;
+			WindowChanged += onWindowChanged;
 		}
 		~DisplayObjectContainer() {
-			for (int i = 0; i < children.Count; i++) {
-				children[i].BoundsChanged -= onBoundsChanged;
-			}
+			WindowChanged -= onWindowChanged;
+			RemoveAllChildren();
 		}
 
 		//public
-		public override PreciseRectangle LocalBounds {
-			get {
-				if (boundsChanged && !_flattened) {
-					applyBounds();
-				}
-				return (PreciseRectangle) _childrenBounds.Clone();
-			}
-		}
-
-		public override void Update(double deltaTime) {
-			for (int i = 0; i < children.Count; i++) {
-				children[i].Update(deltaTime);
-			}
-			if (boundsChanged && !_flattened) {
-				applyBounds();
-			}
-			base.Update(deltaTime);
-			if (boundsChanged && !_flattened) {
-				applyBounds();
-			}
-		}
-		public override void SwapBuffers() {
-			for (int i = 0; i < children.Count; i++) {
-				children[i].SwapBuffers();
-			}
-			base.SwapBuffers();
-		}
-		public override void Draw(RenderTarget target, Transform parentTransform) {
-			base.Draw(target, parentTransform);
-
-			for (int i = children.Count - 1; i >= 0; i--) {
-				children[i].Draw(target, globalTransform);
-			}
-		}
-
 		public void AddChild(DisplayObject obj, int index = 0) {
 			if (obj == null) {
 				throw new ArgumentNullException("obj");
@@ -78,8 +40,7 @@ namespace Egg82LibEnhanced.Graphics {
 			if (index < 0) {
 				index = 0;
 			}
-
-			obj.BoundsChanged += onBoundsChanged;
+			
 			obj.Parent = this;
 			obj.Window = Window;
 			children.Insert(index, obj);
@@ -88,8 +49,6 @@ namespace Egg82LibEnhanced.Graphics {
 				Unflatten();
 				Flatten();
 			}
-
-			boundsChanged = true;
 		}
 		public void RemoveChild(DisplayObject obj) {
 			if (obj == null) {
@@ -100,8 +59,7 @@ namespace Egg82LibEnhanced.Graphics {
 			if (index == -1) {
 				throw new Exception("object is not a child of this object.");
 			}
-
-			obj.BoundsChanged -= onBoundsChanged;
+			
 			children.RemoveAt(index);
 			obj.Parent = null;
 			obj.Window = null;
@@ -110,8 +68,18 @@ namespace Egg82LibEnhanced.Graphics {
 				Unflatten();
 				Flatten();
 			}
+		}
+		public void RemoveAllChildren() {
+			for (int i = 0; i < children.Count; i++) {
+				children[i].Parent = null;
+				children[i].Window = null;
+			}
+			children.Clear();
 
-			boundsChanged = true;
+			if (_flattened) {
+				Unflatten();
+				Flatten();
+			}
 		}
 		public DisplayObject GetChildAt(int index) {
 			if (index < 0 || index >= children.Count) {
@@ -156,67 +124,6 @@ namespace Egg82LibEnhanced.Graphics {
 				return children.Count;
 			}
 		}
-		
-		public override double X {
-			get {
-				if (boundsChanged && !_flattened) {
-					applyBounds();
-				}
-				return base.X + _childrenBounds.X;
-			}
-			set {
-				if (boundsChanged && !_flattened) {
-					applyBounds();
-				}
-				base.X = value - _childrenBounds.X;
-				boundsChanged = true;
-			}
-		}
-		public override double Y {
-			get {
-				if (boundsChanged && !_flattened) {
-					applyBounds();
-				}
-				return base.Y + _childrenBounds.Y;
-			}
-			set {
-				if (boundsChanged && !_flattened) {
-					applyBounds();
-				}
-				base.Y = value - _childrenBounds.Y;
-				boundsChanged = true;
-			}
-		}
-		public override double Width {
-			get {
-				if (boundsChanged && !_flattened) {
-					applyBounds();
-				}
-				return Math.Max(base.Width, _childrenBounds.Width);
-			}
-			set {
-				if (boundsChanged && !_flattened) {
-					applyBounds();
-				}
-				base.Width = value - _childrenBounds.Width;
-				boundsChanged = true;
-			}
-		}
-		public override double Height {
-			get {
-				if (boundsChanged && !_flattened) {
-					applyBounds();
-				}
-				return Math.Max(base.Height, _childrenBounds.Height);
-			}
-			set {
-				if (boundsChanged && !_flattened) {
-					applyBounds();
-				}
-				base.Height = value - _childrenBounds.Height;
-				boundsChanged = true;
-			}
-		}
 
 		public void Flatten() {
 			if (_flattened) {
@@ -229,8 +136,6 @@ namespace Egg82LibEnhanced.Graphics {
 			Texture = TextureUtil.FromBitmap(flattenedBitmap);
 			TextureWidth = flattenedBitmap.Width;
 			TextureHeight = flattenedBitmap.Height;
-			X += _childrenBounds.X;
-			Y += _childrenBounds.Y;
 		}
 		public void Unflatten() {
 			if (!_flattened) {
@@ -241,8 +146,6 @@ namespace Egg82LibEnhanced.Graphics {
 			flattenedBitmap.Dispose();
 			Texture = oldTexture;
 			flattenedBitmap = null;
-			X -= _childrenBounds.X;
-			Y -= _childrenBounds.Y;
 		}
 		public bool Flattened {
 			get {
@@ -251,32 +154,28 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 
 		public Bitmap GetFlattenedBitmap() {
-			if (boundsChanged && !_flattened) {
-				applyBounds();
-			}
+			PreciseRectangle bounds = getBounds();
 
-			Bitmap retVal = new Bitmap((int) _childrenBounds.Width, (int) _childrenBounds.Height);
+			Bitmap retVal = new Bitmap((int) (Math.Abs(bounds.X) + bounds.Width), (int) (Math.Abs(bounds.Y) + bounds.Height));
 
 			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(retVal)) {
 				g.Clear(System.Drawing.Color.Transparent);
-
-				Bitmap graphics = TextureUtil.BitmapFromTexture(GraphicsTexture);
-				g.DrawImage(graphics, new Rectangle((int) (_childrenBounds.X * -1.0d), (int) (_childrenBounds.Y * -1.0d), graphics.Width, graphics.Height));
-				graphics.Dispose();
+				
+				g.DrawImageUnscaled(GraphicsBitmap, new Point((int) Math.Abs(bounds.X), (int) Math.Abs(bounds.Y)));
 				if (Texture != null) {
 					Bitmap texture = TextureUtil.BitmapFromTexture(Texture);
-					g.DrawImage(texture, new Rectangle((int) (_childrenBounds.X * -1.0d), (int) (_childrenBounds.Y * -1.0d), texture.Width, texture.Height));
+					g.DrawImageUnscaled(texture, new Point((int) Math.Abs(bounds.X), (int) Math.Abs(bounds.Y)));
 					texture.Dispose();
 				}
 
 				for (int i = children.Count - 1; i >= 0; i--) {
-					Bitmap childGraphics = TextureUtil.BitmapFromTexture(children[i].GraphicsTexture);
-					g.DrawImage(childGraphics, new Rectangle((int) (_childrenBounds.X * -1.0d + children[i].X), (int) (_childrenBounds.Y * -1.0d + children[i].Y), childGraphics.Width, childGraphics.Height));
+					Bitmap childGraphics = children[i].GraphicsBitmap;
+					g.DrawImageUnscaled(childGraphics, new Point((int) (Math.Abs(bounds.X) + children[i].X), (int) (Math.Abs(bounds.Y) + children[i].Y)));
 					childGraphics.Dispose();
 
 					if (children[i].Texture != null) {
 						Bitmap childTexture = TextureUtil.BitmapFromTexture(children[i].Texture);
-						g.DrawImage(childTexture, new Rectangle((int) (_childrenBounds.X * -1.0d + children[i].X), (int) (_childrenBounds.Y * -1.0d + children[i].Y), childTexture.Width, childTexture.Height));
+						g.DrawImageUnscaled(childTexture, new Point((int) (Math.Abs(bounds.X) + children[i].X), (int) (Math.Abs(bounds.Y) + children[i].Y)));
 						childTexture.Dispose();
 					}
 				}
@@ -286,28 +185,42 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 
 		//private
-		private void applyBounds() {
-			double minX = base.X;
-			double minY = base.Y;
-			double maxWidth = base.Width;
-			double maxHeight = base.Height;
+		internal override void Update(double deltaTime) {
+			for (int i = 0; i < children.Count; i++) {
+				children[i].Update(deltaTime);
+			}
+			base.Update(deltaTime);
+		}
+		internal override void SwapBuffers() {
+			for (int i = 0; i < children.Count; i++) {
+				children[i].SwapBuffers();
+			}
+			base.SwapBuffers();
+		}
+		internal override void Draw(RenderTarget target, Transform parentTransform, SFML.Graphics.Color parentColor) {
+			base.Draw(target, parentTransform, parentColor);
+
+			for (int i = children.Count - 1; i >= 0; i--) {
+				children[i].Draw(target, Transform, parentColor * Color);
+			}
+		}
+
+		private PreciseRectangle getBounds() {
+			PreciseRectangle retVal = new PreciseRectangle(0.0d, 0.0d, Width, Height);
 
 			for (int i = 0; i < children.Count; i++) {
-				minX = Math.Min(minX, children[i].X);
-				minY = Math.Min(minY, children[i].Y);
-				maxWidth = Math.Max(maxWidth, children[i].X + children[i].Width);
-				maxHeight = Math.Max(maxHeight, children[i].Y + children[i].Height);
+				retVal.X = Math.Min(retVal.X, children[i].X);
+				retVal.Y = Math.Min(retVal.Y, children[i].Y);
+				retVal.Width = Math.Max(retVal.Width, children[i].X + children[i].Width);
+				retVal.Height = Math.Max(retVal.Height, children[i].Y + children[i].Height);
 			}
 
-			_childrenBounds.X = minX;
-			_childrenBounds.Y = minY;
-			_childrenBounds.Width = maxWidth;
-			_childrenBounds.Height = maxHeight;
-
-			boundsChanged = false;
+			return retVal;
 		}
-		private void onBoundsChanged(object sender, EventArgs e) {
-			boundsChanged = true;
+		private void onWindowChanged(object sender, EventArgs e) {
+			for (int i = 0; i < children.Count; i++) {
+				children[i].Window = Window;
+			}
 		}
 	}
 }

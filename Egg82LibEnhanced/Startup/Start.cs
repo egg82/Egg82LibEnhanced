@@ -71,13 +71,13 @@ namespace Egg82LibEnhanced.Startup {
 		}
 
 		//private
-		internal static void addWindow(BaseWindow window) {
+		internal static void AddWindow(BaseWindow window) {
 			if (windows.Contains(window)) {
 				return;
 			}
 			windows.Add(window);
 		}
-		internal static void removeWindow(BaseWindow window) {
+		internal static void RemoveWindow(BaseWindow window) {
 			int index = windows.IndexOf(window);
 			if (index == -1) {
 				return;

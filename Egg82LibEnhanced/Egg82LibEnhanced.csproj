@@ -137,8 +137,8 @@
     <Compile Include="Core\Audio.cs" />
     <Compile Include="Core\PhysicsWorld.cs" />
     <Compile Include="Core\ServerClient.cs" />
-    <Compile Include="Core\SpriteGraphics.cs" />
-    <Compile Include="Core\SpriteSkew.cs" />
+    <Compile Include="Core\DisplayGraphics.cs" />
+    <Compile Include="Core\DisplaySkew.cs" />
     <Compile Include="Core\SQLData.cs" />
     <Compile Include="Core\SQLError.cs" />
     <Compile Include="Core\SubSprite.cs" />

@@ -25,7 +25,7 @@ namespace Egg82LibEnhanced.Utils {
 		private object triDesLock = new object();
 		private TripleDES tripleDes = TripleDES.Create();
 
-		private ECDiffieHellmanCng dh = new ECDiffieHellmanCng(4096);
+		private ECDiffieHellmanCng dh = new ECDiffieHellmanCng(521);
 		private byte[] dhKey = null;
 
 		private RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(4096);
@@ -135,16 +135,16 @@ namespace Egg82LibEnhanced.Utils {
 		///</returns>
 		public byte[] EasyEncrypt(byte[] input, byte[] key) {
 			key = HashSha256(key);
-			byte[] iv = GetRandomBytes(32);
+			byte[] iv = GetRandomBytes(16);
 			byte[] encrypted = EncryptAes(input, key, iv);
 			byte[] combined = Combine(iv, encrypted);
 			byte[] hmac = Hmac256(combined, key);
 			return Combine(hmac, combined);
 		}
 		public byte[] EasyDecrypt(byte[] input, byte[] key) {
-			byte[] newInput = GetPartial(input, input.Length - 64, 64);
+			byte[] newInput = GetPartial(input, input.Length - 48, 48);
 			key = HashSha256(key);
-			byte[] iv = GetPartial(input, 32, 32);
+			byte[] iv = GetPartial(input, 16, 32);
 			byte[] hmac = GetPartial(input, 32);
 			byte[] combined = GetPartial(input, input.Length - 32, 32);
 

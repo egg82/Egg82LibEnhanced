@@ -4,83 +4,66 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 
 namespace Egg82LibEnhanced.Core {
-	public class SpriteGraphics : IDisposable {
+	public class DisplayGraphics : IDisposable {
 		//vars
 		internal event EventHandler BoundsChanged = null;
 		
 		public bool Antialiasing = true;
 
-		private Bitmap graphicsBitmap = new Bitmap(1, 1);
-		private bool _changed = false;
+		internal Bitmap Bitmap = new Bitmap(1, 1);
+		internal volatile bool Changed = false;
 
 		//constructor
-		public SpriteGraphics() {
-			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+		public DisplayGraphics() {
+			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 				g.Clear(Color.Transparent);
 			}
 		}
 
 		//public
-		public bool Changed {
-			get {
-				return _changed;
-			}
-			internal set {
-				_changed = value;
-			}
-		}
-		public Bitmap Bitmap {
-			internal get {
-				return graphicsBitmap;
-			}
-			set {
-				throw new InvalidOperationException("Bitmap cannot be set.");
-			}
-		}
-
 		public void DrawArc(Pen pen, double x, double y, double width, double height, double startAngle, double sweepAngle) {
-			if (x + width + pen.Width > graphicsBitmap.Width || y + height + pen.Width > graphicsBitmap.Height) {
-				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, graphicsBitmap.Width), (int) Math.Max(y + height + pen.Width, graphicsBitmap.Height));
+			if (x + width + pen.Width > Bitmap.Width || y + height + pen.Width > Bitmap.Height) {
+				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, Bitmap.Width), (int) Math.Max(y + height + pen.Width, Bitmap.Height));
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawArc(pen, (float) x, (float) y, (float) width, (float) height, (float) startAngle, (float) sweepAngle);
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawArc(pen, (float) x, (float) y, (float) width, (float) height, (float) startAngle, (float) sweepAngle);
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 		public void DrawBezier(Pen pen, double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
-			int maxX = (int) Math.Max(Math.Max(Math.Max(Math.Max(x1 + pen.Width, x2 + pen.Width), x3 + pen.Width), x4 + pen.Width), graphicsBitmap.Width);
-			int maxY = (int) Math.Max(Math.Max(Math.Max(Math.Max(y1 + pen.Width, y2 + pen.Width), y3 + pen.Width), y4 + pen.Width), graphicsBitmap.Height);
-			if (maxX > graphicsBitmap.Width || maxY > graphicsBitmap.Height) {
+			int maxX = (int) Math.Max(Math.Max(Math.Max(Math.Max(x1 + pen.Width, x2 + pen.Width), x3 + pen.Width), x4 + pen.Width), Bitmap.Width);
+			int maxY = (int) Math.Max(Math.Max(Math.Max(Math.Max(y1 + pen.Width, y2 + pen.Width), y3 + pen.Width), y4 + pen.Width), Bitmap.Height);
+			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawBezier(pen, (float) x1, (float) y1, (float) x2, (float) y2, (float) x3, (float) y3, (float) x4, (float) y4);
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawBezier(pen, (float) x1, (float) y1, (float) x2, (float) y2, (float) x3, (float) y3, (float) x4, (float) y4);
 				}
 			}
 
-			_changed = true;
+			Changed = true;
 		}
 		public void DrawBeziers(Pen pen, PrecisePoint[] points) {
-			int maxX = graphicsBitmap.Width;
-			int maxY = graphicsBitmap.Height;
+			int maxX = Bitmap.Width;
+			int maxY = Bitmap.Height;
 
 			for (int i = 0; i < points.Length; i++) {
 				if (points[i].X + pen.Width > maxX) {
@@ -91,27 +74,27 @@ namespace Egg82LibEnhanced.Core {
 				}
 			}
 
-			if (maxX > graphicsBitmap.Width || maxY > graphicsBitmap.Height) {
+			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawBeziers(pen, precisePointArrayToPointFArray(points));
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawBeziers(pen, precisePointArrayToPointFArray(points));
 				}
 			}
-			
-			_changed = true;
+
+			Changed = true;
 		}
 		public void DrawClosedCurve(Pen pen, PrecisePoint[] points, double tension, FillMode fillMode) {
-			int maxX = graphicsBitmap.Width;
-			int maxY = graphicsBitmap.Height;
+			int maxX = Bitmap.Width;
+			int maxY = Bitmap.Height;
 
 			for (int i = 0; i < points.Length; i++) {
 				if ((points[i].X * tension) + pen.Width > maxX) {
@@ -122,27 +105,27 @@ namespace Egg82LibEnhanced.Core {
 				}
 			}
 
-			if (maxX > graphicsBitmap.Width || maxY > graphicsBitmap.Height) {
+			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawClosedCurve(pen, precisePointArrayToPointFArray(points), (float) tension, fillMode);
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawClosedCurve(pen, precisePointArrayToPointFArray(points), (float) tension, fillMode);
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 		public void DrawCurve(Pen pen, PrecisePoint[] points, double offset, int numberOfSegments, double tension) {
-			int maxX = graphicsBitmap.Width;
-			int maxY = graphicsBitmap.Height;
+			int maxX = Bitmap.Width;
+			int maxY = Bitmap.Height;
 
 			for (int i = 0; i < points.Length; i++) {
 				if (((points[i].X + offset) * tension) + pen.Width > maxX) {
@@ -153,68 +136,68 @@ namespace Egg82LibEnhanced.Core {
 				}
 			}
 
-			if (maxX > graphicsBitmap.Width || maxY > graphicsBitmap.Height) {
+			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawCurve(pen, precisePointArrayToPointFArray(points), (int) offset, numberOfSegments, (float) tension);
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawCurve(pen, precisePointArrayToPointFArray(points), (int) offset, numberOfSegments, (float) tension);
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 		public void DrawEllipse(Pen pen, double x, double y, double width, double height) {
-			if (x + width + pen.Width > graphicsBitmap.Width || y + height + pen.Width > graphicsBitmap.Height) {
-				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, graphicsBitmap.Width), (int) Math.Max(y + height + pen.Width, graphicsBitmap.Height));
+			if (x + width + pen.Width > Bitmap.Width || y + height + pen.Width > Bitmap.Height) {
+				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, Bitmap.Width), (int) Math.Max(y + height + pen.Width, Bitmap.Height));
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawEllipse(pen, (float) x, (float) y, (float) width, (float) height);
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawEllipse(pen, (float) x, (float) y, (float) width, (float) height);
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 		public void DrawLine(Pen pen, double x1, double y1, double x2, double y2) {
-			int maxX = (int) Math.Max(Math.Max(x1 + pen.Width, x2 + pen.Width), graphicsBitmap.Width);
-			int maxY = (int) Math.Max(Math.Max(y1 + pen.Width, y2 + pen.Width), graphicsBitmap.Height);
+			int maxX = (int) Math.Max(Math.Max(x1 + pen.Width, x2 + pen.Width), Bitmap.Width);
+			int maxY = (int) Math.Max(Math.Max(y1 + pen.Width, y2 + pen.Width), Bitmap.Height);
 
-			if (maxX > graphicsBitmap.Width || maxY > graphicsBitmap.Height) {
+			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawLine(pen, (float) x1, (float) y1, (float) x2, (float) y2);
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawLine(pen, (float) x1, (float) y1, (float) x2, (float) y2);
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 		public void DrawLines(Pen pen, PrecisePoint[] points) {
-			int maxX = graphicsBitmap.Width;
-			int maxY = graphicsBitmap.Height;
+			int maxX = Bitmap.Width;
+			int maxY = Bitmap.Height;
 
 			for (int i = 0; i < points.Length; i++) {
 				if (points[i].X + pen.Width > maxX) {
@@ -225,46 +208,46 @@ namespace Egg82LibEnhanced.Core {
 				}
 			}
 
-			if (maxX > graphicsBitmap.Width || maxY > graphicsBitmap.Height) {
+			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawLines(pen, precisePointArrayToPointFArray(points));
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawLines(pen, precisePointArrayToPointFArray(points));
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 		public void DrawPie(Pen pen, double x, double y, double width, double height, double startAngle, double sweepAngle) {
-			if (x + width + pen.Width > graphicsBitmap.Width || y + height + pen.Width > graphicsBitmap.Height) {
-				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, graphicsBitmap.Width), (int) Math.Max(y + height + pen.Width, graphicsBitmap.Height));
+			if (x + width + pen.Width > Bitmap.Width || y + height + pen.Width > Bitmap.Height) {
+				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, Bitmap.Width), (int) Math.Max(y + height + pen.Width, Bitmap.Height));
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawPie(pen, (float) x, (float) y, (float) width, (float) height, (float) startAngle, (float) sweepAngle);
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawPie(pen, (float) x, (float) y, (float) width, (float) height, (float) startAngle, (float) sweepAngle);
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 		public void DrawPolygon(Pen pen, PrecisePoint[] points) {
-			int maxX = graphicsBitmap.Width;
-			int maxY = graphicsBitmap.Height;
+			int maxX = Bitmap.Width;
+			int maxY = Bitmap.Height;
 
 			for (int i = 0; i < points.Length; i++) {
 				if (points[i].X + pen.Width > maxX) {
@@ -275,46 +258,46 @@ namespace Egg82LibEnhanced.Core {
 				}
 			}
 
-			if (maxX > graphicsBitmap.Width || maxY > graphicsBitmap.Height) {
+			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawPolygon(pen, precisePointArrayToPointFArray(points));
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawPolygon(pen, precisePointArrayToPointFArray(points));
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 		public void DrawRectangle(Pen pen, double x, double y, double width, double height) {
-			if (x + width + pen.Width > graphicsBitmap.Width || y + height + pen.Width > graphicsBitmap.Height) {
-				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, graphicsBitmap.Width), (int) Math.Max(y + height + pen.Width, graphicsBitmap.Height));
+			if (x + width + pen.Width > Bitmap.Width || y + height + pen.Width > Bitmap.Height) {
+				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, Bitmap.Width), (int) Math.Max(y + height + pen.Width, Bitmap.Height));
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawRectangle(pen, (float) x, (float) y, (float) width, (float) height);
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawRectangle(pen, (float) x, (float) y, (float) width, (float) height);
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 		public void DrawRectangles(Pen pen, PreciseRectangle[] rects) {
-			int maxWidth = graphicsBitmap.Width;
-			int maxHeight = graphicsBitmap.Height;
+			int maxWidth = Bitmap.Width;
+			int maxHeight = Bitmap.Height;
 
 			for (int i = 0; i < rects.Length; i++) {
 				if (rects[i].X + rects[i].Width + pen.Width > maxWidth) {
@@ -325,27 +308,27 @@ namespace Egg82LibEnhanced.Core {
 				}
 			}
 
-			if (maxWidth > graphicsBitmap.Width || maxHeight > graphicsBitmap.Height) {
+			if (maxWidth > Bitmap.Width || maxHeight > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxWidth, maxHeight);
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawRectangles(pen, preciseRectangleArrayToRectangleFArray(rects));
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawRectangles(pen, preciseRectangleArrayToRectangleFArray(rects));
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 		public void FillClosedCurve(Pen pen, PrecisePoint[] points, FillMode fillMode, double tension) {
-			int maxX = graphicsBitmap.Width;
-			int maxY = graphicsBitmap.Height;
+			int maxX = Bitmap.Width;
+			int maxY = Bitmap.Height;
 
 			for (int i = 0; i < points.Length; i++) {
 				if ((points[i].X * tension) + pen.Width > maxX) {
@@ -356,65 +339,65 @@ namespace Egg82LibEnhanced.Core {
 				}
 			}
 
-			if (maxX > graphicsBitmap.Width || maxY > graphicsBitmap.Height) {
+			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillClosedCurve(pen.Brush, precisePointArrayToPointFArray(points), fillMode, (float) tension);
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillClosedCurve(pen.Brush, precisePointArrayToPointFArray(points), fillMode, (float) tension);
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 		public void FillEllipse(Pen pen, double x, double y, double width, double height) {
-			if (x + width + pen.Width > graphicsBitmap.Width || y + height + pen.Width > graphicsBitmap.Height) {
-				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, graphicsBitmap.Width), (int) Math.Max(y + height + pen.Width, graphicsBitmap.Height));
+			if (x + width + pen.Width > Bitmap.Width || y + height + pen.Width > Bitmap.Height) {
+				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, Bitmap.Width), (int) Math.Max(y + height + pen.Width, Bitmap.Height));
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillEllipse(pen.Brush, (float) x, (float) y, (float) width, (float) height);
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillEllipse(pen.Brush, (float) x, (float) y, (float) width, (float) height);
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 		public void FillPie(Pen pen, double x, double y, double width, double height, double startAngle, double sweepAngle) {
-			if (x + width + pen.Width > graphicsBitmap.Width || y + height + pen.Width > graphicsBitmap.Height) {
-				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, graphicsBitmap.Width), (int) Math.Max(y + height + pen.Width, graphicsBitmap.Height));
+			if (x + width + pen.Width > Bitmap.Width || y + height + pen.Width > Bitmap.Height) {
+				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, Bitmap.Width), (int) Math.Max(y + height + pen.Width, Bitmap.Height));
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillPie(pen.Brush, (float) x, (float) y, (float) width, (float) height, (float) startAngle, (float) sweepAngle);
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillPie(pen.Brush, (float) x, (float) y, (float) width, (float) height, (float) startAngle, (float) sweepAngle);
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 		public void FillPolygon(Pen pen, PrecisePoint[] points, FillMode fillMode) {
-			int maxX = graphicsBitmap.Width;
-			int maxY = graphicsBitmap.Height;
+			int maxX = Bitmap.Width;
+			int maxY = Bitmap.Height;
 
 			for (int i = 0; i < points.Length; i++) {
 				if (points[i].X + pen.Width > maxX) {
@@ -425,46 +408,46 @@ namespace Egg82LibEnhanced.Core {
 				}
 			}
 
-			if (maxX > graphicsBitmap.Width || maxY > graphicsBitmap.Height) {
+			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillPolygon(pen.Brush, precisePointArrayToPointFArray(points), fillMode);
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillPolygon(pen.Brush, precisePointArrayToPointFArray(points), fillMode);
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 		public void FillRectangle(Pen pen, double x, double y, double width, double height) {
-			if (x + width + pen.Width > graphicsBitmap.Width || y + height + pen.Width > graphicsBitmap.Height) {
-				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, graphicsBitmap.Width), (int) Math.Max(y + height + pen.Width, graphicsBitmap.Height));
+			if (x + width + pen.Width > Bitmap.Width || y + height + pen.Width > Bitmap.Height) {
+				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, Bitmap.Width), (int) Math.Max(y + height + pen.Width, Bitmap.Height));
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillRectangle(pen.Brush, (float) x, (float) y, (float) width, (float) height);
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillRectangle(pen.Brush, (float) x, (float) y, (float) width, (float) height);
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 		public void FillRectangles(Pen pen, PreciseRectangle[] rects) {
-			int maxWidth = graphicsBitmap.Width;
-			int maxHeight = graphicsBitmap.Height;
+			int maxWidth = Bitmap.Width;
+			int maxHeight = Bitmap.Height;
 
 			for (int i = 0; i < rects.Length; i++) {
 				if (rects[i].X + rects[i].Width + pen.Width > maxWidth) {
@@ -475,43 +458,43 @@ namespace Egg82LibEnhanced.Core {
 				}
 			}
 
-			if (maxWidth > graphicsBitmap.Width || maxHeight > graphicsBitmap.Height) {
+			if (maxWidth > Bitmap.Width || maxHeight > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxWidth, maxHeight);
 				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
-					g.DrawImageUnscaled(graphicsBitmap, new Point(0, 0));
+					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillRectangles(pen.Brush, preciseRectangleArrayToRectangleFArray(rects));
 				}
-				graphicsBitmap = newBitmap;
+				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillRectangles(pen.Brush, preciseRectangleArrayToRectangleFArray(rects));
 				}
 			}
 			
-			_changed = true;
+			Changed = true;
 		}
 
 		public void FillColor(Color color) {
-			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 				g.Clear(color);
 			}
 		}
 		public void Clear() {
-			graphicsBitmap.Dispose();
-			graphicsBitmap = new Bitmap(1, 1);
-			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(graphicsBitmap)) {
+			Bitmap.Dispose();
+			Bitmap = new Bitmap(1, 1);
+			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
 				g.Clear(Color.Transparent);
 			}
 			BoundsChanged?.Invoke(this, EventArgs.Empty);
-			_changed = true;
+			Changed = true;
 		}
 
 		public void Dispose() {
-			graphicsBitmap.Dispose();
-			graphicsBitmap = null;
+			Bitmap.Dispose();
+			Bitmap = null;
 		}
 
 		//private

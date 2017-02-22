@@ -2,15 +2,17 @@
 using System;
 
 namespace Egg82LibEnhanced.Core {
-	public class SpriteSkew {
+	public class DisplaySkew {
 		//vars
+		internal event EventHandler SkewChanged = null;
+
 		private PrecisePoint _topLeft = new PrecisePoint();
 		private PrecisePoint _topRight = new PrecisePoint();
 		private PrecisePoint _bottomLeft = new PrecisePoint();
 		private PrecisePoint _bottomRight = new PrecisePoint();
 
 		//constructor
-		public SpriteSkew() {
+		public DisplaySkew() {
 
 		}
 
@@ -20,10 +22,12 @@ namespace Egg82LibEnhanced.Core {
 				return _topLeft.X;
 			}
 			set {
-				if (double.IsNaN(value) || double.IsInfinity(value)) {
+				if (value == _topLeft.X || double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
+
 				_topLeft.X = value;
+				SkewChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double TopLeftY {
@@ -31,10 +35,12 @@ namespace Egg82LibEnhanced.Core {
 				return _topLeft.Y;
 			}
 			set {
-				if (double.IsNaN(value) || double.IsInfinity(value)) {
+				if (value == _topLeft.Y || double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
-				_topRight.Y = value;
+
+				_topLeft.Y = value;
+				SkewChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double TopRightX {
@@ -42,10 +48,12 @@ namespace Egg82LibEnhanced.Core {
 				return _topRight.X;
 			}
 			set {
-				if (double.IsNaN(value) || double.IsInfinity(value)) {
+				if (value == _topRight.X || double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
+
 				_topRight.X = value;
+				SkewChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double TopRightY {
@@ -53,10 +61,12 @@ namespace Egg82LibEnhanced.Core {
 				return _topRight.Y;
 			}
 			set {
-				if (double.IsNaN(value) || double.IsInfinity(value)) {
+				if (value == _topRight.Y || double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
+
 				_topRight.Y = value;
+				SkewChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double BottomLeftX {
@@ -64,10 +74,12 @@ namespace Egg82LibEnhanced.Core {
 				return _bottomLeft.X;
 			}
 			set {
-				if (double.IsNaN(value) || double.IsInfinity(value)) {
+				if (value == _bottomLeft.X || double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
+
 				_bottomLeft.X = value;
+				SkewChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double BottomLeftY {
@@ -75,10 +87,12 @@ namespace Egg82LibEnhanced.Core {
 				return _bottomLeft.Y;
 			}
 			set {
-				if (double.IsNaN(value) || double.IsInfinity(value)) {
+				if (value == _bottomLeft.Y || double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
+
 				_bottomLeft.Y = value;
+				SkewChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double BottomRightX {
@@ -86,10 +100,12 @@ namespace Egg82LibEnhanced.Core {
 				return _bottomRight.X;
 			}
 			set {
-				if (double.IsNaN(value) || double.IsInfinity(value)) {
+				if (value == _bottomRight.X || double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
+
 				_bottomRight.X = value;
+				SkewChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double BottomRightY {
@@ -97,10 +113,12 @@ namespace Egg82LibEnhanced.Core {
 				return _bottomRight.Y;
 			}
 			set {
-				if (double.IsNaN(value) || double.IsInfinity(value)) {
+				if (value == _bottomRight.Y || double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
+
 				_bottomRight.Y = value;
+				SkewChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 

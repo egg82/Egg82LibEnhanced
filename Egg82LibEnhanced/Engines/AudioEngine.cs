@@ -178,9 +178,7 @@ namespace Egg82LibEnhanced.Engines {
 
 		//private
 		private void onError(object sender, ExceptionEventArgs e) {
-			if (Error != null) {
-				Error.Invoke(this, new ExceptionEventArgs(e.Exception));
-			}
+			Error?.Invoke(this, new ExceptionEventArgs(e.Exception));
 		}
 		private void onRecordData(object sender, WaveInEventArgs e) {
 			List<int> unwritables = new List<int>();

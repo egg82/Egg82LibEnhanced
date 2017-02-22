@@ -72,6 +72,7 @@
     <Compile Include="Sprites\PhysicsCircleSprite.cs" />
     <Compile Include="States\AudioTestState.cs" />
     <Compile Include="States\ClientServerTestState.cs" />
+    <Compile Include="States\CryptoTestState.cs" />
     <Compile Include="States\GraphicsTestState.cs" />
     <Compile Include="States\InputTestState.cs" />
     <Compile Include="States\PhysicsTestState.cs" />

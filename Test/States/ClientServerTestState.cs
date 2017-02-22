@@ -20,7 +20,9 @@ namespace Test.States {
 		}
 
 		//public
-		public override void OnEnter() {
+
+		//private
+		protected override void OnEnter() {
 			client.Connected += onClientConnected;
 			client.Disconnected += onClientDisconnected;
 			client.Error += onClientError;
@@ -37,11 +39,9 @@ namespace Test.States {
 			server.Open(port);
 			client.Connect("127.0.01", port);
 		}
-		public override void OnExit() {
-			
-		}
+		protected override void OnExit() {
 
-		//private
+		}
 		protected override void OnUpdate(double deltaTime) {
 			
 		}

@@ -9,10 +9,9 @@ namespace Test.Sprites {
 
 		//constructor
 		public InputCircleSprite() {
-			Texture = new Texture(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + ".."  + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Asstes" + Path.DirectorySeparatorChar + "Images" + Path.DirectorySeparatorChar + "ball.png");
-			Texture.Smooth = true;
-			TransformOriginX = Width / 2.0d;
-			TransformOriginY = Height / 2.0d;
+			Texture = new Texture(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + ".."  + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Assets" + Path.DirectorySeparatorChar + "Images" + Path.DirectorySeparatorChar + "ball.png");
+			OffsetX = Width / 2.0d;
+			OffsetY = Height / 2.0d;
 		}
 
 		//public
@@ -23,6 +22,6 @@ namespace Test.Sprites {
 		}
 
 		//private
-
+		
 	}
 }

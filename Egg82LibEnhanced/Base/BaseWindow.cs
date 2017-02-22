@@ -7,6 +7,7 @@ using Egg82LibEnhanced.Startup;
 using Egg82LibEnhanced.Utils;
 using FarseerPhysics.Dynamics;
 using SFML.Graphics;
+using SFML.System;
 using SFML.Window;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,9 @@ namespace Egg82LibEnhanced.Base {
 
 		private QuadTree<DisplayObject> _quadTree = null;
 		private PreciseRectangle oldSize = new PreciseRectangle();
-		
+
+		private Color _color = new Color(255, 255, 255, 255);
+
 		private bool _isFinalized = false;
 
 		//constructor
@@ -54,14 +57,14 @@ namespace Egg82LibEnhanced.Base {
 			_physicsWorld = physicsEngine.CreateWorld();
 			inputEngine.AddWindow(this);
 			gameEngine.AddWindow(this);
-			Start.addWindow(this);
+			Start.AddWindow(this);
 		}
 		~BaseWindow() {
 			_isFinalized = true;
 			gameEngine.RemoveWindow(this);
 			inputEngine.RemoveWindow(this);
 			physicsEngine.RemoveWorld(_physicsWorld);
-			Start.removeWindow(this);
+			Start.RemoveWindow(this);
 		}
 
 		//public
@@ -85,10 +88,16 @@ namespace Egg82LibEnhanced.Base {
 			get {
 				return (double) Size.X;
 			}
+			set {
+				Size = new Vector2u((uint) value, Size.Y);
+			}
 		}
 		public double Height {
 			get {
 				return (double) Size.Y;
+			}
+			set {
+				Size = new Vector2u(Size.X, (uint) value);
 			}
 		}
 
@@ -123,8 +132,7 @@ namespace Egg82LibEnhanced.Base {
 
 			state.Window = this;
 			states.Insert(index, state);
-			state.OnEnter();
-			state.Ready = true;
+			state.Enter();
 		}
 		public void RemoveState(BaseState state) {
 			if (state == null) {
@@ -134,9 +142,8 @@ namespace Egg82LibEnhanced.Base {
 			if (index == -1) {
 				return;
 			}
-
-			state.Ready = false;
-			state.OnExit();
+			
+			state.Exit();
 			states.RemoveAt(index);
 			state.Window = null;
 		}
@@ -183,16 +190,16 @@ namespace Egg82LibEnhanced.Base {
 			}
 
 			int index = states.IndexOf(oldState);
-			if (index == -1 || !oldState.HasExitState(newState.GetType())) {
+			if (index == -1) {
 				return false;
 			}
 
 			oldState.Ready = false;
-			oldState.OnExit();
+			oldState.Exit();
 			oldState.Window = null;
 			newState.Window = this;
 			states[index] = newState;
-			newState.OnEnter();
+			newState.Enter();
 			newState.Ready = true;
 			return true;
 		}
@@ -222,15 +229,15 @@ namespace Egg82LibEnhanced.Base {
 
 		//private
 		internal void Draw() {
-			SetActive(true);
+			//SetActive(true);
 			Clear(Color.Transparent);
 			for (int i = states.Count - 1; i >= 0; i--) {
 				if (states[i].Ready) {
-					states[i].Draw(this, Transform.Identity);
+					states[i].Draw(this, Transform.Identity, _color);
 				}
 			}
 			Display();
-			SetActive(false);
+			//SetActive(false);
 		}
 
 		private void onClosed(object sender, EventArgs e) {
@@ -245,7 +252,7 @@ namespace Egg82LibEnhanced.Base {
 				_quadTree.Add(objects[i]);
 			}
 			for (int i = 0; i < states.Count; i++) {
-				states[i].OnResize(Width, Height);
+				states[i].Resize(Width, Height);
 			}
 		}
 	}

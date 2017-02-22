@@ -1,11 +1,9 @@
 ﻿using Egg82LibEnhanced.Graphics;
 using System;
-using System.Collections.Generic;
 
 namespace Egg82LibEnhanced.Base {
 	public abstract class BaseState : DisplayObjectContainer {
 		//vars
-		private List<Type> exitStates = new List<Type>();
 		internal volatile bool Ready = false;
 
 		//constructor
@@ -14,33 +12,24 @@ namespace Egg82LibEnhanced.Base {
 		}
 
 		//public
-		public abstract void OnEnter();
-		public abstract void OnExit();
-		virtual public void OnResize(double width, double height) {
-
-		}
-		
-		public bool HasExitState(Type state) {
-			if (state == null) {
-				throw new ArgumentNullException("state");
-			}
-			return exitStates.Contains(state);
-		}
 
 		//private
-		protected void AddExitState(Type state) {
-			if (state == null) {
-				throw new ArgumentNullException("state");
-			}
-			if (!exitStates.Contains(state)) {
-				exitStates.Add(state);
-			}
+		internal virtual void Enter() {
+			OnEnter();
+			Ready = true;
 		}
-		protected void RemoveExitState(Type state) {
-			if (state == null) {
-				throw new ArgumentNullException("state");
-			}
-			exitStates.Remove(state);
+		internal virtual void Exit() {
+			Ready = false;
+			OnExit();
+		}
+		internal virtual void Resize(double width, double height) {
+			OnResize(width, height);
+		}
+
+		protected abstract void OnEnter();
+		protected abstract void OnExit();
+		protected virtual void OnResize(double width, double height) {
+
 		}
 	}
 }

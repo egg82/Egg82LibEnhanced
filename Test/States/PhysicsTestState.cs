@@ -22,7 +22,9 @@ namespace Test.States {
 		}
 
 		//public
-		public override void OnEnter() {
+
+		//private
+		protected override void OnEnter() {
 			borders[0] = createBorder(Window.Width, 1.0d);
 			borders[0].Position = new Vector2(PhysicsEngine.ToMeters(Window.Width / 2.0d), PhysicsEngine.ToMeters(-0.5d));
 			borders[1] = createBorder(Window.Width, 1.0d);
@@ -39,7 +41,7 @@ namespace Test.States {
 				sprite.CreateBody(Window.PhysicsWorld);
 			}
 		}
-		public override void OnExit() {
+		protected override void OnExit() {
 			while (circles.Count > 0) {
 				PhysicsCircleSprite sprite = circles[0];
 				circles.RemoveAt(0);
@@ -48,8 +50,6 @@ namespace Test.States {
 				circleFactory.ReturnObject(sprite);
 			}
 		}
-
-		//private
 		protected override void OnUpdate(double deltaTime) {
 			
 		}

@@ -13,6 +13,7 @@ namespace Egg82LibEnhanced.Engines {
 		private double _simulationAccuracy = 1.0d;
 		private double _speed = 1.0d;
 
+		private object worldLock = new object();
 		private List<World> worlds = new List<World>();
 		//private List<PhysicsWorld> worlds = new List<PhysicsWorld>();
 
@@ -58,7 +59,9 @@ namespace Egg82LibEnhanced.Engines {
 
 		public World CreateWorld() {
 			World world = new World(new Vector2(0.0f, 0.0f));
-			worlds.Add(world);
+			lock (worldLock) {
+				worlds.Add(world);
+			}
 			return world;
 		}
 		/*public PhysicsWorld CreateWorld() {
@@ -70,7 +73,9 @@ namespace Egg82LibEnhanced.Engines {
 			if (world == null) {
 				throw new ArgumentNullException("world");
 			}
-			worlds.Remove(world);
+			lock (worldLock) {
+				worlds.Remove(world);
+			}
 		}
 		/*public void RemoveWorld(PhysicsWorld world) {
 			if (world == null) {
@@ -85,8 +90,8 @@ namespace Egg82LibEnhanced.Engines {
 			}
 
 			float dt = (float) (deltaTime * _speed);
-			for (int i = 0; i < worlds.Count; i++) {
-				if (worlds[i].BodyList.Count > 0 || worlds[i].BreakableBodyList.Count > 0) {
+			lock (worldLock) {
+				for (int i = 0; i < worlds.Count; i++) {
 					worlds[i].Step(dt);
 				}
 			}

@@ -150,9 +150,10 @@ namespace Egg82LibEnhanced.Engines {
 		}
 		private void update(PreciseElapsedEventArgs e) {
 			double deltaTime = e.DeltaTime / _targetUpdateInterval;
-
+			
+			Tween.Update(e.DeltaTime);
 			inputEngine.Update();
-			physicsEngine.Update(deltaTime * 0.001d);
+			physicsEngine.Update(e.DeltaTime * 0.001d);
 
 			for (int i = 0; i < windows.Count; i++) {
 				windows[i].Update(deltaTime);

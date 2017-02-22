@@ -8,7 +8,6 @@ namespace Egg82LibEnhanced.Utils {
 		//vars
 		private static List<Tween> tweens = new List<Tween>();
 		private static object listLock = new object();
-		private static PreciseTimer timer = timer = new PreciseTimer((1.0d / 60.0d) * 1000.0d, true, true);
 
 		public event EventHandler Complete = null;
 
@@ -47,12 +46,9 @@ namespace Egg82LibEnhanced.Utils {
 			_end = end;
 			_duration = duration;
 			_type = type;
-			
-			timer.Elapsed += onTimer;
 		}
 		~Tween() {
 			bool running = IsRunning;
-			timer.Elapsed -= onTimer;
 			lock (listLock) {
 				tweens.Remove(this);
 			}
@@ -83,22 +79,7 @@ namespace Egg82LibEnhanced.Utils {
 		public static Tween FromTo(Action<double> setFunc, double start, double end, double duration, EasingType type = EasingType.Linear) {
 			return new Tween(setFunc, start, end, duration, type);
 		}
-
-		public static double UpdateInterval {
-			get {
-				return timer.Interval;
-			}
-			set {
-				if (double.IsNaN(value) || double.IsInfinity(value)) {
-					return;
-				}
-				if (value < 0.001d) {
-					value = 0.001d;
-				}
-				timer.Interval = value;
-			}
-		}
-
+		
 		public bool IsRunning {
 			get {
 				lock (listLock) {
@@ -129,13 +110,11 @@ namespace Egg82LibEnhanced.Utils {
 		}
 
 		public void Pause() {
-			timer.Elapsed -= onTimer;
 			lock (listLock) {
 				tweens.Remove(this);
 			}
 		}
 		public void Stop() {
-			timer.Elapsed -= onTimer;
 			lock (listLock) {
 				tweens.Remove(this);
 			}
@@ -146,21 +125,26 @@ namespace Egg82LibEnhanced.Utils {
 			lock (listLock) {
 				tweens.Add(this);
 			}
-			timer.Elapsed += onTimer;
 		}
 
 		//private
-		private void onTimer(object sender, PreciseElapsedEventArgs e) {
-			totalMillis += e.DeltaTime;
+		internal static void Update(double deltaTime) {
+			lock (listLock) {
+				if (tweens.Count == 0) {
+					return;
+				}
+				for (int i = 0; i < tweens.Count; i++) {
+					tweens[i].update(deltaTime);
+				}
+			}
+		}
+		private void update(double deltaTime) {
+			totalMillis += deltaTime;
 			if (totalMillis < _duration) {
 				setFunc.Invoke(Easing.Ease(_start, _end, _duration, totalMillis, _type));
 			} else {
 				setFunc.Invoke(Easing.Ease(_start, _end, _duration, _duration, _type));
-				timer.Elapsed -= onTimer;
-				lock (listLock) {
-					tweens.Remove(this);
-				}
-				Complete?.Invoke(this, EventArgs.Empty);
+				Stop();
 			}
 		}
 	}

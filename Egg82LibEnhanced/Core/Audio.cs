@@ -168,8 +168,8 @@ namespace Egg82LibEnhanced.Core {
 				return;
 			}
 
-			waveOut.Stop();
 			waveOut.PlaybackStopped -= onPlaybackComplete;
+			waveOut.Stop();
 			waveOut.Dispose();
 			waveStream.Dispose();
 			byteStream.Dispose();
@@ -182,12 +182,11 @@ namespace Egg82LibEnhanced.Core {
 
 		//private
 		private void onPlaybackComplete(object sender, StoppedEventArgs e) {
-			if (e != null) {
-				if (Error != null) {
-					Error.Invoke(this, new ExceptionEventArgs(e.Exception));
-				}
+			if (e.Exception != null) {
+				Error?.Invoke(this, new ExceptionEventArgs(e.Exception));
 			} else {
 				if (Repeating) {
+					waveStream.Position = 0L;
 					waveOut.Play();
 				}
 			}

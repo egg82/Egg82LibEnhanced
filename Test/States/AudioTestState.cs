@@ -11,7 +11,7 @@ namespace Test.States {
 	public class AudioTestState : BaseState {
 		//vars
 		private IAudioEngine audioEngine = ServiceLocator.GetService(typeof(IAudioEngine));
-		private string ambientPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + ".."  + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Asstes" + Path.DirectorySeparatorChar + "Audio" + Path.DirectorySeparatorChar + "725191_Subwoofer-Lullaby.mp3";
+		private string ambientPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + ".."  + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Assets" + Path.DirectorySeparatorChar + "Audio" + Path.DirectorySeparatorChar + "725191_Subwoofer-Lullaby.mp3";
 
 		//constructor
 		public AudioTestState() {
@@ -19,18 +19,18 @@ namespace Test.States {
 		}
 
 		//public
-		public override void OnEnter() {
+
+		//private
+		protected override void OnEnter() {
 			FileUtil.Open(ambientPath);
 			audioEngine.AddAudio("ambient1", AudioType.Ambient, AudioFormat.Mp3, FileUtil.Read(ambientPath, 0, (int) FileUtil.GetTotalBytes(ambientPath)));
 			FileUtil.Close(ambientPath);
 			Audio a = audioEngine.GetAudio("ambient1");
 			a.Play(true);
 		}
-		public override void OnExit() {
-			
-		}
+		protected override void OnExit() {
 
-		//private
+		}
 		protected override void OnUpdate(double deltaTime) {
 			
 		}

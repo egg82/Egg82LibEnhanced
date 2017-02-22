@@ -12,25 +12,25 @@ namespace Test.Sprites {
 	class PhysicsCircleSprite : Egg82LibEnhanced.Graphics.Sprite, IPrototype {
 		//vars
 		private Body physicsBody = null;
-		private float minSpeed = 180.0f;
-		private float maxSpeed = 200.0f;
+		private float minSpeed = 0.5f;
+		private float maxSpeed = 10.0f;
 
 		//constructor
 		public PhysicsCircleSprite(Texture tex = null) {
 			if (tex != null) {
 				Texture = tex;
 			} else {
-				Texture = new Texture(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + ".."  + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Asstes" + Path.DirectorySeparatorChar + "Images" + Path.DirectorySeparatorChar + "ball.png");
+				Texture = new Texture(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + ".."  + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Assets" + Path.DirectorySeparatorChar + "Images" + Path.DirectorySeparatorChar + "ball.png");
 				Texture.Smooth = true;
 			}
-			TransformOriginX = 64.0d;
-			TransformOriginY = 64.0d;
+			OffsetX = Width / 2.0d;
+			OffsetY = Height / 2.0d;
+			ScaleX = ScaleY = 0.5d;
 		}
 
 		//public
 		public void CreateBody(World world) {
-			ScaleX = ScaleY = 0.5d;
-			physicsBody = BodyFactory.CreateCircle(world, PhysicsEngine.ToMeters(128.0d / 4.0d), 0.003f, new Vector2(PhysicsEngine.ToMeters(MathUtil.Random(GlobalWidth / 2.0d, Window.Width - GlobalWidth / 2.0d)), PhysicsEngine.ToMeters(MathUtil.Random(GlobalHeight / 2.0d, Window.Height - GlobalHeight / 2.0d))));
+			physicsBody = BodyFactory.CreateCircle(world, PhysicsEngine.ToMeters(Width / 2.0d), 0.003f, new Vector2(PhysicsEngine.ToMeters(MathUtil.Random(Width / 2.0d, Window.Width - Width / 2.0d)), PhysicsEngine.ToMeters(MathUtil.Random(Height / 2.0d, Window.Height - Height / 2.0d))));
 			physicsBody.BodyType = BodyType.Dynamic;
 			physicsBody.AngularDamping = 0.0f;
 			physicsBody.Restitution = 1.0f;
@@ -39,7 +39,7 @@ namespace Test.Sprites {
 			physicsBody.FixedRotation = false;
 			physicsBody.SleepingAllowed = true;
 
-			physicsBody.ApplyAngularImpulse((float) MathUtil.Random(-1.0d, 1.0d));
+			physicsBody.ApplyAngularImpulse((float) MathUtil.Random(-1000.0d, 1000.0d));
 			physicsBody.ApplyLinearImpulse(new Vector2((float) MathUtil.Random(-1.0d, 1.0d), (float) MathUtil.Random(-1.0d, 1.0d)));
 		}
 		public void DestroyBody(World world) {
