@@ -9,9 +9,11 @@ namespace Egg82LibEnhanced.Engines {
 	public class GameEngine : IGameEngine {
 		//vars
 		private List<BaseWindow> windows = new List<BaseWindow>();
-		private PreciseTimer updateTimer = new PreciseTimer((1.0d / 120.0d) * 1000.0d);
-		private double _targetUpdateInterval = (1.0d / 60.0d) * 1000.0d;
+		private PreciseTimer updateTimer = new PreciseTimer((1.0d / 60.0d) * 1000.0d);
+		private PreciseTimer inputTimer = new PreciseTimer((1.0d / 120.0d) * 1000.0d);
+		private PreciseTimer physicsTimer = new PreciseTimer((1.0d / 60.0d) * 1000.0d);
 		private PreciseTimer drawTimer = new PreciseTimer((1.0d / 60.0d) * 1000.0d);
+		private double _targetUpdateInterval = (1.0d / 60.0d) * 1000.0d;
 		private bool _drawSync = true;
 		private object drawLock = new object();
 
@@ -22,15 +24,35 @@ namespace Egg82LibEnhanced.Engines {
 		public GameEngine() {
 			updateTimer.Elapsed += onUpdateTimer;
 			updateTimer.AutoReset = true;
-
+			inputTimer.Elapsed += onInputTimer;
+			inputTimer.AutoReset = true;
+			physicsTimer.Elapsed += onPhysicsTimer;
+			physicsTimer.AutoReset = true;
 			drawTimer.Elapsed += onDrawTimer;
 			drawTimer.AutoReset = true;
 
+			int processors = Environment.ProcessorCount;
+			if (processors >= 4) {
+				drawTimer.ProcessorNumber = processors - 3;
+				updateTimer.ProcessorNumber = processors - 2;
+				inputTimer.ProcessorNumber = processors - 1;
+				physicsTimer.ProcessorNumber = processors;
+			} else if (processors >= 2) {
+				drawTimer.ProcessorNumber = 1;
+				updateTimer.ProcessorNumber = 1;
+				inputTimer.ProcessorNumber = 2;
+				physicsTimer.ProcessorNumber = 2;
+			}
+
 			updateTimer.Start();
+			inputTimer.Start();
+			physicsTimer.Start();
 			drawTimer.Start();
 		}
 		~GameEngine() {
 			drawTimer.Stop();
+			physicsTimer.Stop();
+			inputTimer.Stop();
 			updateTimer.Stop();
 		}
 
@@ -99,6 +121,8 @@ namespace Egg82LibEnhanced.Engines {
 					value = 0.001d;
 				}
 				updateTimer.Interval = value;
+				inputTimer.Interval = (value < 0.002d) ? 0.001d : value / 2.0d;
+				physicsTimer.Interval = value;
 
 				if (_drawSync) {
 					checkDrawInterval();
@@ -148,12 +172,16 @@ namespace Egg82LibEnhanced.Engines {
 				update(e);
 			}
 		}
+		private void onInputTimer(object sender, PreciseElapsedEventArgs e) {
+			inputEngine.Update();
+		}
+		private void onPhysicsTimer(object sender, PreciseElapsedEventArgs e) {
+			physicsEngine.Update(e.DeltaTime * 0.001d);
+		}
 		private void update(PreciseElapsedEventArgs e) {
 			double deltaTime = e.DeltaTime / _targetUpdateInterval;
 			
 			Tween.Update(e.DeltaTime);
-			inputEngine.Update();
-			physicsEngine.Update(e.DeltaTime * 0.001d);
 
 			for (int i = 0; i < windows.Count; i++) {
 				windows[i].Update(deltaTime);

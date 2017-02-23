@@ -1,10 +1,18 @@
 ﻿using Egg82LibEnhanced.Events;
 using System;
 using System.Diagnostics;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Egg82LibEnhanced.Utils {
 	public class PreciseTimer {
+		//externs
+		[DllImport("kernel32.dll")]
+		private static extern int GetCurrentThreadId();
+		[DllImport("kernel32.dll")]
+		private static extern int GetCurrentProcessorNumber();
+
 		//vars
 		public event EventHandler<PreciseElapsedEventArgs> Elapsed = null;
 		public bool AutoReset = false;
@@ -12,6 +20,7 @@ namespace Egg82LibEnhanced.Utils {
 		private double _interval = 0.0d;
 		private volatile bool _running = false;
 		private int processors = Environment.ProcessorCount;
+		private int _processorNumber = 0;
 
 		private Thread timerThread = null;
 
@@ -36,6 +45,21 @@ namespace Egg82LibEnhanced.Utils {
 		}
 
 		//public
+		public int ProcessorNumber {
+			get {
+				return _processorNumber;
+			}
+			set {
+				if (value < 0) {
+					value = 0;
+				}
+				if (value > processors) {
+					value = processors;
+				}
+				_processorNumber = value;
+			}
+		}
+		
 		public void Start() {
 			if (_running || _interval == 0.0d) {
 				return;
@@ -74,37 +98,51 @@ namespace Egg82LibEnhanced.Utils {
 
 		//private
 		private void setThread() {
-			timerThread = new Thread(delegate () {
+			timerThread = new Thread(delegate() {
 				Stopwatch watch = new Stopwatch();
+				ProcessThread currentThread = getCurrentThread();
+				Thread.BeginThreadAffinity();
+
+				int oldAffinity = _processorNumber;
+				if (_processorNumber != 0) {
+					currentThread.ProcessorAffinity = new IntPtr(1 << _processorNumber - 1);
+				}
 
 				watch.Start();
 				double lastTime = 0.0d;
-				if (processors <= 1) {
-					do {
-						while (lastTime + watch.Elapsed.TotalMilliseconds < _interval) {
+				do {
+					if (oldAffinity != _processorNumber) {
+						currentThread.ProcessorAffinity = new IntPtr((_processorNumber != 0) ? 1 << _processorNumber - 1 : 0xFFFF);
+						oldAffinity = _processorNumber;
+					}
+					
+					while (lastTime + watch.Elapsed.TotalMilliseconds < _interval) {
+						if (processors > 1) {
+							Thread.SpinWait(1000);
+						} else {
 							Thread.Sleep(1);
 						}
-						double ms = watch.Elapsed.TotalMilliseconds;
-						double dt = ms - lastTime;
-						lastTime = ms;
-						Elapsed?.Invoke(this, new PreciseElapsedEventArgs(ms, dt));
-					} while (_running && AutoReset);
-				} else {
-					do {
-						while (lastTime + watch.Elapsed.TotalMilliseconds < _interval) {
-							Thread.SpinWait(1000);
-						}
-						double ms = watch.Elapsed.TotalMilliseconds;
-						double dt = ms - lastTime;
-						lastTime = ms;
-						Elapsed?.Invoke(this, new PreciseElapsedEventArgs(ms, dt));
-					} while (_running && AutoReset);
-				}
+					}
+					double ms = watch.Elapsed.TotalMilliseconds;
+					double dt = ms - lastTime;
+					lastTime = ms;
+					Elapsed?.Invoke(this, new PreciseElapsedEventArgs(ms, dt));
+				} while (_running && AutoReset);
 				watch.Stop();
 
+				if (oldAffinity != 0) {
+					currentThread.ProcessorAffinity = new IntPtr(0xFFFF);
+				}
+
+				Thread.EndThreadAffinity();
 				_running = false;
 			});
 			timerThread.Priority = ThreadPriority.AboveNormal;
+		}
+
+		private ProcessThread getCurrentThread() {
+			int id = GetCurrentThreadId();
+			return (from ProcessThread thread in Process.GetCurrentProcess().Threads where thread.Id == id select thread).Single();
 		}
 	}
 }
