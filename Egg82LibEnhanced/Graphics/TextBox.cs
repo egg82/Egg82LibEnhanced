@@ -25,7 +25,7 @@ namespace Egg82LibEnhanced.Graphics {
 		private string _text = null;
 		private bool _antiAliasing = true;
 		private Color _color = System.Drawing.Color.White;
-		private PreciseRectangle _hitBox = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
+		private PreciseRectangle _hitBox = new PreciseRectangle();
 
 		private InteractableState _state = InteractableState.Normal;
 

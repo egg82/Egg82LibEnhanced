@@ -347,6 +347,7 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 			set {
 				_color = value;
+				verticesChanged = true;
 			}
 		}
 		public BlendMode BlendMode {
