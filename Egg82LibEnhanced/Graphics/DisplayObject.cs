@@ -1,7 +1,6 @@
 ﻿using Egg82LibEnhanced.Base;
 using Egg82LibEnhanced.Core;
 using Egg82LibEnhanced.Geom;
-using Egg82LibEnhanced.Patterns.Interfaces;
 using Egg82LibEnhanced.Utils;
 using SFML.Graphics;
 using SFML.System;
@@ -12,8 +11,8 @@ namespace Egg82LibEnhanced.Graphics {
 	public abstract class DisplayObject : IQuad {
 		//vars
 		public bool Visible = true;
-
-		internal event EventHandler WindowChanged = null;
+		
+		internal event EventHandler BoundsChanged = null;
 
 		private RenderStates graphicsRenderState = RenderStates.Default;
 		private VertexArray graphicsArray = new VertexArray(PrimitiveType.Quads, 4);
@@ -23,7 +22,7 @@ namespace Egg82LibEnhanced.Graphics {
 		private volatile bool verticesChanged = false;
 		private PreciseRectangle _textureBounds = new PreciseRectangle();
 		private SFML.Graphics.Color _color = new SFML.Graphics.Color(255, 255, 255, 255);
-
+		
 		private PreciseRectangle _localBounds = new PreciseRectangle();
 		private PrecisePoint _offset = new PrecisePoint();
 		private PrecisePoint _scale = new PrecisePoint(1.0d, 1.0d);
@@ -76,7 +75,7 @@ namespace Egg82LibEnhanced.Graphics {
 				return _globalBounds.X;
 			}
 		}
-		public double X {
+		public virtual double X {
 			get {
 				return _localBounds.X;
 			}
@@ -92,7 +91,8 @@ namespace Egg82LibEnhanced.Graphics {
 				reScale(prevScale);
 
 				_localBounds.X = value;
-				applyGlobalBounds();
+				ApplyGlobalBounds();
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double GlobalY {
@@ -100,7 +100,7 @@ namespace Egg82LibEnhanced.Graphics {
 				return _globalBounds.Y;
 			}
 		}
-		public double Y {
+		public virtual double Y {
 			get {
 				return _localBounds.Y;
 			}
@@ -116,15 +116,16 @@ namespace Egg82LibEnhanced.Graphics {
 				reScale(prevScale);
 				
 				_localBounds.Y = value;
-				applyGlobalBounds();
+				ApplyGlobalBounds();
+				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
-		public double Width {
+		public virtual double Width {
 			get {
 				return _localBounds.Width;
 			}
 		}
-		public double Height {
+		public virtual double Height {
 			get {
 				return _localBounds.Height;
 			}
@@ -289,14 +290,8 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 
-				PrecisePoint prevScale = unScale();
-				double prevRotation = unRotate();
-				localTransform.Translate((float) (_offset.X - value), 0.0f);
-				reRotate(prevRotation);
-				reScale(prevScale);
-
+				X += _offset.X - value;
 				_offset.X = value;
-				applyGlobalBounds();
 			}
 		}
 		public double OffsetY {
@@ -308,18 +303,12 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 
-				PrecisePoint prevScale = unScale();
-				double prevRotation = unRotate();
-				localTransform.Translate(0.0f, (float) (_offset.Y - value));
-				reRotate(prevRotation);
-				reScale(prevScale);
-
+				X += _offset.Y - value;
 				_offset.Y = value;
-				applyGlobalBounds();
 			}
 		}
 
-		public DisplayObject Parent {
+		public virtual DisplayObject Parent {
 			get {
 				return _parent;
 			}
@@ -329,10 +318,10 @@ namespace Egg82LibEnhanced.Graphics {
 				}
 
 				_parent = value;
-				applyGlobalBounds();
+				ApplyGlobalBounds();
 			}
 		}
-		public BaseWindow Window {
+		public virtual BaseWindow Window {
 			get {
 				return _window;
 			}
@@ -349,7 +338,6 @@ namespace Egg82LibEnhanced.Graphics {
 				}
 
 				_window = value;
-				WindowChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 
@@ -391,6 +379,8 @@ namespace Egg82LibEnhanced.Graphics {
 			if (!Visible) {
 				return;
 			}
+
+			renderGraphics();
 
 			if (verticesChanged) {
 				graphicsArray[0] = new Vertex(new Vector2f((float) _skew.TopLeftX, (float) _skew.TopLeftY), _color * parentColor, new Vector2f(0.0f, 0.0f));
@@ -460,14 +450,15 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 		
 		private void applyLocalBounds() {
-			_localBounds.Width = (Math.Max(_textureBounds.Width, _graphics.Bitmap.Width) + Math.Max(_skew.TopRightX, _skew.BottomRightX)) * _scale.X;
-			_localBounds.Height = (Math.Max(_textureBounds.Height, _graphics.Bitmap.Height) + Math.Max(_skew.BottomLeftY, _skew.BottomRightY)) * _scale.Y;
+			_localBounds.Width = Math.Max(_textureBounds.Width, _graphics.Bitmap.Width) + Math.Max(_skew.TopRightX, _skew.BottomRightX) * _scale.X;
+			_localBounds.Height = Math.Max(_textureBounds.Height, _graphics.Bitmap.Height) + Math.Max(_skew.BottomLeftY, _skew.BottomRightY) * _scale.Y;
 
-			applyGlobalBounds();
+			ApplyGlobalBounds();
+			BoundsChanged?.Invoke(this, EventArgs.Empty);
 		}
-		private void applyGlobalBounds() {
-			_globalBounds.X = (_parent != null) ? _parent.GlobalX + _localBounds.X - _offset.X : _localBounds.X - _offset.X;
-			_globalBounds.Y = (_parent != null) ? _parent.GlobalY + _localBounds.Y - _offset.Y : _localBounds.Y - _offset.Y;
+		internal void ApplyGlobalBounds() {
+			_globalBounds.X = (_parent != null) ? _parent.GlobalX + _localBounds.X : _localBounds.X;
+			_globalBounds.Y = (_parent != null) ? _parent.GlobalY + _localBounds.Y : _localBounds.Y;
 			_globalBounds.Width = _localBounds.Width;
 			_globalBounds.Height = _localBounds.Height;
 

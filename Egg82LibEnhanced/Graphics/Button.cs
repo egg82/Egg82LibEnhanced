@@ -20,7 +20,7 @@ namespace Egg82LibEnhanced.Graphics {
 		private string _normalTexture = null;
 		private string _downTexture = null;
 		private string _hoverTexture = null;
-		private PreciseRectangle _hitBox = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
+		private PreciseRectangle _hitBox = new PreciseRectangle();
 
 		private InteractableState _state = InteractableState.Normal;
 
@@ -179,7 +179,7 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 
 		private void onMouseDown(object sender, MouseButtonEventArgs e) {
-			if (e.Button == Mouse.Button.Left && e.X >= _hitBox.X && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
+			if (e.Button == Mouse.Button.Left && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
 				if (_state != InteractableState.Down) {
 					if (_downTexture != null) {
 						bool update = false;
@@ -199,7 +199,7 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 		private void onMouseUp(object sender, MouseButtonEventArgs e) {
 			if (e.Button == Mouse.Button.Left && _state == InteractableState.Down) {
-				if (e.X >= _hitBox.X && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
+				if (e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
 					bool update = false;
 					if (_hitBox.X == X && _hitBox.Y == Y && _hitBox.Width == Width && _hitBox.Height == Height) {
 						update = true;
@@ -227,7 +227,7 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 		}
 		private void onMouseMove(object sender, MouseMoveEventArgs e) {
-			if (e.X >= _hitBox.X && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
+			if (e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
 				if (_state == InteractableState.Normal) {
 					if (_hoverTexture != null) {
 						bool update = false;

@@ -176,7 +176,7 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 		private void onMouseUp(object sender, MouseButtonEventArgs e) {
 			if (e.Button == Mouse.Button.Left && _state == InteractableState.Down) {
-				if (e.X >= _hitBox.X && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
+				if (e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
 					_state = InteractableState.Hover;
 					Released?.Invoke(this, EventArgs.Empty);
 				} else {
@@ -186,7 +186,7 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 		}
 		private void onMouseMove(object sender, MouseMoveEventArgs e) {
-			if (e.X >= _hitBox.X && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
+			if (e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
 				if (_state == InteractableState.Normal) {
 					_state = InteractableState.Hover;
 					Entered?.Invoke(this, EventArgs.Empty);
