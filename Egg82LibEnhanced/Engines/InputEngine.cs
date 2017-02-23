@@ -115,6 +115,9 @@ namespace Egg82LibEnhanced.Engines {
 
 		public void Update() {
 			_controllers.NumControllers = 0;
+			if (!_controllers.Supported) {
+				return;
+			}
 
 			for (int i = 0; i < _controllers.controllers.Length; i++) {
 				if (!_controllers.controllers[i].IsConnected) {

@@ -7,6 +7,8 @@ using System;
 namespace Egg82LibEnhanced.Core {
 	public class Controllers {
 		//vars
+		public bool Supported = true;
+		
 		private bool _currentlyUsingController = false;
 		internal Controller[] controllers = new Controller[4];
 		internal Gamepad[] states = new Gamepad[4];
