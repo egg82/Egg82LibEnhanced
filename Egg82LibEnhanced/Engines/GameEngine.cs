@@ -4,9 +4,24 @@ using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Utils;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Egg82LibEnhanced.Engines {
 	public class GameEngine : IGameEngine {
+		//externs
+		[DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		private static extern ExecutionState SetThreadExecutionState(ExecutionState esFlags);
+		
+		//enums
+		[Flags]
+		private enum ExecutionState : uint {
+			ES_SYSTEM_REQUIRED = 0x00000001,
+			ES_DISPLAY_REQUIRED = 0x00000002,
+			//ES_USER_PRESENT = 0x00000004,
+			ES_AWAYMODE_REQUIRED = 0x00000040,
+			ES_CONTINUOUS = 0x80000000
+		}
+		
 		//vars
 		private List<BaseWindow> windows = new List<BaseWindow>();
 		private PreciseTimer updateTimer = new PreciseTimer((1.0d / 60.0d) * 1000.0d);
@@ -22,6 +37,8 @@ namespace Egg82LibEnhanced.Engines {
 
 		//constructor
 		public GameEngine() {
+			SetThreadExecutionState(ExecutionState.ES_CONTINUOUS | ExecutionState.ES_DISPLAY_REQUIRED | ExecutionState.ES_SYSTEM_REQUIRED);
+
 			updateTimer.Elapsed += onUpdateTimer;
 			updateTimer.AutoReset = true;
 			inputTimer.Elapsed += onInputTimer;
