@@ -15,12 +15,12 @@ namespace Egg82LibEnhanced.Utils {
 
 		//vars
 		public event EventHandler<PreciseElapsedEventArgs> Elapsed = null;
-		public bool AutoReset = false;
-
+		public volatile bool AutoReset = false;
+		
 		private double _interval = 0.0d;
 		private volatile bool _running = false;
 		private int processors = Environment.ProcessorCount;
-		private int _processorNumber = 0;
+		private volatile int _processorNumber = 0;
 
 		private Thread timerThread = null;
 
@@ -85,6 +85,8 @@ namespace Egg82LibEnhanced.Utils {
 			set {
 				if (value < 0.0d) {
 					value = 0.0d;
+				}
+				if (value == 0.0d) {
 					Stop();
 				}
 				_interval = value;
@@ -116,7 +118,7 @@ namespace Egg82LibEnhanced.Utils {
 						oldAffinity = _processorNumber;
 					}
 					
-					while (lastTime + watch.Elapsed.TotalMilliseconds < _interval) {
+					while (watch.Elapsed.TotalMilliseconds - lastTime < _interval) {
 						if (processors > 1) {
 							Thread.SpinWait(1000);
 						} else {
@@ -126,6 +128,7 @@ namespace Egg82LibEnhanced.Utils {
 					double ms = watch.Elapsed.TotalMilliseconds;
 					double dt = ms - lastTime;
 					lastTime = ms;
+
 					Elapsed?.Invoke(this, new PreciseElapsedEventArgs(ms, dt));
 				} while (_running && AutoReset);
 				watch.Stop();

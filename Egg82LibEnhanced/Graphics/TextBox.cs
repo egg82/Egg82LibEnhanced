@@ -25,7 +25,7 @@ namespace Egg82LibEnhanced.Graphics {
 		private string _text = null;
 		private bool _antiAliasing = true;
 		private Color _color = System.Drawing.Color.White;
-		private PreciseRectangle _hitBox = new PreciseRectangle();
+		private PreciseRectangle _hitBox = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
 
 		private InteractableState _state = InteractableState.Normal;
 
@@ -209,6 +209,10 @@ namespace Egg82LibEnhanced.Graphics {
 					g.Clear(System.Drawing.Color.Transparent);
 				}
 				Texture = TextureUtil.FromBitmap(fontBitmap);
+				_hitBox.X = 0.0d;
+				_hitBox.Y = 0.0d;
+				_hitBox.Width = 1.0d;
+				_hitBox.Height = 1.0d;
 				return;
 			}
 
@@ -234,15 +238,17 @@ namespace Egg82LibEnhanced.Graphics {
 				}
 			}
 			
-			bool update = false;
+			/*bool update = false;
 			if (_hitBox.X == X && _hitBox.Y == Y && _hitBox.Width == Width && _hitBox.Height == Height) {
 				update = true;
-			}
+			}*/
 			Texture = TextureUtil.FromBitmap(fontBitmap);
-			if (update) {
+			//if (update) {
+				_hitBox.X = 0.0d;
+				_hitBox.Y = 0.0d;
 				_hitBox.Width = Width;
 				_hitBox.Height = Height;
-			}
+			//}
 		}
 	}
 }

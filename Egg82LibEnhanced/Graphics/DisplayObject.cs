@@ -23,15 +23,15 @@ namespace Egg82LibEnhanced.Graphics {
 		private PreciseRectangle _textureBounds = new PreciseRectangle();
 		private SFML.Graphics.Color _color = new SFML.Graphics.Color(255, 255, 255, 255);
 		
-		private PreciseRectangle _localBounds = new PreciseRectangle();
+		private PreciseRectangle _localBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
 		private PrecisePoint _offset = new PrecisePoint();
 		private PrecisePoint _scale = new PrecisePoint(1.0d, 1.0d);
 		private double _rotation = 0.0d;
 
 		private bool _textureSmoothing = true;
 
-		private PreciseRectangle _previousGlobalBounds = new PreciseRectangle();
-		private PreciseRectangle _globalBounds = new PreciseRectangle();
+		private PreciseRectangle _previousGlobalBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
+		private PreciseRectangle _globalBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
 
 		private DisplayGraphics _graphics = new DisplayGraphics();
 		private DisplaySkew _skew = new DisplaySkew();
@@ -84,6 +84,12 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 
+				/*
+				 * Transform.Translate points in whatever direction rotation is going
+				 * and scales to whatever the Transform's scale is. Solution:
+				 * Undo rotation & scale, translate, then re-rotate and scale.
+				 */
+				 
 				PrecisePoint prevScale = unScale();
 				double prevRotation = unRotate();
 				localTransform.Translate((float) (value - _localBounds.X), 0.0f);
@@ -108,6 +114,12 @@ namespace Egg82LibEnhanced.Graphics {
 				if (value == _localBounds.Y || double.IsNaN(value) || double.IsInfinity(value)) {
 					return;
 				}
+
+				/*
+				 * Transform.Translate points in whatever direction rotation is going
+				 * and scales to whatever the Transform's scale is. Solution:
+				 * Undo rotation & scale, translate, then re-rotate and scale.
+				 */
 
 				PrecisePoint prevScale = unScale();
 				double prevRotation = unRotate();
@@ -136,6 +148,12 @@ namespace Egg82LibEnhanced.Graphics {
 				return renderState.Texture;
 			}
 			set {
+				/*
+				 * Tip: Never access the current Texture's properties
+				 * before switching because a lot of the frameowrk's
+				 * methods call Dispose before swapping textures out.
+				 */
+
 				if (value == null) {
 					renderState.Texture = null;
 					_textureBounds.Width = 0.0d;
@@ -143,12 +161,12 @@ namespace Egg82LibEnhanced.Graphics {
 				} else {
 					value.Smooth = _textureSmoothing;
 
-					if (renderState.Texture == null || (_textureBounds.X == renderArray[0].TexCoords.X && _textureBounds.Y == renderArray[0].TexCoords.Y && _textureBounds.X + _textureBounds.Width == renderArray[2].TexCoords.X && _textureBounds.Y + _textureBounds.Height == renderArray[2].TexCoords.Y)) {
+					//if (renderState.Texture == null || (_textureBounds.X == renderArray[0].TexCoords.X && _textureBounds.Y == renderArray[0].TexCoords.Y && _textureBounds.X + _textureBounds.Width == renderArray[2].TexCoords.X && _textureBounds.Y + _textureBounds.Height == renderArray[2].TexCoords.Y)) {
 						_textureBounds.Width = value.Size.X;
 						_textureBounds.Height = value.Size.Y;
 						applyLocalBounds();
 						verticesChanged = true;
-					}
+					//}
 
 					renderState.Texture = value;
 				}
@@ -290,6 +308,7 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 
+				//Making sure X, Y always points to top-left corner
 				X += _offset.X - value;
 				_offset.X = value;
 			}
@@ -303,6 +322,7 @@ namespace Egg82LibEnhanced.Graphics {
 					return;
 				}
 
+				//Making sure X, Y always points to top-left corner
 				X += _offset.Y - value;
 				_offset.Y = value;
 			}

@@ -121,7 +121,7 @@ namespace Egg82LibEnhanced.Engines {
 			set {
 				_drawSync = value;
 				if (_drawSync) {
-					checkDrawInterval();
+					drawTimer.Interval = checkDrawInterval(drawTimer.Interval);
 				}
 			}
 		}
@@ -132,7 +132,7 @@ namespace Egg82LibEnhanced.Engines {
 			}
 			set {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
-					throw new InvalidOperationException("value cannot be NaN or infinity.");
+					return;
 				}
 				if (value < 0.001d) {
 					value = 0.001d;
@@ -142,7 +142,7 @@ namespace Egg82LibEnhanced.Engines {
 				physicsTimer.Interval = value;
 
 				if (_drawSync) {
-					checkDrawInterval();
+					drawTimer.Interval = checkDrawInterval(drawTimer.Interval);
 				}
 			}
 		}
@@ -152,7 +152,7 @@ namespace Egg82LibEnhanced.Engines {
 			}
 			set {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
-					throw new InvalidOperationException("value cannot be NaN or infinity.");
+					return;
 				}
 				if (value < 0.001d) {
 					value = 0.001d;
@@ -166,16 +166,13 @@ namespace Egg82LibEnhanced.Engines {
 			}
 			set {
 				if (double.IsNaN(value) || double.IsInfinity(value)) {
-					throw new InvalidOperationException("value cannot be NaN or infinity.");
+					return;
 				}
 				if (value < 0.001d) {
 					value = 0.001d;
 				}
-				drawTimer.Interval = value;
 
-				if (_drawSync) {
-					checkDrawInterval();
-				}
+				drawTimer.Interval = (_drawSync) ? checkDrawInterval(value) : value;
 			}
 		}
 
@@ -226,10 +223,16 @@ namespace Egg82LibEnhanced.Engines {
 			}
 		}
 
-		private void checkDrawInterval() {
-			if (updateTimer.Interval % drawTimer.Interval != 0.0d) {
-				drawTimer.Interval = Math.Round((drawTimer.Interval / updateTimer.Interval), MidpointRounding.AwayFromZero) * updateTimer.Interval;
+		private double checkDrawInterval(double value) {
+			if (updateTimer.Interval % value != 0.0d) {
+				value = Math.Round((value / updateTimer.Interval), MidpointRounding.AwayFromZero) * updateTimer.Interval;
 			}
+
+			if (value < 0.001d) {
+				value = 0.001d;
+			}
+
+			return value;
 		}
 	}
 }

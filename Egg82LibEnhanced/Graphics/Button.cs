@@ -20,7 +20,7 @@ namespace Egg82LibEnhanced.Graphics {
 		private string _normalTexture = null;
 		private string _downTexture = null;
 		private string _hoverTexture = null;
-		private PreciseRectangle _hitBox = new PreciseRectangle();
+		private PreciseRectangle _hitBox = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
 
 		private InteractableState _state = InteractableState.Normal;
 
@@ -116,15 +116,17 @@ namespace Egg82LibEnhanced.Graphics {
 				}
 				_normalTexture = value;
 				if (_state == InteractableState.Normal) {
-					bool update = false;
+					/*bool update = false;
 					if (_hitBox.X == X && _hitBox.Y == Y && _hitBox.Width == Width && _hitBox.Height == Height) {
 						update = true;
-					}
+					}*/
 					Texture = atlas.GetTexture(_normalTexture);
-					if (update) {
+					//if (update) {
+						_hitBox.X = 0.0d;
+						_hitBox.Y = 0.0d;
 						_hitBox.Width = Width;
 						_hitBox.Height = Height;
-					}
+					//}
 				}
 			}
 		}
@@ -138,15 +140,17 @@ namespace Egg82LibEnhanced.Graphics {
 				}
 				_downTexture = value;
 				if (_state == InteractableState.Down) {
-					bool update = false;
+					/*bool update = false;
 					if (_hitBox.X == X && _hitBox.Y == Y && _hitBox.Width == Width && _hitBox.Height == Height) {
 						update = true;
-					}
+					}*/
 					Texture = atlas.GetTexture(_downTexture);
-					if (update) {
+					//if (update) {
+						_hitBox.X = 0.0d;
+						_hitBox.Y = 0.0d;
 						_hitBox.Width = Width;
 						_hitBox.Height = Height;
-					}
+					//}
 				}
 			}
 		}
@@ -160,15 +164,17 @@ namespace Egg82LibEnhanced.Graphics {
 				}
 				_hoverTexture = value;
 				if (_state == InteractableState.Hover) {
-					bool update = false;
+					/*bool update = false;
 					if (_hitBox.X == X && _hitBox.Y == Y && _hitBox.Width == Width && _hitBox.Height == Height) {
 						update = true;
-					}
+					}*/
 					Texture = atlas.GetTexture(_hoverTexture);
-					if (update) {
+					//if (update) {
+						_hitBox.X = 0.0d;
+						_hitBox.Y = 0.0d;
 						_hitBox.Width = Width;
 						_hitBox.Height = Height;
-					}
+					//}
 				}
 			}
 		}
@@ -182,15 +188,17 @@ namespace Egg82LibEnhanced.Graphics {
 			if (e.Button == Mouse.Button.Left && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
 				if (_state != InteractableState.Down) {
 					if (_downTexture != null) {
-						bool update = false;
+						/*bool update = false;
 						if (_hitBox.X == X && _hitBox.Y == Y && _hitBox.Width == Width && _hitBox.Height == Height) {
 							update = true;
-						}
+						}*/
 						Texture = atlas.GetTexture(_downTexture);
-						if (update) {
+						//if (update) {
+							_hitBox.X = 0.0d;
+							_hitBox.Y = 0.0d;
 							_hitBox.Width = Width;
 							_hitBox.Height = Height;
-						}
+						//}
 					}
 					_state = InteractableState.Down;
 					Pressed?.Invoke(this, EventArgs.Empty);
@@ -200,27 +208,31 @@ namespace Egg82LibEnhanced.Graphics {
 		private void onMouseUp(object sender, MouseButtonEventArgs e) {
 			if (e.Button == Mouse.Button.Left && _state == InteractableState.Down) {
 				if (e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
-					bool update = false;
+					/*bool update = false;
 					if (_hitBox.X == X && _hitBox.Y == Y && _hitBox.Width == Width && _hitBox.Height == Height) {
 						update = true;
-					}
+					}*/
 					Texture = (_hoverTexture != null) ? atlas.GetTexture(_hoverTexture) : atlas.GetTexture(_normalTexture);
-					if (update) {
+					//if (update) {
+						_hitBox.X = 0.0d;
+						_hitBox.Y = 0.0d;
 						_hitBox.Width = Width;
 						_hitBox.Height = Height;
-					}
+					//}
 					_state = InteractableState.Hover;
 					Released?.Invoke(this, EventArgs.Empty);
 				} else {
-					bool update = false;
+					/*bool update = false;
 					if (_hitBox.X == X && _hitBox.Y == Y && _hitBox.Width == Width && _hitBox.Height == Height) {
 						update = true;
-					}
+					}*/
 					Texture = atlas.GetTexture(_normalTexture);
-					if (update) {
+					//if (update) {
+						_hitBox.X = 0.0d;
+						_hitBox.Y = 0.0d;
 						_hitBox.Width = Width;
 						_hitBox.Height = Height;
-					}
+					//}
 					_state = InteractableState.Normal;
 					ReleasedOutside?.Invoke(this, EventArgs.Empty);
 				}
@@ -230,30 +242,34 @@ namespace Egg82LibEnhanced.Graphics {
 			if (e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
 				if (_state == InteractableState.Normal) {
 					if (_hoverTexture != null) {
-						bool update = false;
+						/*bool update = false;
 						if (_hitBox.X == X && _hitBox.Y == Y && _hitBox.Width == Width && _hitBox.Height == Height) {
 							update = true;
-						}
+						}*/
 						Texture = atlas.GetTexture(_hoverTexture);
-						if (update) {
+						//if (update) {
+							_hitBox.X = 0.0d;
+							_hitBox.Y = 0.0d;
 							_hitBox.Width = Width;
 							_hitBox.Height = Height;
-						}
+						//}
 					}
 					_state = InteractableState.Hover;
 					Entered?.Invoke(this, EventArgs.Empty);
 				}
 			} else {
 				if (_state == InteractableState.Hover) {
-					bool update = false;
+					/*bool update = false;
 					if (_hitBox.X == X && _hitBox.Y == Y && _hitBox.Width == Width && _hitBox.Height == Height) {
 						update = true;
-					}
+					}*/
 					Texture = atlas.GetTexture(_normalTexture);
-					if (update) {
+					//if (update) {
+						_hitBox.X = 0.0d;
+						_hitBox.Y = 0.0d;
 						_hitBox.Width = Width;
 						_hitBox.Height = Height;
-					}
+					//}
 					_state = InteractableState.Normal;
 					Exited?.Invoke(this, EventArgs.Empty);
 				}
