@@ -10,8 +10,6 @@ namespace Egg82LibEnhanced.Utils {
 		//externs
 		[DllImport("kernel32.dll")]
 		private static extern int GetCurrentThreadId();
-		[DllImport("kernel32.dll")]
-		private static extern int GetCurrentProcessorNumber();
 
 		//vars
 		public event EventHandler<PreciseElapsedEventArgs> Elapsed = null;
@@ -118,7 +116,12 @@ namespace Egg82LibEnhanced.Utils {
 						oldAffinity = _processorNumber;
 					}
 					
-					while (watch.Elapsed.TotalMilliseconds - lastTime < _interval) {
+					/*
+					 * 0.002 ms is about the time it takes
+					 * to do the below operations. Need to
+					 * take that into account!
+					 */
+					while (watch.Elapsed.TotalMilliseconds - lastTime < _interval - 0.002d) {
 						if (processors > 1) {
 							Thread.SpinWait(1000);
 						} else {
