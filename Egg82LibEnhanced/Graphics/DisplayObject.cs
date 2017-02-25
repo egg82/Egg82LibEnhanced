@@ -229,7 +229,7 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 		}
 
-		public bool TextureSmoothing {
+		public virtual bool TextureSmoothing {
 			get {
 				return _textureSmoothing;
 			}
@@ -471,8 +471,8 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 		
 		private void applyLocalBounds() {
-			_localBounds.Width = Math.Max(_textureBounds.Width, _graphics.Bitmap.Width) + Math.Max(_skew.TopRightX, _skew.BottomRightX) * _scale.X;
-			_localBounds.Height = Math.Max(_textureBounds.Height, _graphics.Bitmap.Height) + Math.Max(_skew.BottomLeftY, _skew.BottomRightY) * _scale.Y;
+			_localBounds.Width = (Math.Max(_textureBounds.Width, _graphics.Bitmap.Width) + Math.Max(_skew.TopRightX, _skew.BottomRightX)) * _scale.X;
+			_localBounds.Height = (Math.Max(_textureBounds.Height, _graphics.Bitmap.Height) + Math.Max(_skew.BottomLeftY, _skew.BottomRightY)) * _scale.Y;
 
 			ApplyGlobalBounds();
 			BoundsChanged?.Invoke(this, EventArgs.Empty);

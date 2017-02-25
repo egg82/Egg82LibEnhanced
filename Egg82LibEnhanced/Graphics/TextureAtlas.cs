@@ -144,8 +144,11 @@ namespace Egg82LibEnhanced.Graphics {
 			if (name == null) {
 				throw new ArgumentNullException("name");
 			}
-
-			Bitmap bitmap = TextureUtil.GetRegion(atlasBitmap, region, (rotated) ? -90.0d : 0.0d);
+			
+			Bitmap bitmap = TextureUtil.GetRegion(atlasBitmap, region);
+			if (rotated) {
+				bitmap.RotateFlip(RotateFlipType.Rotate90FlipXY);
+			}
 
 			if (subBitmaps.ContainsKey(name)) {
 				subBitmaps[name] = bitmap;

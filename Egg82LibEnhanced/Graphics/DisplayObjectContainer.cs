@@ -81,6 +81,18 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 		}
 
+		public override bool TextureSmoothing {
+			get {
+				return base.TextureSmoothing;
+			}
+			set {
+				base.TextureSmoothing = value;
+				for (int i = 0; i < children.Count; i++) {
+					children[i].TextureSmoothing = value;
+				}
+			}
+		}
+
 		public void AddChild(DisplayObject obj, int index = 0) {
 			if (obj == null) {
 				throw new ArgumentNullException("obj");

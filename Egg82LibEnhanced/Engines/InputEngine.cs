@@ -83,6 +83,11 @@ namespace Egg82LibEnhanced.Engines {
 			if (windows.Contains(window)) {
 				return;
 			}
+
+			if (windows.Count == 0) {
+				_focusedWindow = window;
+				Mouse.currentWindow = window;
+			}
 			
 			window.GainedFocus += onFocused;
 			window.KeyPressed += onKeyDown;
@@ -137,161 +142,105 @@ namespace Egg82LibEnhanced.Engines {
 
 				if ((tempState.Buttons & GamepadButtonFlags.A) != GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.A) == GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonDown != null) {
-						ButtonDown.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.A));
-					}
+					ButtonDown?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.A));
 				} else if ((tempState.Buttons & GamepadButtonFlags.A) == GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.A) != GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonUp != null) {
-						ButtonUp.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.A));
-					}
+					ButtonUp?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.A));
 				}
 				if ((tempState.Buttons & GamepadButtonFlags.B) != GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.B) == GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonDown != null) {
-						ButtonDown.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.B));
-					}
+					ButtonDown?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.B));
 				} else if ((tempState.Buttons & GamepadButtonFlags.B) == GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.B) != GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonUp != null) {
-						ButtonUp.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.B));
-					}
+					ButtonUp?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.B));
 				}
 				if ((tempState.Buttons & GamepadButtonFlags.Y) != GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.Y) == GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonDown != null) {
-						ButtonDown.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Y));
-					}
+					ButtonDown?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Y));
 				} else if ((tempState.Buttons & GamepadButtonFlags.Y) == GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.Y) != GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonUp != null) {
-						ButtonUp.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Y));
-					}
+					ButtonUp?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Y));
 				}
 				if ((tempState.Buttons & GamepadButtonFlags.X) != GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.X) == GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonDown != null) {
-						ButtonDown.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.X));
-					}
+					ButtonDown?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.X));
 				} else if ((tempState.Buttons & GamepadButtonFlags.X) == GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.X) != GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonUp != null) {
-						ButtonUp.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.X));
-					}
+					ButtonUp?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.X));
 				}
 
 				if ((tempState.Buttons & GamepadButtonFlags.LeftShoulder) != GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.LeftShoulder) == GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonDown != null) {
-						ButtonDown.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.LeftBumper));
-					}
+					ButtonDown?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.LeftBumper));
 				} else if ((tempState.Buttons & GamepadButtonFlags.LeftShoulder) == GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.LeftShoulder) != GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonUp != null) {
-						ButtonUp.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.LeftBumper));
-					}
+					ButtonUp?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.LeftBumper));
 				}
 				if ((tempState.Buttons & GamepadButtonFlags.RightShoulder) != GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.RightShoulder) == GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonDown != null) {
-						ButtonDown.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.RightBumper));
-					}
+					ButtonDown?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.RightBumper));
 				} else if ((tempState.Buttons & GamepadButtonFlags.RightShoulder) == GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.RightShoulder) != GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonUp != null) {
-						ButtonUp.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.RightBumper));
-					}
+					ButtonUp?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.RightBumper));
 				}
 
 				if ((tempState.Buttons & GamepadButtonFlags.LeftThumb) != GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.LeftThumb) == GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonDown != null) {
-						ButtonDown.Invoke(this, new ButtonEventArgs(XboxButtonCode.LeftStick));
-					}
+					ButtonDown?.Invoke(this, new ButtonEventArgs(XboxButtonCode.LeftStick));
 				} else if ((tempState.Buttons & GamepadButtonFlags.LeftThumb) == GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.LeftThumb) != GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonUp != null) {
-						ButtonUp.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.LeftStick));
-					}
+					ButtonUp?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.LeftStick));
 				}
 				if ((tempState.Buttons & GamepadButtonFlags.RightThumb) != GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.RightThumb) == GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonDown != null) {
-						ButtonDown.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.RightStick));
-					}
+					ButtonDown?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.RightStick));
 				} else if ((tempState.Buttons & GamepadButtonFlags.RightThumb) == GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.RightThumb) != GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonUp != null) {
-						ButtonUp.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.RightStick));
-					}
+					ButtonUp?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.RightStick));
 				}
 
 				if ((tempState.Buttons & GamepadButtonFlags.Start) != GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.Start) == GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonDown != null) {
-						ButtonDown.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Start));
-					}
+					ButtonDown?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Start));
 				} else if ((tempState.Buttons & GamepadButtonFlags.Start) == GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.Start) != GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonUp != null) {
-						ButtonUp.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Start));
-					}
+					ButtonUp?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Start));
 				}
 				if ((tempState.Buttons & GamepadButtonFlags.Back) != GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.Back) == GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonDown != null) {
-						ButtonDown.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Back));
-					}
+					ButtonDown?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Back));
 				} else if ((tempState.Buttons & GamepadButtonFlags.Back) == GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.Back) != GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonUp != null) {
-						ButtonUp.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Back));
-					}
+					ButtonUp?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Back));
 				}
 
 				if ((tempState.Buttons & GamepadButtonFlags.DPadUp) != GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.DPadUp) == GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonDown != null) {
-						ButtonDown.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Up));
-					}
+					ButtonDown?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Up));
 				} else if ((tempState.Buttons & GamepadButtonFlags.DPadUp) == GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.DPadUp) != GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonUp != null) {
-						ButtonUp.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Up));
-					}
+					ButtonUp?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Up));
 				}
 				if ((tempState.Buttons & GamepadButtonFlags.DPadDown) != GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.DPadDown) == GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonDown != null) {
-						ButtonDown.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Down));
-					}
+					ButtonDown?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Down));
 				} else if ((tempState.Buttons & GamepadButtonFlags.DPadDown) == GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.DPadDown) != GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonUp != null) {
-						ButtonUp.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Down));
-					}
+					ButtonUp?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Down));
 				}
 				if ((tempState.Buttons & GamepadButtonFlags.DPadLeft) != GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.DPadLeft) == GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonDown != null) {
-						ButtonDown.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Left));
-					}
+					ButtonDown?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Left));
 				} else if ((tempState.Buttons & GamepadButtonFlags.DPadLeft) == GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.DPadLeft) != GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonUp != null) {
-						ButtonUp.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Left));
-					}
+					ButtonUp?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Left));
 				}
 				if ((tempState.Buttons & GamepadButtonFlags.DPadRight) != GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.DPadRight) == GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonDown != null) {
-						ButtonDown.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Right));
-					}
+					ButtonDown?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Right));
 				} else if ((tempState.Buttons & GamepadButtonFlags.DPadRight) == GamepadButtonFlags.None && (_controllers.states[i].Buttons & GamepadButtonFlags.DPadRight) != GamepadButtonFlags.None) {
 					_controllers.CurrentlyUsingController = true;
-					if (ButtonUp != null) {
-						ButtonUp.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Right));
-					}
+					ButtonUp?.Invoke(_focusedWindow, new ButtonEventArgs(XboxButtonCode.Right));
 				}
 
 				short dzPos = (short) (_controllers.StickDeadZone * 32767.0d);
@@ -299,100 +248,64 @@ namespace Egg82LibEnhanced.Engines {
 
 				if (tempState.LeftThumbY >= dzPos && tempState.LeftThumbX < maxAnglePos && tempState.LeftThumbX > maxAngleNeg) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftN, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftN, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
 				} else if (tempState.LeftThumbX >= dzPos && tempState.LeftThumbY < maxAnglePos && tempState.LeftThumbY > maxAngleNeg) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftE, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftE, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
 				} else if (tempState.LeftThumbY <= dzNeg && tempState.LeftThumbX < maxAnglePos && tempState.LeftThumbX > maxAngleNeg) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftS, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftS, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
 				} else if (tempState.LeftThumbX <= dzNeg && tempState.LeftThumbY < maxAnglePos && tempState.LeftThumbY > maxAngleNeg) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftW, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftW, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
 				} else if (tempState.LeftThumbY >= dzPos && tempState.LeftThumbX >= maxAnglePos) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftNE, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftNE, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
 				} else if (tempState.LeftThumbY >= dzPos && tempState.LeftThumbX <= maxAngleNeg) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftNW, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftNW, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
 				} else if (tempState.LeftThumbY <= dzNeg && tempState.LeftThumbX >= maxAnglePos) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftSE, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftSE, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
 				} else if (tempState.LeftThumbY <= dzNeg && tempState.LeftThumbX <= maxAngleNeg) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftSW, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.LeftSW, new PrecisePoint((tempState.LeftThumbX < 0) ? tempState.LeftThumbX / 32768.0d : tempState.LeftThumbX / 32767.0d, (tempState.LeftThumbY < 0) ? tempState.LeftThumbY / 32768.0d : tempState.LeftThumbY / 32767.0d)));
 				}
 				if (tempState.RightThumbY >= dzPos && tempState.RightThumbX < maxAnglePos && tempState.RightThumbX > maxAngleNeg) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightN, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightN, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
 				} else if (tempState.RightThumbX >= dzPos && tempState.RightThumbY < maxAnglePos && tempState.RightThumbY > maxAngleNeg) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightE, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightE, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
 				} else if (tempState.RightThumbY <= dzNeg && tempState.RightThumbX < maxAnglePos && tempState.RightThumbX > maxAngleNeg) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightS, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightS, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
 				} else if (tempState.RightThumbX <= dzNeg && tempState.RightThumbY < maxAnglePos && tempState.RightThumbY > maxAngleNeg) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightW, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightW, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
 				} else if (tempState.RightThumbY >= dzPos && tempState.RightThumbX >= maxAnglePos) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightNE, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightNE, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
 				} else if (tempState.RightThumbY >= dzPos && tempState.RightThumbX <= maxAngleNeg) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightNW, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightNW, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
 				} else if (tempState.RightThumbY <= dzNeg && tempState.RightThumbX >= maxAnglePos) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightSE, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightSE, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
 				} else if (tempState.RightThumbY <= dzNeg && tempState.RightThumbX <= maxAngleNeg) {
 					_controllers.CurrentlyUsingController = true;
-					if (StickMoved != null) {
-						StickMoved.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightSW, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
-					}
+					StickMoved?.Invoke(_focusedWindow, new StickEventArgs(XboxStickCode.RightSW, new PrecisePoint((tempState.RightThumbX < 0) ? tempState.RightThumbX / 32768.0d : tempState.RightThumbX / 32767.0d, (tempState.RightThumbY < 0) ? tempState.RightThumbY / 32768.0d : tempState.RightThumbY / 32767.0d)));
 				}
 
 				byte dzTrig = (byte) (_controllers.TriggerDeadZone * 255.0d);
 
 				if (tempState.LeftTrigger >= dzTrig) {
 					_controllers.CurrentlyUsingController = true;
-					if (TriggerPressed != null) {
-						TriggerPressed.Invoke(_focusedWindow, new TriggerEventArgs(XboxTriggerCode.Left, tempState.LeftTrigger / 255.0d));
-					}
+					TriggerPressed?.Invoke(_focusedWindow, new TriggerEventArgs(XboxTriggerCode.Left, tempState.LeftTrigger / 255.0d));
 				}
 				if (tempState.RightTrigger >= dzTrig) {
 					_controllers.CurrentlyUsingController = true;
-					if (TriggerPressed != null) {
-						TriggerPressed.Invoke(_focusedWindow, new TriggerEventArgs(XboxTriggerCode.Right, tempState.RightTrigger / 255.0d));
-					}
+					TriggerPressed?.Invoke(_focusedWindow, new TriggerEventArgs(XboxTriggerCode.Right, tempState.RightTrigger / 255.0d));
 				}
 
 				_controllers.states[i] = tempState;
@@ -412,10 +325,8 @@ namespace Egg82LibEnhanced.Engines {
 				return;
 			}
 			_keyboard.keys[key] = true;
-
-			if (KeyDown != null) {
-				KeyDown.Invoke(sender, e);
-			}
+			
+			KeyDown?.Invoke(sender, e);
 		}
 		private void onKeyUp(object sender, KeyEventArgs e) {
 			_controllers.CurrentlyUsingController = false;
@@ -429,10 +340,8 @@ namespace Egg82LibEnhanced.Engines {
 				return;
 			}
 			_keyboard.keys[key] = false;
-
-			if (KeyUp != null) {
-				KeyUp.Invoke(sender, e);
-			}
+			
+			KeyUp?.Invoke(sender, e);
 		}
 
 		private void onMouseMove(object sender, MouseMoveEventArgs e) {
@@ -440,18 +349,14 @@ namespace Egg82LibEnhanced.Engines {
 			
 			_mouse.X = (double) e.X;
 			_mouse.Y = (double) e.Y;
-
-			if (MouseMove != null) {
-				MouseMove.Invoke(sender, e);
-			}
+			
+			MouseMove?.Invoke(sender, e);
 		}
 		private void onMouseWheel(object sender, MouseWheelScrollEventArgs e) {
 			_controllers.CurrentlyUsingController = false;
 			_mouse.WheelDelta = (double) e.Delta;
-
-			if (MouseWheel != null) {
-				MouseWheel.Invoke(sender, e);
-			}
+			
+			MouseWheel?.Invoke(sender, e);
 		}
 		private void onMouseDown(object sender, MouseButtonEventArgs e) {
 			_controllers.CurrentlyUsingController = false;
@@ -467,10 +372,8 @@ namespace Egg82LibEnhanced.Engines {
 			} else if (e.Button == SFML.Window.Mouse.Button.XButton2) {
 				_mouse.ExtraButton2Down = true;
 			}
-
-			if (MouseDown != null) {
-				MouseDown.Invoke(sender, e);
-			}
+			
+			MouseDown?.Invoke(sender, e);
 		}
 		private void onMouseUp(object sender, MouseButtonEventArgs e) {
 			_controllers.CurrentlyUsingController = false;
@@ -486,14 +389,13 @@ namespace Egg82LibEnhanced.Engines {
 			} else if (e.Button == SFML.Window.Mouse.Button.XButton2) {
 				_mouse.ExtraButton2Down = false;
 			}
-
-			if (MouseUp != null) {
-				MouseUp.Invoke(sender, e);
-			}
+			
+			MouseUp?.Invoke(sender, e);
 		}
 
 		private void onFocused(object sender, EventArgs e) {
 			_focusedWindow = (BaseWindow) sender;
+			_mouse.currentWindow = _focusedWindow;
 		}
 	}
 }

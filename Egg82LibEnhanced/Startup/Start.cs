@@ -56,6 +56,11 @@ namespace Egg82LibEnhanced.Startup {
 		public static void UpdateEvents() {
 			_numWindowsOpen = 0;
 			for (int i = windows.Count - 1; i >= 0; i--) {
+				if (windows[i].NeedsRepacement) {
+					BaseWindow replacement = windows[i].GetReplacement();
+					windows[i].Close();
+					windows[i] = replacement;
+				}
 				windows[i].DispatchEvents();
 				if (windows[i].IsOpen) {
 					_numWindowsOpen++;

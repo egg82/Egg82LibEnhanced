@@ -29,7 +29,7 @@ namespace Egg82LibEnhanced.Engines {
 		private PreciseTimer physicsTimer = new PreciseTimer((1.0d / 60.0d) * 1000.0d);
 		private PreciseTimer drawTimer = new PreciseTimer((1.0d / 60.0d) * 1000.0d);
 		private double _targetUpdateInterval = (1.0d / 60.0d) * 1000.0d;
-		private bool _drawSync = true;
+		private volatile bool _drawSync = true;
 		private object drawLock = new object();
 
 		private IInputEngine inputEngine = (IInputEngine) ServiceLocator.GetService(typeof(IInputEngine));

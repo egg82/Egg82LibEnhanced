@@ -54,7 +54,7 @@ namespace Egg82LibEnhanced.Utils {
 
 			return retVal;
 		}
-		public static Bitmap GetRegion(Bitmap bitmap, Rectangle region, double rotation = 0.0d) {
+		public static Bitmap GetRegion(Bitmap bitmap, Rectangle region) {
 			if (bitmap == null) {
 				throw new ArgumentNullException("bitmap");
 			}
@@ -81,9 +81,6 @@ namespace Egg82LibEnhanced.Utils {
 				g.Clear(System.Drawing.Color.Transparent);
 				g.SmoothingMode = SmoothingMode.AntiAlias;
 				g.DrawImage(bitmap, dest, region, GraphicsUnit.Pixel);
-				if (rotation != 0.0d) {
-					g.RotateTransform((float) rotation);
-				}
 			}
 			return retVal;
 		}
@@ -100,9 +97,21 @@ namespace Egg82LibEnhanced.Utils {
 			if (width <= 0 || height <= 0) {
 				return null;
 			}
+
 			Texture tex = new Texture((uint) width, (uint) height);
 			tex.Update(image);
 			return tex;
+		}
+		public static byte[] ToBytes(Texture image) {
+			if (image == null) {
+				throw new ArgumentNullException("image");
+			}
+
+			SFML.Graphics.Image im = image.CopyToImage();
+			byte[] pixels = im.Pixels;
+			im.Dispose();
+
+			return pixels;
 		}
 
 		public static Bitmap BitmapFromTexture(Texture tex) {
