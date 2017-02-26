@@ -10,6 +10,10 @@ using System.Drawing;
 namespace Egg82LibEnhanced.Graphics {
 	public abstract class DisplayObject : IQuad {
 		//vars
+
+		/// <summary>
+		/// Whether or not the DisplayObject will be drawn to the screen.
+		/// </summary>
 		public bool Visible = true;
 		
 		internal event EventHandler BoundsChanged = null;
@@ -20,7 +24,7 @@ namespace Egg82LibEnhanced.Graphics {
 		private VertexArray renderArray = new VertexArray(PrimitiveType.Quads, 4);
 
 		private volatile bool verticesChanged = false;
-		private PreciseRectangle _textureBounds = new PreciseRectangle();
+		private DisplayRect _textureBounds = new DisplayRect();
 		private SFML.Graphics.Color _color = new SFML.Graphics.Color(255, 255, 255, 255);
 		
 		private PreciseRectangle _localBounds = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
@@ -43,9 +47,13 @@ namespace Egg82LibEnhanced.Graphics {
 		private Transform localTransform = Transform.Identity;
 
 		//constructor
+		/// <summary>
+		/// An object used for displaying graphics to the screen.
+		/// </summary>
 		public DisplayObject() {
 			_graphics.BoundsChanged += onGraphicsBoundsChanged;
-			_skew.SkewChanged += onSkewChanged;
+			_textureBounds.Changed += onTextureBoundsChanged;
+			_skew.Changed += onSkewChanged;
 			graphicsRenderState.Texture = TextureUtil.FromBitmap(_graphics.Bitmap);
 		}
 		~DisplayObject() {
@@ -53,28 +61,44 @@ namespace Egg82LibEnhanced.Graphics {
 				_window.QuadTree.Remove(this);
 			}
 			_graphics.BoundsChanged -= onGraphicsBoundsChanged;
-			_skew.SkewChanged -= onSkewChanged;
+			_textureBounds.Changed -= onTextureBoundsChanged;
+			_skew.Changed -= onSkewChanged;
 			graphicsRenderState.Texture.Dispose();
 			_graphics.Dispose();
 		}
 
 		//public
+		/// <summary>
+		/// Gets a copy of the DisplayObject's local bounds.
+		/// </summary>
 		public PreciseRectangle LocalBounds {
 			get {
 				return (PreciseRectangle) _localBounds.Clone();
 			}
 		}
+		/// <summary>
+		/// Gets a copy of the DisplayObject's global bounds.
+		/// </summary>
 		public PreciseRectangle GlobalBounds {
 			get {
 				return (PreciseRectangle) _globalBounds.Clone();
 			}
 		}
-		
+
+		/// <summary>
+		/// The DisplayObject's global X position. This will always refer to the DisplayObject's leftmost co-ordinate.
+		/// </summary>
 		public double GlobalX {
 			get {
 				return _globalBounds.X;
 			}
+			set {
+				X += value - _globalBounds.X;
+			}
 		}
+		/// <summary>
+		/// The DisplayObject's local X position. This will always refer to the DisplayObject's leftmost co-ordinate.
+		/// </summary>
 		public virtual double X {
 			get {
 				return _localBounds.X;
@@ -101,11 +125,20 @@ namespace Egg82LibEnhanced.Graphics {
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
+		/// <summary>
+		/// The DisplayObject's global Y position. This will always refer to the DisplayObject's topmost co-ordinate.
+		/// </summary>
 		public double GlobalY {
 			get {
 				return _globalBounds.Y;
 			}
+			set {
+				Y += value - _globalBounds.Y;
+			}
 		}
+		/// <summary>
+		/// The DisplayObject's local Y position. This will always refer to the DisplayObject's topmost co-ordinate.
+		/// </summary>
 		public virtual double Y {
 			get {
 				return _localBounds.Y;
@@ -132,17 +165,26 @@ namespace Egg82LibEnhanced.Graphics {
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
+		/// <summary>
+		/// The DisplayObject's width. Read-only.
+		/// </summary>
 		public virtual double Width {
 			get {
 				return _localBounds.Width;
 			}
 		}
+		/// <summary>
+		/// The DisplayObject's height. Read-only.
+		/// </summary>
 		public virtual double Height {
 			get {
 				return _localBounds.Height;
 			}
 		}
 
+		/// <summary>
+		/// The DisplayObject's texture.
+		/// </summary>
 		public Texture Texture {
 			get {
 				return renderState.Texture;
@@ -160,75 +202,28 @@ namespace Egg82LibEnhanced.Graphics {
 					_textureBounds.Height = 0.0d;
 				} else {
 					value.Smooth = _textureSmoothing;
-
-					//if (renderState.Texture == null || (_textureBounds.X == renderArray[0].TexCoords.X && _textureBounds.Y == renderArray[0].TexCoords.Y && _textureBounds.X + _textureBounds.Width == renderArray[2].TexCoords.X && _textureBounds.Y + _textureBounds.Height == renderArray[2].TexCoords.Y)) {
-						_textureBounds.Width = value.Size.X;
-						_textureBounds.Height = value.Size.Y;
-						applyLocalBounds();
-						verticesChanged = true;
-					//}
+					
+					_textureBounds.Width = value.Size.X;
+					_textureBounds.Height = value.Size.Y;
+					applyLocalBounds();
+					verticesChanged = true;
 
 					renderState.Texture = value;
 				}
 			}
 		}
-		public double TextureX {
+		/// <summary>
+		/// The Texture's display rectangle. This means you may have a large texture and display only part of it.
+		/// </summary>
+		public DisplayRect TextureRect {
 			get {
-				return _textureBounds.X;
-			}
-			set {
-				if (value == _textureBounds.X || double.IsNaN(value) || double.IsInfinity(value)) {
-					return;
-				}
-
-				_textureBounds.X = value;
-				applyLocalBounds();
-				verticesChanged = true;
-			}
-		}
-		public double TextureY {
-			get {
-				return _textureBounds.Y;
-			}
-			set {
-				if (value == _textureBounds.Y || double.IsNaN(value) || double.IsInfinity(value)) {
-					return;
-				}
-
-				_textureBounds.Y = value;
-				applyLocalBounds();
-				verticesChanged = true;
-			}
-		}
-		public double TextureWidth {
-			get {
-				return _textureBounds.Width;
-			}
-			set {
-				if (value == _textureBounds.Width || double.IsNaN(value) || double.IsInfinity(value)) {
-					return;
-				}
-
-				_textureBounds.Width = value;
-				applyLocalBounds();
-				verticesChanged = true;
-			}
-		}
-		public double TextureHeight {
-			get {
-				return _textureBounds.Height;
-			}
-			set {
-				if (value == _textureBounds.Height || double.IsNaN(value) || double.IsInfinity(value)) {
-					return;
-				}
-
-				_textureBounds.Height = value;
-				applyLocalBounds();
-				verticesChanged = true;
+				return _textureBounds;
 			}
 		}
 
+		/// <summary>
+		/// Whether or not to smooth-out the DisplayObject's textures.
+		/// </summary>
 		public virtual bool TextureSmoothing {
 			get {
 				return _textureSmoothing;
@@ -244,17 +239,26 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 		}
 
+		/// <summary>
+		/// The DisplayGraphics object attached to this DisplayObject.
+		/// </summary>
 		public DisplayGraphics Graphics {
 			get {
 				return _graphics;
 			}
 		}
+		/// <summary>
+		/// The DisplayObject's skew.
+		/// </summary>
 		public DisplaySkew Skew {
 			get {
 				return _skew;
 			}
 		}
 
+		/// <summary>
+		/// The DisplayObject's scale, width.
+		/// </summary>
 		public double ScaleX {
 			get {
 				return _scale.X;
@@ -270,6 +274,9 @@ namespace Egg82LibEnhanced.Graphics {
 				applyLocalBounds();
 			}
 		}
+		/// <summary>
+		/// The DisplayObject's scale, height.
+		/// </summary>
 		public double ScaleY {
 			get {
 				return _scale.Y;
@@ -285,6 +292,9 @@ namespace Egg82LibEnhanced.Graphics {
 				applyLocalBounds();
 			}
 		}
+		/// <summary>
+		/// The DisplayObject's rotation in degrees.
+		/// </summary>
 		public double Rotation {
 			get {
 				return _rotation;
@@ -299,7 +309,10 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 		}
 
-		public double OffsetX {
+		/// <summary>
+		/// The DisplayObject's tranform offset, X. Rotation and scale transform the object at the transform offset position.
+		/// </summary>
+		public double TransformOffsetX {
 			get {
 				return _offset.X;
 			}
@@ -313,7 +326,10 @@ namespace Egg82LibEnhanced.Graphics {
 				_offset.X = value;
 			}
 		}
-		public double OffsetY {
+		/// <summary>
+		/// The DisplayObject's tranform offset, Y. Rotation and scale transform the object at the transform offset position.
+		/// </summary>
+		public double TransformOffsetY {
 			get {
 				return _offset.Y;
 			}
@@ -328,6 +344,9 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 		}
 
+		/// <summary>
+		/// The DisplayObject's current parent. A DisplayObject may have zero or one parent(s).
+		/// </summary>
 		public virtual DisplayObject Parent {
 			get {
 				return _parent;
@@ -341,6 +360,9 @@ namespace Egg82LibEnhanced.Graphics {
 				ApplyGlobalBounds();
 			}
 		}
+		/// <summary>
+		/// The DisplayObject's current window. A DisplayObject may have zero or one window(s).
+		/// </summary>
 		public virtual BaseWindow Window {
 			get {
 				return _window;
@@ -361,6 +383,9 @@ namespace Egg82LibEnhanced.Graphics {
 			}
 		}
 
+		/// <summary>
+		/// The DisplayObject's color.
+		/// </summary>
 		public SFML.Graphics.Color Color {
 			get {
 				return _color;
@@ -370,6 +395,9 @@ namespace Egg82LibEnhanced.Graphics {
 				verticesChanged = true;
 			}
 		}
+		/// <summary>
+		/// The DisplayObject's blend mode.
+		/// </summary>
 		public BlendMode BlendMode {
 			get {
 				return renderState.BlendMode;
@@ -379,6 +407,9 @@ namespace Egg82LibEnhanced.Graphics {
 				renderState.BlendMode = value;
 			}
 		}
+		/// <summary>
+		/// The DisplayObject's shader.
+		/// </summary>
 		public Shader Shader {
 			get {
 				return renderState.Shader;
@@ -423,7 +454,14 @@ namespace Egg82LibEnhanced.Graphics {
 			target.Draw(renderArray, renderState);
 		}
 
+		/// <summary>
+		/// Called once every frame, after physics and input has been updated. Override this to check inputs, move objects, etc.
+		/// </summary>
+		/// <param name="deltaTime">The amount of time (in percentage of time that's supposed to be taken) between this frame and the last.</param>
 		protected abstract void OnUpdate(double deltaTime);
+		/// <summary>
+		/// Called once every frame, after all objects have had OnUpdate called. Override this to provide double-buffering.
+		/// </summary>
 		virtual protected void OnSwapBuffers() {
 
 		}
@@ -504,9 +542,12 @@ namespace Egg82LibEnhanced.Graphics {
 			Texture tex = TextureUtil.FromBitmap(_graphics.Bitmap);
 			tex.Smooth = _textureSmoothing;
 			graphicsRenderState.Texture = tex;
-			//TextureUtil.UpdateTextureWithBitmap(_graphics.Bitmap, graphicsSprite.Texture);
 		}
 		private void onGraphicsBoundsChanged(object sender, EventArgs e) {
+			applyLocalBounds();
+			verticesChanged = true;
+		}
+		private void onTextureBoundsChanged(object sender, EventArgs e) {
 			applyLocalBounds();
 			verticesChanged = true;
 		}

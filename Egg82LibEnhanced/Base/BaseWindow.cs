@@ -47,7 +47,16 @@ namespace Egg82LibEnhanced.Base {
 		private bool _visible = true;
 
 		//constructor
-		public BaseWindow(double width, double height, string title, Styles style, bool vSync, uint antiAliasing) {
+		/// <summary>
+		/// A physical window that displays on the screen. This is where all DisplayObjects will live when drawn to the screen. You may have multiple windows.
+		/// </summary>
+		/// <param name="width">The window's width.</param>
+		/// <param name="height">The window's height.</param>
+		/// <param name="title">The window's title.</param>
+		/// <param name="style">Any style flags to apply to the window.</param>
+		/// <param name="vSync">(optional) Whether or not this window syncs its rendering to the refresh rate of the monitor.</param>
+		/// <param name="antiAliasing">(optional) The amount of AntiAliasing to use. More = slower but lexx pixelated.</param>
+		public BaseWindow(double width, double height, string title, Styles style, bool vSync = true, uint antiAliasing = 16) {
 			if (double.IsNaN(width)) {
 				throw new ArgumentNullException("width");
 			}
@@ -151,6 +160,9 @@ namespace Egg82LibEnhanced.Base {
 		}
 
 		//public
+		/// <summary>
+		/// Whether or not this window is in fullscreen mode. Setting this value creates a new window.
+		/// </summary>
 		public bool Fullscreen {
 			get {
 				return _fullscreen;
@@ -159,6 +171,9 @@ namespace Egg82LibEnhanced.Base {
 				_fullscreen = value;
 			}
 		}
+		/// <summary>
+		/// This window's title.
+		/// </summary>
 		public string Title {
 			get {
 				return _title;
@@ -175,11 +190,20 @@ namespace Egg82LibEnhanced.Base {
 				window.SetTitle(value);
 			}
 		}
+		/// <summary>
+		/// The amount of AntiAliasing in this window. Setting this value creates a new window.
+		/// </summary>
 		public uint AntiAliasing {
 			get {
 				return _antiAliasing;
 			}
+			set {
+				_antiAliasing = value;
+			}
 		}
+		/// <summary>
+		/// Whether or not the mouse cursor is visible while inside this window.
+		/// </summary>
 		public bool CursorVisible {
 			get {
 				return _cursorVisible;
@@ -193,6 +217,9 @@ namespace Egg82LibEnhanced.Base {
 				window.SetMouseCursorVisible(value);
 			}
 		}
+		/// <summary>
+		/// Whether or not this window is visible.
+		/// </summary>
 		public bool Visible {
 			get {
 				return _visible;
@@ -206,6 +233,9 @@ namespace Egg82LibEnhanced.Base {
 				window.SetVisible(value);
 			}
 		}
+		/// <summary>
+		/// Whether or not this window syncs its rendering to the refresh rate of the monitor.
+		/// </summary>
 		public bool VerticalSync {
 			get {
 				return _vSync;
@@ -218,6 +248,9 @@ namespace Egg82LibEnhanced.Base {
 				_vSync = value;
 			}
 		}
+		/// <summary>
+		/// The icon for this window.
+		/// </summary>
 		public Texture Icon {
 			get {
 				return _icon;
@@ -231,7 +264,18 @@ namespace Egg82LibEnhanced.Base {
 				window.SetIcon(value.Size.X, value.Size.Y, TextureUtil.ToBytes(value));
 			}
 		}
+		/// <summary>
+		/// Whether or not the window is open.
+		/// </summary>
+		public bool IsOpen {
+			get {
+				return window.IsOpen;
+			}
+		}
 
+		/// <summary>
+		/// This window's X position, relative to the main (spawning) monitor and including any border it has.
+		/// </summary>
 		public double X {
 			get {
 				return (double) window.Position.X;
@@ -244,6 +288,9 @@ namespace Egg82LibEnhanced.Base {
 				window.Position = new Vector2i((int) value, window.Position.Y);
 			}
 		}
+		/// <summary>
+		/// This window's Y position, relative to the main (spawning) monitor and inclusing any border it has.
+		/// </summary>
 		public double Y {
 			get {
 				return (double) window.Position.Y;
@@ -256,6 +303,9 @@ namespace Egg82LibEnhanced.Base {
 				window.Position = new Vector2i(window.Position.X, (int) value);
 			}
 		}
+		/// <summary>
+		/// This window's internal width. This excludes any border it has.
+		/// </summary>
 		public double Width {
 			get {
 				return (double) window.Size.X;
@@ -264,6 +314,9 @@ namespace Egg82LibEnhanced.Base {
 				window.Size = new Vector2u((uint) value, window.Size.Y);
 			}
 		}
+		/// <summary>
+		/// This window's internal height. This excludes any border it has.
+		/// </summary>
 		public double Height {
 			get {
 				return (double) window.Size.Y;
@@ -273,21 +326,11 @@ namespace Egg82LibEnhanced.Base {
 			}
 		}
 
-		public void Update(double deltaTime) {
-			for (int i = 0; i < states.Count; i++) {
-				if (states[i].Ready) {
-					states[i].Update(deltaTime);
-				}
-			}
-		}
-		public void SwapBuffers() {
-			for (int i = 0; i < states.Count; i++) {
-				if (states[i].Ready) {
-					states[i].SwapBuffers();
-				}
-			}
-		}
-
+		/// <summary>
+		/// Adds a child BaseState to the BaseWindow.
+		/// </summary>
+		/// <param name="state">The child BaseState to add.</param>
+		/// <param name="index">(optional) The index at which to add the child. The default is the top of the stack.</param>
 		public void AddState(BaseState state, int index = 0) {
 			if (state == null) {
 				throw new ArgumentNullException("state");
@@ -306,6 +349,10 @@ namespace Egg82LibEnhanced.Base {
 			states.Insert(index, state);
 			state.Enter();
 		}
+		/// <summary>
+		/// Removes a child BaseState from the BaseWindow.
+		/// </summary>
+		/// <param name="state">The child BaseState to remove.</param>
 		public void RemoveState(BaseState state) {
 			if (state == null) {
 				throw new ArgumentNullException("state");
@@ -319,6 +366,11 @@ namespace Egg82LibEnhanced.Base {
 			states.RemoveAt(index);
 			state.Window = null;
 		}
+		/// <summary>
+		/// Returns a child BaseState at the specified index.
+		/// </summary>
+		/// <param name="index">The index of the child.</param>
+		/// <returns>The child, or null if the speicified index is out-of-bounds.</returns>
 		public BaseState GetStateAt(int index) {
 			if (index < 0 || index >= states.Count) {
 				return null;
@@ -326,6 +378,11 @@ namespace Egg82LibEnhanced.Base {
 
 			return states[index];
 		}
+		/// <summary>
+		/// Returns the index of the provided child BaseState.
+		/// </summary>
+		/// <param name="state">The child.</param>
+		/// <returns>The index of the provided child, or -1 if the provided BaseState is not a child of this BaseWindow.</returns>
 		public int IndexOf(BaseState state) {
 			if (state == null) {
 				throw new ArgumentNullException("state");
@@ -333,6 +390,11 @@ namespace Egg82LibEnhanced.Base {
 
 			return states.IndexOf(state);
 		}
+		/// <summary>
+		/// Sets the index of the provided child BaseState to the provided index.
+		/// </summary>
+		/// <param name="state">The child.</param>
+		/// <param name="index">The index to set the child to.</param>
 		public void SetIndex(BaseState state, int index) {
 			if (state == null) {
 				throw new ArgumentNullException("state");
@@ -345,7 +407,7 @@ namespace Egg82LibEnhanced.Base {
 			}
 
 			int currentIndex = states.IndexOf(state);
-			if (currentIndex == -1) {
+			if (currentIndex == -1 || index == currentIndex) {
 				return;
 			}
 
@@ -353,6 +415,13 @@ namespace Egg82LibEnhanced.Base {
 			states.Insert(index, state);
 		}
 
+		/// <summary>
+		/// Tries to swap states from the old BaseState provided to the provided new BaseState.
+		/// This swaps at the old BaseState's current index as opposed to adding a new state to the stack.
+		/// </summary>
+		/// <param name="oldState">The old state from which to swap.</param>
+		/// <param name="newState">The new state to swap to.</param>
+		/// <returns>True if successful, false if unsuccessful.</returns>
 		public bool TrySwapStates(BaseState oldState, BaseState newState) {
 			if (oldState == null) {
 				throw new ArgumentNullException("oldState");
@@ -376,18 +445,18 @@ namespace Egg82LibEnhanced.Base {
 			return true;
 		}
 
-		public bool IsOpen {
-			get {
-				return window.IsOpen;
-			}
-		}
-
+		/// <summary>
+		/// The number of child states this BaseWindow has.
+		/// </summary>
 		public int NumStates {
 			get {
 				return states.Count;
 			}
 		}
 
+		/// <summary>
+		/// The physics world attached to this window. Returns null if not using the physics engine.
+		/// </summary>
 		public World PhysicsWorld {
 			get {
 				return _physicsWorld;
@@ -399,24 +468,44 @@ namespace Egg82LibEnhanced.Base {
 			}
 		}*/
 
+		/// <summary>
+		/// The quad tree attached to this window. Contains all DisplayObjects this window has, visible or not.
+		/// The quad tree uses each DisplayObject's GlobalBounds property as the stored bounds.
+		/// </summary>
 		public QuadTree<DisplayObject> QuadTree {
 			get {
 				return _quadTree;
 			}
 		}
 
+		/// <summary>
+		/// Closes the window.
+		/// </summary>
 		public void Close() {
 			window.Close();
 		}
 
 		//private
+		internal void Update(double deltaTime) {
+			for (int i = 0; i < states.Count; i++) {
+				if (states[i].Ready) {
+					states[i].Update(deltaTime);
+				}
+			}
+		}
+		internal void SwapBuffers() {
+			for (int i = 0; i < states.Count; i++) {
+				if (states[i].Ready) {
+					states[i].SwapBuffers();
+				}
+			}
+		}
 		internal void Draw() {
 			if (_vSync != previousVsync) {
 				window.SetVerticalSyncEnabled(_vSync);
 				previousVsync = _vSync;
 			}
 			
-			//SetActive(true);
 			window.Clear(Color.Transparent);
 			for (int i = states.Count - 1; i >= 0; i--) {
 				if (states[i].Ready) {
@@ -424,7 +513,6 @@ namespace Egg82LibEnhanced.Base {
 				}
 			}
 			window.Display();
-			//SetActive(false);
 		}
 		
 		internal bool NeedsRepacement {
@@ -432,6 +520,9 @@ namespace Egg82LibEnhanced.Base {
 				if (_fullscreen && (styles & Styles.Fullscreen) == Styles.None) {
 					return true;
 				} else if (!_fullscreen && (styles & Styles.Fullscreen) != Styles.None) {
+					return true;
+				}
+				if (_antiAliasing != window.Settings.AntialiasingLevel) {
 					return true;
 				}
 				return false;

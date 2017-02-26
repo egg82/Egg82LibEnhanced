@@ -109,6 +109,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\DisplayRect.cs" />
     <Compile Include="Core\IMod.cs" />
     <Compile Include="Core\ModContainer.cs" />
     <Compile Include="Engines\Nulls\NullAudioEngine.cs" />
@@ -141,7 +142,6 @@
     <Compile Include="Core\DisplaySkew.cs" />
     <Compile Include="Core\SQLData.cs" />
     <Compile Include="Core\SQLError.cs" />
-    <Compile Include="Core\SubSprite.cs" />
     <Compile Include="Engines\AudioEngine.cs" />
     <Compile Include="Engines\GameEngine.cs" />
     <Compile Include="Engines\IAudioEngine.cs" />
@@ -172,8 +172,6 @@
     <Compile Include="Net\TcpClient.cs" />
     <Compile Include="Net\TcpServer.cs" />
     <Compile Include="Patterns\Command.cs" />
-    <Compile Include="Patterns\Interfaces\IDrawable.cs" />
-    <Compile Include="Patterns\Interfaces\IUpdatable.cs" />
     <Compile Include="Patterns\IRegistry.cs" />
     <Compile Include="Patterns\ObjectPool.cs" />
     <Compile Include="Patterns\Prototypes\IPrototype.cs" />

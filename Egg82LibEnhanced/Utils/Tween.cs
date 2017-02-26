@@ -9,6 +9,9 @@ namespace Egg82LibEnhanced.Utils {
 		private static List<Tween> tweens = new List<Tween>();
 		private static object listLock = new object();
 
+		/// <summary>
+		/// Called when the tween has finished updating.
+		/// </summary>
 		public event EventHandler Complete = null;
 
 		private Action<double> setFunc = null;
@@ -19,6 +22,14 @@ namespace Egg82LibEnhanced.Utils {
 		private double totalMillis = 0.0d;
 
 		//constructor
+		/// <summary>
+		/// An object used to smoothly translate a field from start to finish with various types of easing. The tween is automatically started upon creation.
+		/// </summary>
+		/// <param name="setFunc">The method that is called with the new value every time the tween is updated.</param>
+		/// <param name="start">The starting value of the tween.</param>
+		/// <param name="end">The ending value of the tween.</param>
+		/// <param name="duration">The duration, in milliseconds, of the tween.</param>
+		/// <param name="type">(optional) The type of easing the tween will use.</param>
 		public Tween(Action<double> setFunc, double start, double end, double duration, EasingType type = EasingType.Linear) {
 			if (setFunc == null) {
 				throw new ArgumentNullException("setFunc");
@@ -59,27 +70,86 @@ namespace Egg82LibEnhanced.Utils {
 		}
 
 		//public
+		/// <summary>
+		/// Creates a tween that sets a property of the specified object. It starts at the specified value and ends at the property's current value.
+		/// </summary>
+		/// <param name="obj">The object to change.</param>
+		/// <param name="propertyName">The name of the property to use.</param>
+		/// <param name="start">The starting value.</param>
+		/// <param name="duration">The duration, in milliseconds, of the tween.</param>
+		/// <param name="type">(optional) The type of easing the tween will use.</param>
+		/// <returns>The tween that was created.</returns>
 		public static Tween From(object obj, string propertyName, double start, double duration, EasingType type = EasingType.Linear) {
 			return From(ReflectUtil.FunctionFromPropertyGetter<double>(obj, propertyName), ReflectUtil.ActionFromPropertySetter<double>(obj, propertyName), start, duration, type);
 		}
+		/// <summary>
+		/// Creates a tween that sets a method. It starts at the specified value and ends at the current value.
+		/// </summary>
+		/// <param name="getFunc">The method that provides the current value.</param>
+		/// <param name="setFunc">The method that is called with the new value every time the tween is updated.</param>
+		/// <param name="start">The starting value.</param>
+		/// <param name="duration">The duration, in milliseconds, of the tween.</param>
+		/// <param name="type">(optional) The type of easing the tween will use.</param>
+		/// <returns>The tween that was created.</returns>
 		public static Tween From(Func<double> getFunc, Action<double> setFunc, double start, double duration, EasingType type = EasingType.Linear) {
 			return new Tween(setFunc, start, getFunc.Invoke(), duration, type);
 		}
 
+		/// <summary>
+		/// Creates a tween that sets a property of the specified object. It starts at the property's current value and ends at the specified value.
+		/// </summary>
+		/// <param name="obj">The object to change.</param>
+		/// <param name="propertyName">The name of the property to use.</param>
+		/// <param name="end">The ending value.</param>
+		/// <param name="duration">The duration, in milliseconds, of the tween.</param>
+		/// <param name="type">(optional) The type of easing the tween will use.</param>
+		/// <returns>The tween that was created.</returns>
 		public static Tween To(object obj, string propertyName, double end, double duration, EasingType type = EasingType.Linear) {
 			return To(ReflectUtil.FunctionFromPropertyGetter<double>(obj, propertyName), ReflectUtil.ActionFromPropertySetter<double>(obj, propertyName), end, duration, type);
 		}
+		/// <summary>
+		/// Creates a tween that sets a method. It starts at the specified value and ends at the current value.
+		/// </summary>
+		/// <param name="getFunc">The method that provides the current value.</param>
+		/// <param name="setFunc">The method that is called with the new value every time the tween is updated.</param>
+		/// <param name="end">The ending value.</param>
+		/// <param name="duration">The duration, in milliseconds, of the tween.</param>
+		/// <param name="type">(optional) The type of easing the tween will use.</param>
+		/// <returns>The tween that was created.</returns>
 		public static Tween To(Func<double> getFunc, Action<double> setFunc, double end, double duration, EasingType type = EasingType.Linear) {
 			return new Tween(setFunc, getFunc.Invoke(), end, duration, type);
 		}
 
+		/// <summary>
+		/// Creates a tween that sets a property of the specified object. It starts at the specified value and ends at the specified value.
+		/// </summary>
+		/// <param name="obj">The object to change.</param>
+		/// <param name="propertyName">The name of the property to use.</param>
+		/// <param name="start">The starting value.</param>
+		/// <param name="end">The ending value.</param>
+		/// <param name="duration">The duration, in milliseconds, of the tween.</param>
+		/// <param name="type">(optional) The type of easing the tween will use.</param>
+		/// <returns>The tween that was created.</returns>
 		public static Tween FromTo(object obj, string propertyName, double start, double end, double duration, EasingType type = EasingType.Linear) {
 			return FromTo(ReflectUtil.ActionFromPropertySetter<double>(obj, propertyName), start, end, duration, type);
 		}
+		/// <summary>
+		/// Creates a tween that sets a method. It starts at the specified value and ends at the specified value.
+		/// </summary>
+		/// <param name="getFunc">The method that provides the current value.</param>
+		/// <param name="setFunc">The method that is called with the new value every time the tween is updated.</param>
+		/// <param name="start">The starting value.</param>
+		/// <param name="end">The ending value.</param>
+		/// <param name="duration">The duration, in milliseconds, of the tween.</param>
+		/// <param name="type">(optional) The type of easing the tween will use.</param>
+		/// <returns>The tween that was created.</returns>
 		public static Tween FromTo(Action<double> setFunc, double start, double end, double duration, EasingType type = EasingType.Linear) {
 			return new Tween(setFunc, start, end, duration, type);
 		}
 		
+		/// <summary>
+		/// Whether or not the tween is currently running.
+		/// </summary>
 		public bool IsRunning {
 			get {
 				lock (listLock) {
@@ -88,32 +158,50 @@ namespace Egg82LibEnhanced.Utils {
 			}
 		}
 
+		/// <summary>
+		/// The starting value of the tween. Read-only.
+		/// </summary>
 		public double StartD {
 			get {
 				return _start;
 			}
 		}
+		/// <summary>
+		/// The ending value of the tween. Read-only.
+		/// </summary>
 		public double EndD {
 			get {
 				return _end;
 			}
 		}
+		/// <summary>
+		/// The duration, in milliseconds, of the tween. Read-only.
+		/// </summary>
 		public double DurationD {
 			get {
 				return _duration;
 			}
 		}
+		/// <summary>
+		/// The easing type of the tween. Read-only.
+		/// </summary>
 		public EasingType TypeD {
 			get {
 				return _type;
 			}
 		}
 
+		/// <summary>
+		/// Pauses the tween, saving its current position.
+		/// </summary>
 		public void Pause() {
 			lock (listLock) {
 				tweens.Remove(this);
 			}
 		}
+		/// <summary>
+		/// Stops and resets the tween.
+		/// </summary>
 		public void Stop() {
 			lock (listLock) {
 				tweens.Remove(this);
@@ -121,6 +209,9 @@ namespace Egg82LibEnhanced.Utils {
 			totalMillis = 0.0d;
 			Complete?.Invoke(this, EventArgs.Empty);
 		}
+		/// <summary>
+		/// Starts/Resumes the tween.
+		/// </summary>
 		public void Start() {
 			lock (listLock) {
 				tweens.Add(this);

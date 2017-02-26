@@ -4,7 +4,7 @@ using System;
 namespace Egg82LibEnhanced.Core {
 	public class DisplaySkew {
 		//vars
-		internal event EventHandler SkewChanged = null;
+		internal event EventHandler Changed = null;
 
 		private PrecisePoint _topLeft = new PrecisePoint();
 		private PrecisePoint _topRight = new PrecisePoint();
@@ -27,7 +27,7 @@ namespace Egg82LibEnhanced.Core {
 				}
 
 				_topLeft.X = value;
-				SkewChanged?.Invoke(this, EventArgs.Empty);
+				Changed?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double TopLeftY {
@@ -40,7 +40,7 @@ namespace Egg82LibEnhanced.Core {
 				}
 
 				_topLeft.Y = value;
-				SkewChanged?.Invoke(this, EventArgs.Empty);
+				Changed?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double TopRightX {
@@ -53,7 +53,7 @@ namespace Egg82LibEnhanced.Core {
 				}
 
 				_topRight.X = value;
-				SkewChanged?.Invoke(this, EventArgs.Empty);
+				Changed?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double TopRightY {
@@ -66,7 +66,7 @@ namespace Egg82LibEnhanced.Core {
 				}
 
 				_topRight.Y = value;
-				SkewChanged?.Invoke(this, EventArgs.Empty);
+				Changed?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double BottomLeftX {
@@ -79,7 +79,7 @@ namespace Egg82LibEnhanced.Core {
 				}
 
 				_bottomLeft.X = value;
-				SkewChanged?.Invoke(this, EventArgs.Empty);
+				Changed?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double BottomLeftY {
@@ -92,7 +92,7 @@ namespace Egg82LibEnhanced.Core {
 				}
 
 				_bottomLeft.Y = value;
-				SkewChanged?.Invoke(this, EventArgs.Empty);
+				Changed?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double BottomRightX {
@@ -105,7 +105,7 @@ namespace Egg82LibEnhanced.Core {
 				}
 
 				_bottomRight.X = value;
-				SkewChanged?.Invoke(this, EventArgs.Empty);
+				Changed?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		public double BottomRightY {
@@ -118,7 +118,7 @@ namespace Egg82LibEnhanced.Core {
 				}
 
 				_bottomRight.Y = value;
-				SkewChanged?.Invoke(this, EventArgs.Empty);
+				Changed?.Invoke(this, EventArgs.Empty);
 			}
 		}
 
