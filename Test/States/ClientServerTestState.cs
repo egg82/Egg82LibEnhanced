@@ -1,11 +1,11 @@
-﻿using Egg82LibEnhanced.Base;
+﻿using Egg82LibEnhanced.Display;
 using Egg82LibEnhanced.Events;
 using Egg82LibEnhanced.Net;
 using System;
 using System.Text;
 
 namespace Test.States {
-	public class ClientServerTestState : BaseState {
+	public class ClientServerTestState : State {
 		//vars
 		private TcpClient client = new TcpClient();
 		private TcpServer server = new TcpServer();

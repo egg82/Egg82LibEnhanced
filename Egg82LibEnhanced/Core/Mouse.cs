@@ -1,4 +1,4 @@
-﻿using Egg82LibEnhanced.Base;
+﻿using Egg82LibEnhanced.Display;
 using Egg82LibEnhanced.Geom;
 using System;
 using System.Runtime.InteropServices;
@@ -18,7 +18,7 @@ namespace Egg82LibEnhanced.Core {
 		private bool _extraButton1Down = false;
 		private bool _extraButton2Down = false;
 
-		internal BaseWindow currentWindow = null;
+		internal Window CurrentWindow = null;
 
 		//constructor
 		public Mouse() {
@@ -76,7 +76,7 @@ namespace Egg82LibEnhanced.Core {
 				}
 
 				_location.X = value;
-				//SetCursorPos((int) (currentWindow.X + _location.X), (int) (currentWindow.Y + _location.Y));
+				//SetCursorPos((int) (CurrentWindow.X + _location.X), (int) (CurrentWindow.Y + _location.Y));
 			}
 		}
 		public double Y {
@@ -89,7 +89,7 @@ namespace Egg82LibEnhanced.Core {
 				}
 
 				_location.Y = value;
-				//SetCursorPos((int) (currentWindow.X + _location.X), (int) (currentWindow.Y + _location.Y));
+				//SetCursorPos((int) (CurrentWindow.X + _location.X), (int) (CurrentWindow.Y + _location.Y));
 			}
 		}
 		public double WheelDelta {

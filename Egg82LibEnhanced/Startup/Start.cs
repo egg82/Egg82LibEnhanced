@@ -1,4 +1,4 @@
-﻿using Egg82LibEnhanced.Base;
+﻿using Egg82LibEnhanced.Display;
 using Egg82LibEnhanced.Engines;
 using Egg82LibEnhanced.Engines.Nulls;
 using Egg82LibEnhanced.Patterns;
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Egg82LibEnhanced.Startup {
 	public class Start {
 		//vars
-		private static List<BaseWindow> windows = new List<BaseWindow>();
+		private static List<Window> windows = new List<Window>();
 		private static int _numWindowsOpen = 0;
 
 		//constructor
@@ -57,7 +57,7 @@ namespace Egg82LibEnhanced.Startup {
 			_numWindowsOpen = 0;
 			for (int i = windows.Count - 1; i >= 0; i--) {
 				if (windows[i].NeedsRepacement) {
-					BaseWindow replacement = windows[i].GetReplacement();
+					Window replacement = windows[i].GetReplacement();
 					windows[i].Close();
 					windows[i] = replacement;
 				}
@@ -76,13 +76,13 @@ namespace Egg82LibEnhanced.Startup {
 		}
 
 		//private
-		internal static void AddWindow(BaseWindow window) {
+		internal static void AddWindow(Window window) {
 			if (windows.Contains(window)) {
 				return;
 			}
 			windows.Add(window);
 		}
-		internal static void RemoveWindow(BaseWindow window) {
+		internal static void RemoveWindow(Window window) {
 			int index = windows.IndexOf(window);
 			if (index == -1) {
 				return;

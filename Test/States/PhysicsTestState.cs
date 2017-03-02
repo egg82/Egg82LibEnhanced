@@ -1,4 +1,4 @@
-﻿using Egg82LibEnhanced.Base;
+﻿using Egg82LibEnhanced.Display;
 using Egg82LibEnhanced.Engines;
 using Egg82LibEnhanced.Patterns;
 using FarseerPhysics.Dynamics;
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using Test.Sprites;
 
 namespace Test.States {
-	public class PhysicsTestState : BaseState {
+	public class PhysicsTestState : State {
 		//vars
 		private ObjectPool<PhysicsCircleSprite> circleFactory = new ObjectPool<PhysicsCircleSprite>(new PhysicsCircleSprite(), 50);
 		private List<PhysicsCircleSprite> circles = new List<PhysicsCircleSprite>();

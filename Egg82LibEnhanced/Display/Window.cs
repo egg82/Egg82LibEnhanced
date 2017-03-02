@@ -1,6 +1,5 @@
 ﻿using Egg82LibEnhanced.Engines;
 using Egg82LibEnhanced.Geom;
-using Egg82LibEnhanced.Graphics;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Startup;
 using Egg82LibEnhanced.Utils;
@@ -11,8 +10,8 @@ using SFML.Window;
 using System;
 using System.Collections.Generic;
 
-namespace Egg82LibEnhanced.Base {
-	public class BaseWindow {
+namespace Egg82LibEnhanced.Display {
+	public class Window {
 		//vars
 		internal event EventHandler GainedFocus = null;
 		internal event EventHandler<KeyEventArgs> KeyPressed = null;
@@ -26,7 +25,7 @@ namespace Egg82LibEnhanced.Base {
 		private IPhysicsEngine physicsEngine = (IPhysicsEngine) ServiceLocator.GetService(typeof(IPhysicsEngine));
 		private IInputEngine inputEngine = (IInputEngine) ServiceLocator.GetService(typeof(IInputEngine));
 
-		private List<BaseState> states = new List<BaseState>();
+		private List<State> states = new List<State>();
 		private World _physicsWorld = null;
 		//private PhysicsWorld _physicsWorld = null;
 
@@ -34,6 +33,7 @@ namespace Egg82LibEnhanced.Base {
 		private PreciseRectangle oldSize = new PreciseRectangle();
 
 		private RenderWindow window = null;
+		private PreciseRectangle viewport = new PreciseRectangle();
 		private volatile bool _fullscreen = false;
 		private Styles alternateStyles = Styles.Fullscreen;
 		private Styles styles = Styles.None;
@@ -56,7 +56,7 @@ namespace Egg82LibEnhanced.Base {
 		/// <param name="style">Any style flags to apply to the window.</param>
 		/// <param name="vSync">(optional) Whether or not this window syncs its rendering to the refresh rate of the monitor.</param>
 		/// <param name="antiAliasing">(optional) The amount of AntiAliasing to use. More = slower but lexx pixelated.</param>
-		public BaseWindow(double width, double height, string title, Styles style, bool vSync = true, uint antiAliasing = 16) {
+		public Window(double width, double height, string title, Styles style, bool vSync = true, uint antiAliasing = 16) {
 			if (double.IsNaN(width)) {
 				throw new ArgumentNullException("width");
 			}
@@ -93,8 +93,10 @@ namespace Egg82LibEnhanced.Base {
 			window.MouseButtonReleased += onMouseUp;
 
 			window.SetVerticalSyncEnabled(vSync);
-			window.SetView(new View(new FloatRect(0.0f, 0.0f, (float) width, (float) height)));
-			_quadTree = new QuadTree<DisplayObject>(new PreciseRectangle(0.0d, 0.0d, width, height));
+			IntRect vp = window.GetViewport(window.GetView());
+			viewport.Width = (double) vp.Width;
+			viewport.Height = (double) vp.Height;
+			_quadTree = new QuadTree<DisplayObject>(new PreciseRectangle(0.0d, 0.0d, viewport.Width, viewport.Height));
 
 			window.SetActive(false);
 
@@ -103,7 +105,7 @@ namespace Egg82LibEnhanced.Base {
 			gameEngine.AddWindow(this);
 			Start.AddWindow(this);
 		}
-		internal BaseWindow(World physicsWorld, List<BaseState> states, Styles alternateStyle, Texture icon, double width, double height, string title, Styles style, bool vSync, uint antiAliasing) {
+		internal Window(World physicsWorld, List<State> states, Styles alternateStyle, Texture icon, double width, double height, string title, Styles style, bool vSync, uint antiAliasing) {
 			window = new RenderWindow(new VideoMode((uint) width, (uint) height), title, style, new ContextSettings(24, 8, antiAliasing));
 
 			alternateStyles = alternateStyle;
@@ -128,12 +130,14 @@ namespace Egg82LibEnhanced.Base {
 			window.MouseButtonReleased += onMouseUp;
 
 			window.SetVerticalSyncEnabled(vSync);
-			window.SetView(new View(new FloatRect(0.0f, 0.0f, (float) width, (float) height)));
-			_quadTree = new QuadTree<DisplayObject>(new PreciseRectangle(0.0d, 0.0d, width, height));
+			IntRect vp = window.GetViewport(window.GetView());
+			viewport.Width = (double) vp.Width;
+			viewport.Height = (double) vp.Height;
+			_quadTree = new QuadTree<DisplayObject>(new PreciseRectangle(0.0d, 0.0d, viewport.Width, viewport.Height));
 			
 			for (int i = 0; i < states.Count; i++) {
 				this.states.Add(states[i]);
-				states[i].Window = this;
+				states[i].SetWindow(this);
 			}
 
 			window.SetActive(false);
@@ -142,7 +146,7 @@ namespace Egg82LibEnhanced.Base {
 			inputEngine.AddWindow(this);
 			gameEngine.AddWindow(this);
 		}
-		~BaseWindow() {
+		~Window() {
 			window.Closed -= onClosed;
 			window.Resized -= onResize;
 
@@ -289,7 +293,7 @@ namespace Egg82LibEnhanced.Base {
 			}
 		}
 		/// <summary>
-		/// This window's Y position, relative to the main (spawning) monitor and inclusing any border it has.
+		/// This window's Y position, relative to the main (spawning) monitor and including any border it has.
 		/// </summary>
 		public double Y {
 			get {
@@ -308,9 +312,10 @@ namespace Egg82LibEnhanced.Base {
 		/// </summary>
 		public double Width {
 			get {
-				return (double) window.Size.X;
+				return viewport.Width;
 			}
 			set {
+				value += window.Size.X - viewport.Width;
 				window.Size = new Vector2u((uint) value, window.Size.Y);
 			}
 		}
@@ -319,9 +324,10 @@ namespace Egg82LibEnhanced.Base {
 		/// </summary>
 		public double Height {
 			get {
-				return (double) window.Size.Y;
+				return viewport.Height;
 			}
 			set {
+				value += window.Size.Y - viewport.Height;
 				window.Size = new Vector2u(window.Size.X, (uint) value);
 			}
 		}
@@ -331,7 +337,7 @@ namespace Egg82LibEnhanced.Base {
 		/// </summary>
 		/// <param name="state">The child BaseState to add.</param>
 		/// <param name="index">(optional) The index at which to add the child. The default is the top of the stack.</param>
-		public void AddState(BaseState state, int index = 0) {
+		public void AddState(State state, int index = 0) {
 			if (state == null) {
 				throw new ArgumentNullException("state");
 			}
@@ -345,7 +351,7 @@ namespace Egg82LibEnhanced.Base {
 				index = 0;
 			}
 
-			state.Window = this;
+			state.SetWindow(this);
 			states.Insert(index, state);
 			state.Enter();
 		}
@@ -353,7 +359,7 @@ namespace Egg82LibEnhanced.Base {
 		/// Removes a child BaseState from the BaseWindow.
 		/// </summary>
 		/// <param name="state">The child BaseState to remove.</param>
-		public void RemoveState(BaseState state) {
+		public void RemoveState(State state) {
 			if (state == null) {
 				throw new ArgumentNullException("state");
 			}
@@ -364,14 +370,14 @@ namespace Egg82LibEnhanced.Base {
 			
 			state.Exit();
 			states.RemoveAt(index);
-			state.Window = null;
+			state.SetWindow(null);
 		}
 		/// <summary>
 		/// Returns a child BaseState at the specified index.
 		/// </summary>
 		/// <param name="index">The index of the child.</param>
 		/// <returns>The child, or null if the speicified index is out-of-bounds.</returns>
-		public BaseState GetStateAt(int index) {
+		public State GetStateAt(int index) {
 			if (index < 0 || index >= states.Count) {
 				return null;
 			}
@@ -383,7 +389,7 @@ namespace Egg82LibEnhanced.Base {
 		/// </summary>
 		/// <param name="state">The child.</param>
 		/// <returns>The index of the provided child, or -1 if the provided BaseState is not a child of this BaseWindow.</returns>
-		public int IndexOf(BaseState state) {
+		public int IndexOf(State state) {
 			if (state == null) {
 				throw new ArgumentNullException("state");
 			}
@@ -395,7 +401,7 @@ namespace Egg82LibEnhanced.Base {
 		/// </summary>
 		/// <param name="state">The child.</param>
 		/// <param name="index">The index to set the child to.</param>
-		public void SetIndex(BaseState state, int index) {
+		public void SetIndex(State state, int index) {
 			if (state == null) {
 				throw new ArgumentNullException("state");
 			}
@@ -422,7 +428,7 @@ namespace Egg82LibEnhanced.Base {
 		/// <param name="oldState">The old state from which to swap.</param>
 		/// <param name="newState">The new state to swap to.</param>
 		/// <returns>True if successful, false if unsuccessful.</returns>
-		public bool TrySwapStates(BaseState oldState, BaseState newState) {
+		public bool TrySwapStates(State oldState, State newState) {
 			if (oldState == null) {
 				throw new ArgumentNullException("oldState");
 			}
@@ -437,8 +443,8 @@ namespace Egg82LibEnhanced.Base {
 
 			oldState.Ready = false;
 			oldState.Exit();
-			oldState.Window = null;
-			newState.Window = this;
+			oldState.SetWindow(null);
+			newState.SetWindow(this);
 			states[index] = newState;
 			newState.Enter();
 			newState.Ready = true;
@@ -528,11 +534,11 @@ namespace Egg82LibEnhanced.Base {
 				return false;
 			}
 		}
-		internal BaseWindow GetReplacement() {
+		internal Window GetReplacement() {
 			gameEngine.RemoveWindow(this);
 			inputEngine.RemoveWindow(this);
 
-			return new BaseWindow(_physicsWorld, states, styles, _icon, (double) window.Size.X, (double) window.Size.Y, _title, alternateStyles, _vSync, _antiAliasing);
+			return new Window(_physicsWorld, states, styles, _icon, (double) window.Size.X, (double) window.Size.Y, _title, alternateStyles, _vSync, _antiAliasing);
 		}
 		internal void DispatchEvents() {
 			window.DispatchEvents();
@@ -567,9 +573,12 @@ namespace Egg82LibEnhanced.Base {
 		}
 		private void onResize(object sender, SizeEventArgs e) {
 			List<DisplayObject> objects = _quadTree.GetAllObjects();
-			_quadTree = new QuadTree<DisplayObject>(new PreciseRectangle((double) e.Width, (double) e.Height));
 			window.SetView(new View(new FloatRect(0.0f, 0.0f, (float) e.Width, (float) e.Height)));
-			
+			IntRect vp = window.GetViewport(window.GetView());
+			viewport.Width = (double) vp.Width;
+			viewport.Height = (double) vp.Height;
+			_quadTree = new QuadTree<DisplayObject>(new PreciseRectangle(viewport.Width, viewport.Height));
+
 			for (int i = 0; i < objects.Count; i++) {
 				_quadTree.Add(objects[i]);
 			}

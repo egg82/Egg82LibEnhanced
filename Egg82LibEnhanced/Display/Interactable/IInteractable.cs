@@ -2,7 +2,7 @@
 using Egg82LibEnhanced.Geom;
 using System;
 
-namespace Egg82LibEnhanced.Graphics {
+namespace Egg82LibEnhanced.Display.Interactable {
 	public interface IInteractable {
 		//events
 		event EventHandler Entered;

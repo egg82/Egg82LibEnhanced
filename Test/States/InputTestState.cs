@@ -1,4 +1,4 @@
-﻿using Egg82LibEnhanced.Base;
+﻿using Egg82LibEnhanced.Display;
 using Egg82LibEnhanced.Engines;
 using Egg82LibEnhanced.Enums;
 using Egg82LibEnhanced.Geom;
@@ -8,7 +8,7 @@ using Test.Sprites;
 using static SFML.Window.Keyboard;
 
 namespace Test.States {
-	class InputTestState : BaseState {
+	class InputTestState : State {
 		//vars
 		private InputCircleSprite sprite = new InputCircleSprite();
 

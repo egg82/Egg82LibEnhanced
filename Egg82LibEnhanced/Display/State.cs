@@ -1,8 +1,7 @@
-﻿using Egg82LibEnhanced.Graphics;
-using System;
+﻿using System;
 
-namespace Egg82LibEnhanced.Base {
-	public abstract class BaseState : DisplayObjectContainer {
+namespace Egg82LibEnhanced.Display {
+	public abstract class State : DisplayObjectContainer {
 		//vars
 		internal volatile bool Ready = false;
 
@@ -12,7 +11,7 @@ namespace Egg82LibEnhanced.Base {
 		/// Think of states as a way to organize objects. You can have a main menu state, a level select state,
 		/// a options menu state, and a state for level 0, 1, 2, etc.
 		/// </summary>
-		public BaseState() {
+		public State() {
 
 		}
 

@@ -4,13 +4,13 @@ using SFML.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using Egg82LibEnhanced.Base;
 
-namespace Egg82LibEnhanced.Graphics {
+namespace Egg82LibEnhanced.Display {
 	public abstract class DisplayObjectContainer : DisplayObject {
 		//vars
 		private List<DisplayObject> children = new List<DisplayObject>();
 		private PreciseRectangle childBounds = new PreciseRectangle();
+		private bool boundsDirty = false;
 		private bool _flattened = false;
 		private Bitmap flattenedBitmap = null;
 		private Texture oldTexture = null;
@@ -20,59 +20,14 @@ namespace Egg82LibEnhanced.Graphics {
 		/// An object used to contain/modify multiple DisplayObjects.
 		/// </summary>
 		public DisplayObjectContainer() {
-			BoundsChanged += onBoundsChanged;
+			LocalBoundsChanged += onBoundsChanged;
 		}
 		~DisplayObjectContainer() {
-			BoundsChanged -= onBoundsChanged;
+			LocalBoundsChanged -= onBoundsChanged;
 			RemoveAllChildren();
 		}
 
 		//public
-		/// <summary>
-		/// The DisplayObjectContainer's local X position, including children. This will always refer to the leftmost co-ordinate of the leftmost child DisplayObject.
-		/// </summary>
-		public override double X {
-			get {
-				return base.X + childBounds.X;
-			}
-			set {
-				base.X = value - childBounds.X;
-				for (int i = 0; i < children.Count; i++) {
-					children[i].ApplyGlobalBounds();
-				}
-			}
-		}
-		/// <summary>
-		/// The DisplayObjectContainer's local Y position, including children. This will always refer to the topmost co-ordinate of the topmost child DisplayObject.
-		/// </summary>
-		public override double Y {
-			get {
-				return base.Y + childBounds.Y;
-			}
-			set {
-				base.Y = value - childBounds.Y;
-				for (int i = 0; i < children.Count; i++) {
-					children[i].ApplyGlobalBounds();
-				}
-			}
-		}
-		/// <summary>
-		/// The DisplayObject's width, including children. Read-only.
-		/// </summary>
-		public override double Width {
-			get {
-				return childBounds.Width;
-			}
-		}
-		/// <summary>
-		/// The DisplayObject's height, including children. Read-only.
-		/// </summary>
-		public override double Height {
-			get {
-				return childBounds.Height;
-			}
-		}
-
 		/// <summary>
 		/// Whether or not to smooth-out the DisplayObjectContainer's textures. This includes all child textures.
 		/// </summary>
@@ -89,31 +44,65 @@ namespace Egg82LibEnhanced.Graphics {
 		}
 
 		/// <summary>
-		/// The DisplayObject's current parent. A DisplayObject may have zero or one parent(s).
+		/// The DisplayObjectContainer's local X position, including children. This will always refer to the leftmost co-ordinate of the leftmost child DisplayObject.
 		/// </summary>
-		public override DisplayObject Parent {
+		public override double X {
 			get {
-				return base.Parent;
+				if (boundsDirty) {
+					calculateBounds();
+				}
+				return base.X + childBounds.X;
 			}
-			internal set {
-				base.Parent = value;
+			set {
+				if (boundsDirty) {
+					calculateBounds();
+				}
+				base.X = value - childBounds.X;
 				for (int i = 0; i < children.Count; i++) {
 					children[i].ApplyGlobalBounds();
 				}
 			}
 		}
 		/// <summary>
-		/// The DisplayObject's current window. A DisplayObject may have zero or one window(s).
+		/// The DisplayObjectContainer's local Y position, including children. This will always refer to the topmost co-ordinate of the topmost child DisplayObject.
 		/// </summary>
-		public override BaseWindow Window {
+		public override double Y {
 			get {
-				return base.Window;
-			}
-			internal set {
-				base.Window = value;
-				for (int i = 0; i < children.Count; i++) {
-					children[i].Window = Window;
+				if (boundsDirty) {
+					calculateBounds();
 				}
+				return base.Y + childBounds.Y;
+			}
+			set {
+				if (boundsDirty) {
+					calculateBounds();
+				}
+				base.Y = value - childBounds.Y;
+				for (int i = 0; i < children.Count; i++) {
+					children[i].ApplyGlobalBounds();
+				}
+			}
+		}
+		/// <summary>
+		/// The DisplayObject's width, including children. Read-only.
+		/// </summary>
+		public override double Width {
+			get {
+				if (boundsDirty) {
+					calculateBounds();
+				}
+				return childBounds.Width;
+			}
+		}
+		/// <summary>
+		/// The DisplayObject's height, including children. Read-only.
+		/// </summary>
+		public override double Height {
+			get {
+				if (boundsDirty) {
+					calculateBounds();
+				}
+				return childBounds.Height;
 			}
 		}
 
@@ -140,11 +129,11 @@ namespace Egg82LibEnhanced.Graphics {
 				index = 0;
 			}
 			
-			obj.Parent = this;
-			obj.Window = Window;
-			obj.BoundsChanged += onChildBoundsChanged;
+			obj.SetParent(this);
+			obj.SetWindow(Window);
+			obj.LocalBoundsChanged += onBoundsChanged;
 			children.Insert(index, obj);
-			onChildBoundsChanged(obj, EventArgs.Empty);
+			onBoundsChanged(obj, EventArgs.Empty);
 		}
 		/// <summary>
 		/// Removes a child DisplayObject from the DisplayObjectContainer.
@@ -160,22 +149,27 @@ namespace Egg82LibEnhanced.Graphics {
 				throw new Exception("object is not a child of this object.");
 			}
 
-			obj.BoundsChanged -= onChildBoundsChanged;
+			obj.LocalBoundsChanged -= onBoundsChanged;
 			children.RemoveAt(index);
-			obj.Parent = null;
-			obj.Window = null;
-			onChildBoundsChanged(obj, EventArgs.Empty);
+			obj.SetParent(null);
+			obj.SetWindow(null);
+			onBoundsChanged(obj, EventArgs.Empty);
 		}
 		/// <summary>
 		/// Removes all child DisplayObjects.
 		/// </summary>
 		public void RemoveAllChildren() {
 			for (int i = 0; i < children.Count; i++) {
-				children[i].BoundsChanged -= onChildBoundsChanged;
-				children[i].Parent = null;
-				children[i].Window = null;
+				children[i].LocalBoundsChanged -= onBoundsChanged;
+				children[i].SetParent(null);
+				children[i].SetWindow(null);
 			}
 			children.Clear();
+
+			childBounds.X = X;
+			childBounds.Y = Y;
+			childBounds.Width = Width;
+			childBounds.Height = Height;
 		}
 		/// <summary>
 		/// Returns a child DisplayObject at the specified index.
@@ -263,7 +257,7 @@ namespace Egg82LibEnhanced.Graphics {
 			flattenedBitmap.Dispose();
 			Texture = oldTexture;
 			flattenedBitmap = null;
-			onChildBoundsChanged(null, EventArgs.Empty);
+			onBoundsChanged(null, EventArgs.Empty);
 		}
 		/// <summary>
 		/// Whether or not the DisplayObjectContainer has been flattened.
@@ -281,10 +275,10 @@ namespace Egg82LibEnhanced.Graphics {
 		public Bitmap GetFlattenedBitmap() {
 			Bitmap retVal = new Bitmap((int) childBounds.Width, (int) childBounds.Height);
 
-			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(retVal)) {
+			using (Graphics g = System.Drawing.Graphics.FromImage(retVal)) {
 				g.Clear(System.Drawing.Color.Transparent);
 				
-				g.DrawImageUnscaled(GraphicsBitmap, new Point((int) Math.Abs(childBounds.X), (int) Math.Abs(childBounds.Y)));
+				g.DrawImageUnscaled(Graphics.Bitmap, new Point((int) Math.Abs(childBounds.X), (int) Math.Abs(childBounds.Y)));
 				if (Texture != null) {
 					Bitmap texture = TextureUtil.BitmapFromTexture(Texture);
 					g.DrawImageUnscaled(texture, new Point((int) Math.Abs(childBounds.X), (int) Math.Abs(childBounds.Y)));
@@ -292,7 +286,7 @@ namespace Egg82LibEnhanced.Graphics {
 				}
 
 				for (int i = children.Count - 1; i >= 0; i--) {
-					Bitmap childGraphics = children[i].GraphicsBitmap;
+					Bitmap childGraphics = children[i].Graphics.Bitmap;
 					g.DrawImageUnscaled(childGraphics, new Point((int) (Math.Abs(childBounds.X) + children[i].X), (int) (Math.Abs(childBounds.Y) + children[i].Y)));
 					childGraphics.Dispose();
 
@@ -323,39 +317,49 @@ namespace Egg82LibEnhanced.Graphics {
 		internal override void Draw(RenderTarget target, Transform parentTransform, SFML.Graphics.Color parentColor) {
 			base.Draw(target, parentTransform, parentColor);
 
+			Transform globalTransform = parentTransform * LocalTransform;
+			SFML.Graphics.Color globalColor = parentColor * Color;
+
 			for (int i = children.Count - 1; i >= 0; i--) {
-				children[i].Draw(target, Transform, parentColor * Color);
+				children[i].Draw(target, globalTransform, globalColor);
 			}
 		}
 
-		private void onChildBoundsChanged(object sender, EventArgs e) {
-			if (_flattened) {
-				return;
+		internal override void SetParent(DisplayObject value) {
+			base.SetParent(value);
+			for (int i = 0; i < children.Count; i++) {
+				children[i].ApplyGlobalBounds();
 			}
+		}
+		internal override void SetWindow(Window value) {
+			base.SetWindow(value);
+			for (int i = 0; i < children.Count; i++) {
+				children[i].SetWindow(value);
+			}
+		}
 
+		private void calculateBounds() {
 			childBounds.X = 0.0d;
 			childBounds.Y = 0.0d;
 			childBounds.Width = base.Width;
 			childBounds.Height = base.Height;
 
 			for (int i = 0; i < children.Count; i++) {
-				childBounds.X = Math.Min(childBounds.X, children[i].X);
-				childBounds.Y = Math.Min(childBounds.Y, children[i].Y);
+				childBounds.Left = Math.Min(childBounds.Left, children[i].X);
+				childBounds.Top = Math.Min(childBounds.Top, children[i].Y);
 				childBounds.Right = Math.Max(childBounds.Right, children[i].X + children[i].Width);
 				childBounds.Bottom = Math.Max(childBounds.Bottom, children[i].Y + children[i].Height);
 			}
+
+			boundsDirty = false;
 		}
+		
 		private void onBoundsChanged(object sender, EventArgs e) {
 			if (_flattened) {
 				return;
 			}
 
-			if (base.Width > childBounds.Width) {
-				childBounds.Width = base.Width;
-			}
-			if (base.Height > childBounds.Height) {
-				childBounds.Height = base.Height;
-			}
+			boundsDirty = true;
 		}
 	}
 }

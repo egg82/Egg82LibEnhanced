@@ -1,5 +1,4 @@
-﻿using Egg82LibEnhanced.Base;
-using Egg82LibEnhanced.Enums;
+﻿using Egg82LibEnhanced.Enums;
 using Egg82LibEnhanced.Events;
 using Egg82LibEnhanced.Geom;
 using SFML.Window;
@@ -30,15 +29,15 @@ namespace Egg82LibEnhanced.Engines {
 		private short maxAnglePos = 8192;
 		private short maxAngleNeg = -8193;
 
-		private List<BaseWindow> windows = new List<BaseWindow>();
-		private BaseWindow _focusedWindow = null;
+		private List<Display.Window> windows = new List<Display.Window>();
+		private Display.Window _focusedWindow = null;
 
 		//constructor
 		public InputEngine() {
 			
 		}
 		~InputEngine() {
-			BaseWindow window = null;
+			Display.Window window = null;
 			for (int i = 0; i < windows.Count; i++) {
 				window = windows[i];
 				window.GainedFocus -= onFocused;
@@ -69,13 +68,13 @@ namespace Egg82LibEnhanced.Engines {
 			}
 		}
 
-		public BaseWindow FocusedWindow {
+		public Display.Window FocusedWindow {
 			get {
 				return _focusedWindow;
 			}
 		}
 
-		public void AddWindow(BaseWindow window) {
+		public void AddWindow(Display.Window window) {
 			if (window == null) {
 				throw new ArgumentNullException("window");
 			}
@@ -86,7 +85,7 @@ namespace Egg82LibEnhanced.Engines {
 
 			if (windows.Count == 0) {
 				_focusedWindow = window;
-				Mouse.currentWindow = window;
+				Mouse.CurrentWindow = window;
 			}
 			
 			window.GainedFocus += onFocused;
@@ -98,7 +97,7 @@ namespace Egg82LibEnhanced.Engines {
 			window.MouseButtonReleased += onMouseUp;
 			windows.Add(window);
 		}
-		public void RemoveWindow(BaseWindow window) {
+		public void RemoveWindow(Display.Window window) {
 			if (window == null) {
 				throw new ArgumentNullException("window");
 			}
@@ -394,8 +393,8 @@ namespace Egg82LibEnhanced.Engines {
 		}
 
 		private void onFocused(object sender, EventArgs e) {
-			_focusedWindow = (BaseWindow) sender;
-			_mouse.currentWindow = _focusedWindow;
+			_focusedWindow = (Display.Window) sender;
+			_mouse.CurrentWindow = _focusedWindow;
 		}
 	}
 }

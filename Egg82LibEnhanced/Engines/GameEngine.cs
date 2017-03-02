@@ -1,4 +1,4 @@
-﻿using Egg82LibEnhanced.Base;
+﻿using Egg82LibEnhanced.Display;
 using Egg82LibEnhanced.Events;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Utils;
@@ -23,7 +23,7 @@ namespace Egg82LibEnhanced.Engines {
 		}
 		
 		//vars
-		private List<BaseWindow> windows = new List<BaseWindow>();
+		private List<Window> windows = new List<Window>();
 		private PreciseTimer updateTimer = new PreciseTimer((1.0d / 60.0d) * 1000.0d);
 		private PreciseTimer inputTimer = new PreciseTimer((1.0d / 120.0d) * 1000.0d);
 		private PreciseTimer physicsTimer = new PreciseTimer((1.0d / 60.0d) * 1000.0d);
@@ -74,7 +74,7 @@ namespace Egg82LibEnhanced.Engines {
 		}
 
 		//public
-		public void AddWindow(BaseWindow window) {
+		public void AddWindow(Window window) {
 			if (window == null) {
 				throw new ArgumentNullException("window");
 			}
@@ -84,7 +84,7 @@ namespace Egg82LibEnhanced.Engines {
 
 			windows.Add(window);
 		}
-		public void RemoveWindow(BaseWindow window) {
+		public void RemoveWindow(Window window) {
 			if (window == null) {
 				throw new ArgumentNullException("window");
 			}
@@ -95,13 +95,13 @@ namespace Egg82LibEnhanced.Engines {
 
 			windows.RemoveAt(index);
 		}
-		public BaseWindow GetWindowAt(int index) {
+		public Window GetWindowAt(int index) {
 			if (index < 0 || index >= windows.Count) {
 				return null;
 			}
 			return windows[index];
 		}
-		public int IndexOf(BaseWindow window) {
+		public int IndexOf(Window window) {
 			if (window == null) {
 				throw new ArgumentNullException("window");
 			}

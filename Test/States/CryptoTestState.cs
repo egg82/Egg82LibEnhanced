@@ -1,10 +1,10 @@
-﻿using Egg82LibEnhanced.Base;
+﻿using Egg82LibEnhanced.Display;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Utils;
 using System;
 
 namespace Test.States {
-	class CryptoTestState : BaseState {
+	class CryptoTestState : State {
 		//vars
 		private ICryptoUtil cryptoUtil = ServiceLocator.GetService(typeof(ICryptoUtil));
 

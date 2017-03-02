@@ -9,7 +9,7 @@ using System;
 using System.IO;
 
 namespace Test.Sprites {
-	class PhysicsCircleSprite : Egg82LibEnhanced.Graphics.Sprite, IPrototype {
+	class PhysicsCircleSprite : Egg82LibEnhanced.Display.Sprite, IPrototype {
 		//vars
 		private Body physicsBody = null;
 		private float minSpeed = 0.5f;
@@ -21,10 +21,10 @@ namespace Test.Sprites {
 				Texture = tex;
 			} else {
 				Texture = new Texture(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + ".."  + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Assets" + Path.DirectorySeparatorChar + "Images" + Path.DirectorySeparatorChar + "ball.png");
-				Texture.Smooth = true;
 			}
-			OffsetX = Width / 2.0d;
-			OffsetY = Height / 2.0d;
+			TextureSmoothing = true;
+			TransformOffsetX = Width / 2.0d;
+			TransformOffsetY = Height / 2.0d;
 			ScaleX = ScaleY = 0.5d;
 		}
 

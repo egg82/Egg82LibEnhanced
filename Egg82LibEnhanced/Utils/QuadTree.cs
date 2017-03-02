@@ -11,7 +11,7 @@ namespace Egg82LibEnhanced.Utils {
 		/// <summary>
 		/// The rectangle that defines the object's boundaries.
 		/// </summary>
-		PreciseRectangle GlobalBounds { get; }
+		PreciseRectangle QuadBounds { get; }
 	}
 
 	/// <summary>
@@ -497,13 +497,13 @@ namespace Egg82LibEnhanced.Utils {
 			// If a child can't contain an object, it will live in this Quad
 			QuadTreeNode<T> destTree = this;
 
-			if (childTL.QuadRect.Contains(item.Data.GlobalBounds)) {
+			if (childTL.QuadRect.Contains(item.Data.QuadBounds)) {
 				destTree = childTL;
-			} else if (childTR.QuadRect.Contains(item.Data.GlobalBounds)) {
+			} else if (childTR.QuadRect.Contains(item.Data.QuadBounds)) {
 				destTree = childTR;
-			} else if (childBL.QuadRect.Contains(item.Data.GlobalBounds)) {
+			} else if (childBL.QuadRect.Contains(item.Data.QuadBounds)) {
 				destTree = childBL;
-			} else if (childBR.QuadRect.Contains(item.Data.GlobalBounds)) {
+			} else if (childBR.QuadRect.Contains(item.Data.QuadBounds)) {
 				destTree = childBR;
 			}
 
@@ -513,7 +513,7 @@ namespace Egg82LibEnhanced.Utils {
 
 		private void Relocate(QuadTreeObject<T> item) {
 			// Are we still inside our parent?
-			if (QuadRect.Contains(item.Data.GlobalBounds)) {
+			if (QuadRect.Contains(item.Data.QuadBounds)) {
 				// Good, have we moved inside any of our children?
 				if (childTL != null) {
 					QuadTreeNode<T> dest = GetDestinationTree(item);
@@ -617,7 +617,7 @@ namespace Egg82LibEnhanced.Utils {
 		/// <param name="item">The item to insert.</param>
 		internal void Insert(QuadTreeObject<T> item) {
 			// If this quad doesn't contain the items rectangle, do nothing, unless we are the root
-			if (!rect.Contains(item.Data.GlobalBounds)) {
+			if (!rect.Contains(item.Data.QuadBounds)) {
 				//System.Diagnostics.Debug.Assert(parent == null, "We are not the root, and this object doesn't fit here. How did we get here?");
 				if (parent == null) {
 					// This object is outside of the QuadTree bounds, we should add it at the root level
@@ -668,14 +668,14 @@ namespace Egg82LibEnhanced.Utils {
 		internal void GetObjects(PreciseRectangle searchRect, ref List<T> results) {
 			// We can't do anything if the results list doesn't exist
 			if (results != null) {
-				if (searchRect.Contains(this.rect)) {
+				if (searchRect.Contains(rect)) {
 					// If the search area completely contains this quad, just get every object this quad and all it's children have
 					GetAllObjects(ref results);
-				} else if (searchRect.Intersects(this.rect)) {
+				} else if (searchRect.Intersects(rect)) {
 					// Otherwise, if the quad isn't fully contained, only add objects that intersect with the search rectangle
 					if (objects != null) {
 						for (int i = 0; i < objects.Count; i++) {
-							if (searchRect.Intersects(objects[i].Data.GlobalBounds)) {
+							if (searchRect.Intersects(objects[i].Data.QuadBounds)) {
 								results.Add(objects[i].Data);
 							}
 						}

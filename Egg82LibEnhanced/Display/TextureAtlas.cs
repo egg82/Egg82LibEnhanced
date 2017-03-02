@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Xml;
 
-namespace Egg82LibEnhanced.Graphics {
+namespace Egg82LibEnhanced.Display {
 	public class TextureAtlas : IDisposable {
 		//vars
 		private bool fromTexture = false;

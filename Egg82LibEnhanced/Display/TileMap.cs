@@ -3,7 +3,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace Egg82LibEnhanced.Graphics {
+namespace Egg82LibEnhanced.Display {
 	public class TileMap : DisplayObject {
 		//vars
 		private Bitmap currentBitmap = new Bitmap(1, 1);

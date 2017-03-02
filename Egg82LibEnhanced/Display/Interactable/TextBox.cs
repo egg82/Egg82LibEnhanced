@@ -9,7 +9,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 
-namespace Egg82LibEnhanced.Graphics {
+namespace Egg82LibEnhanced.Display.Interactable {
 	public class TextBox : DisplayObject, IInteractable {
 		//vars
 		public event EventHandler Entered = null;

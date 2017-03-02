@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Egg82LibEnhanced.Graphics {
+namespace Egg82LibEnhanced.Display {
 	public class Sprite : DisplayObjectContainer {
 		//vars
 

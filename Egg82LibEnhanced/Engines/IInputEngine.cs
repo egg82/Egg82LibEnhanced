@@ -1,5 +1,4 @@
-﻿using Egg82LibEnhanced.Base;
-using Egg82LibEnhanced.Events;
+﻿using Egg82LibEnhanced.Events;
 using SFML.Window;
 using System;
 
@@ -24,10 +23,10 @@ namespace Egg82LibEnhanced.Engines {
 		Core.Keyboard Keyboard { get; }
 		Core.Controllers Controllers { get; }
 
-		BaseWindow FocusedWindow { get; }
+		Display.Window FocusedWindow { get; }
 
-		void AddWindow(BaseWindow window);
-		void RemoveWindow(BaseWindow window);
+		void AddWindow(Display.Window window);
+		void RemoveWindow(Display.Window window);
 		void Update();
 	}
 }

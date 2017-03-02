@@ -51,6 +51,7 @@ namespace Egg82LibEnhanced.Geom {
 				if (double.IsNaN(value)) {
 					return;
 				}
+				_height += _y - value;
 				_y = value;
 			}
 		}
@@ -73,6 +74,7 @@ namespace Egg82LibEnhanced.Geom {
 				if (double.IsNaN(value)) {
 					return;
 				}
+				_width += _x - value;
 				_x = value;
 			}
 		}

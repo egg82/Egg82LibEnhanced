@@ -1,5 +1,4 @@
-﻿using Egg82LibEnhanced.Base;
-using Egg82LibEnhanced.Graphics;
+﻿using Egg82LibEnhanced.Display;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Utils;
 using System;
@@ -8,7 +7,7 @@ using System.IO;
 using Test.Sprites;
 
 namespace Test.States {
-	class GraphicsTestState : BaseState {
+	class GraphicsTestState : State {
 		//vars
 		private ObjectPool<CircleSprite> circleFactory = new ObjectPool<CircleSprite>(new CircleSprite(), 1000);
 		private List<CircleSprite> circles = new List<CircleSprite>();
@@ -40,8 +39,8 @@ namespace Test.States {
 
 			while (circleFactory.NumFreeInstances > 0) {
 				CircleSprite sprite = circleFactory.GetObject();
-				sprite.OffsetX = sprite.Width / 2.0d;
-				sprite.OffsetY = sprite.Height / 2.0d;
+				sprite.TransformOffsetX = sprite.Width / 2.0d;
+				sprite.TransformOffsetY = sprite.Height / 2.0d;
 				sprite.Rotation = MathUtil.Random(-180.0d, 180.0d);
 				sprite.ScaleX = sprite.ScaleY = MathUtil.Random(0.1d, 0.3d);
 				sprite.X = MathUtil.Random(0.0d, Window.Width - sprite.Width);
@@ -63,15 +62,15 @@ namespace Test.States {
 		}
 		protected override void OnUpdate(double deltaTime) {
 			for (int i = 0; i < circles.Count; i++) {
-				if (circles[i].X < circles[i].Width / 2.0d) {
-					circles[i].X = circles[i].Width / 2.0d;
-				} else if (circles[i].X + circles[i].Width / 2.0d > Window.Width) {
-					circles[i].X = Window.Width - circles[i].Width / 2.0d;
+				if (circles[i].X < 0.0d) {
+					circles[i].X = 0.0d;
+				} else if (circles[i].X + circles[i].Width > Window.Width) {
+					circles[i].X = Window.Width - circles[i].Width;
 				}
-				if (circles[i].Y < circles[i].Height / 2.0d) {
-					circles[i].Y = circles[i].Height / 2.0d;
-				} else if (circles[i].Y + circles[i].Height / 2.0d > Window.Height) {
-					circles[i].Y = Window.Height - circles[i].Height / 2.0d;
+				if (circles[i].Y < 0.0d) {
+					circles[i].Y = 0.0d;
+				} else if (circles[i].Y + circles[i].Height > Window.Height) {
+					circles[i].Y = Window.Height - circles[i].Height;
 				}
 			}
 		}

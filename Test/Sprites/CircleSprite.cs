@@ -5,7 +5,7 @@ using System;
 using System.IO;
 
 namespace Test.Sprites {
-	class CircleSprite : Egg82LibEnhanced.Graphics.Sprite, IPrototype {
+	class CircleSprite : Egg82LibEnhanced.Display.Sprite, IPrototype {
 		//vars
 		private double speed = MathUtil.Random(1.0d, 2.0d);
 
@@ -15,8 +15,8 @@ namespace Test.Sprites {
 				Texture = tex;
 			} else {
 				Texture = new Texture(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + ".."  + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Assets" + Path.DirectorySeparatorChar + "Images" + Path.DirectorySeparatorChar + "ball.png");
-				Texture.Smooth = true;
 			}
+			TextureSmoothing = true;
 		}
 
 		//public
@@ -26,16 +26,8 @@ namespace Test.Sprites {
 
 		//private
 		protected override void OnUpdate(double deltaTime) {
-			if (MathUtil.Random(0.0d, 1.0d) >= 0.5d) {
-				X += (float) (speed * deltaTime);
-			} else {
-				X -= (float) (speed * deltaTime);
-			}
-			if (MathUtil.Random(0.0d, 1.0d) >= 0.5d) {
-				Y += (float) (speed * deltaTime);
-			} else {
-				Y -= (float) (speed * deltaTime);
-			}
+			X += (speed * deltaTime) * ((MathUtil.Random(0.0d, 1.0d) >= 0.5d) ? 1.0d : -1.0d);
+			Y += (speed * deltaTime) * ((MathUtil.Random(0.0d, 1.0d) >= 0.5d) ? 1.0d : -1.0d);
 		}
 	}
 }

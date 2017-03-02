@@ -5,7 +5,7 @@ using Egg82LibEnhanced.Patterns;
 using SFML.Window;
 using System;
 
-namespace Egg82LibEnhanced.Graphics {
+namespace Egg82LibEnhanced.Display.Interactable {
 	public class Button : DisplayObject, IInteractable {
 		//vars
 		public event EventHandler Entered = null;

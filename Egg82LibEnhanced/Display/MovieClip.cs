@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Egg82LibEnhanced.Graphics {
+namespace Egg82LibEnhanced.Display {
 	public class MovieClip : DisplayObject {
 		//vars
 		private TextureAtlas atlas = null;

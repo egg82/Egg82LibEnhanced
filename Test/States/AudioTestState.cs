@@ -1,5 +1,5 @@
-﻿using Egg82LibEnhanced.Base;
-using Egg82LibEnhanced.Core;
+﻿using Egg82LibEnhanced.Core;
+using Egg82LibEnhanced.Display;
 using Egg82LibEnhanced.Engines;
 using Egg82LibEnhanced.Enums;
 using Egg82LibEnhanced.Patterns;
@@ -8,7 +8,7 @@ using System;
 using System.IO;
 
 namespace Test.States {
-	public class AudioTestState : BaseState {
+	public class AudioTestState : State {
 		//vars
 		private IAudioEngine audioEngine = ServiceLocator.GetService(typeof(IAudioEngine));
 		private string ambientPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + ".."  + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Assets" + Path.DirectorySeparatorChar + "Audio" + Path.DirectorySeparatorChar + "725191_Subwoofer-Lullaby.mp3";
