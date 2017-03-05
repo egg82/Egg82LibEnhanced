@@ -110,18 +110,22 @@ namespace Egg82LibEnhanced.Utils {
 
 				watch.Start();
 				double lastTime = 0.0d;
+				double dt = 0.0d;
+				/*
+				 * 0.002 ms is about the time it takes
+				 * to do the below operations on a reasonable
+				 * CPU. Need to take that into account!
+				 */
+				double interval = _interval - 0.002d;
 				do {
 					if (oldAffinity != _processorNumber) {
 						currentThread.ProcessorAffinity = new IntPtr((_processorNumber != 0) ? 1 << _processorNumber - 1 : 0xFFFF);
 						oldAffinity = _processorNumber;
 					}
 					
-					/*
-					 * 0.002 ms is about the time it takes
-					 * to do the below operations. Need to
-					 * take that into account!
-					 */
-					while (watch.Elapsed.TotalMilliseconds - lastTime < _interval - 0.002d) {
+					//dt is the last frame's Delta Time. Playing catch-up.
+					//while ((dt - interval) + (watch.Elapsed.TotalMilliseconds - lastTime) < interval) {
+					while(dt + watch.Elapsed.TotalMilliseconds - lastTime - interval < interval) {
 						if (processors > 1) {
 							Thread.SpinWait(1000);
 						} else {
@@ -129,7 +133,7 @@ namespace Egg82LibEnhanced.Utils {
 						}
 					}
 					double ms = watch.Elapsed.TotalMilliseconds;
-					double dt = ms - lastTime;
+					dt = ms - lastTime;
 					lastTime = ms;
 
 					Elapsed?.Invoke(this, new PreciseElapsedEventArgs(ms, dt));

@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Egg82LibEnhanced.Utils {
 	/// <summary>
@@ -59,6 +60,7 @@ namespace Egg82LibEnhanced.Utils {
 
 		// The root of this quad tree
 		private readonly QuadTreeNode<T> quadTreeRoot;
+		private HashSet<T> movedObjects = new HashSet<T>();
 
 		#endregion
 
@@ -110,6 +112,7 @@ namespace Egg82LibEnhanced.Utils {
 		/// <param name="rect">The rectangle to find objects in.</param>
 		/// <param name="results">A reference to a list that will be populated with the results.</param>
 		public void GetObjects(PreciseRectangle rect, ref List<T> results) {
+			moveAllObjects();
 			quadTreeRoot.GetObjects(rect, ref results);
 		}
 
@@ -127,14 +130,14 @@ namespace Egg82LibEnhanced.Utils {
 		/// </summary>
 		/// <param name="item">The item that has moved</param>
 		public bool Move(T item) {
-			lock (objLock) {
-				if (Contains(item)) {
-					quadTreeRoot.Move(wrappedDictionary[item]);
-					return true;
-				} else {
-					return false;
+			if (Contains(item)) {
+				if (!movedObjects.Contains(item)) {
+					movedObjects.Add(item);
 				}
+				return true;
 			}
+			
+			return false;
 		}
 
 		#endregion
@@ -163,6 +166,7 @@ namespace Egg82LibEnhanced.Utils {
 		///<exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only. </exception>
 		public void Clear() {
 			lock (objLock) {
+				movedObjects.Clear();
 				wrappedDictionary.Clear();
 				quadTreeRoot.Clear();
 			}
@@ -230,6 +234,7 @@ namespace Egg82LibEnhanced.Utils {
 		///<exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
 		public bool Remove(T item) {
 			lock (objLock) {
+				movedObjects.Remove(item);
 				if (Contains(item)) {
 					quadTreeRoot.Delete(wrappedDictionary[item], true);
 					wrappedDictionary.Remove(item);
@@ -272,11 +277,20 @@ namespace Egg82LibEnhanced.Utils {
 		#endregion
 
 
-		/// <summary>
+		/*/// <summary>
 		/// The top left child for this QuadTree, only usable in debug mode
 		/// </summary>
 		public QuadTreeNode<T> RootQuad {
 			get { return quadTreeRoot; }
+		}*/
+
+		private void moveAllObjects() {
+			while (movedObjects.Count > 0) {
+				T obj = movedObjects.First();
+				quadTreeRoot.Move(wrappedDictionary[obj]);
+				// Need this instead of Clear because HashSet is unordered
+				movedObjects.Remove(obj);
+			}
 		}
 	}
 

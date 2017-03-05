@@ -25,8 +25,8 @@ namespace Test.States {
 
 		//private
 		protected override void OnEnter() {
-			sprite.X = Window.Width / 2.0d;
-			sprite.Y = Window.Height / 2.0d;
+			sprite.X = Window.Width / 2.0d - sprite.Width / 2.0d;
+			sprite.Y = Window.Height / 2.0d - sprite.Height / 2.0d;
 			AddChild(sprite);
 		}
 		protected override void OnExit() {
@@ -49,8 +49,6 @@ namespace Test.States {
 					sprite.Rotation += left.X * sprite.Speed;
 				}
 			}
-
-			//Console.WriteLine(sprite.X + ", " + sprite.GlobalX + ", " + sprite.Rotation);
 		}
 	}
 }

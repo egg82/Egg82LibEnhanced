@@ -81,8 +81,8 @@ namespace Test.Sprites {
 			}
 			physicsBody.LinearVelocity = newVelocity;
 
-			X = PhysicsEngine.ToPixels(physicsBody.Position.X);
-			Y = PhysicsEngine.ToPixels(physicsBody.Position.Y);
+			X = PhysicsEngine.ToPixels(physicsBody.Position.X) - Width / 2.0d;
+			Y = PhysicsEngine.ToPixels(physicsBody.Position.Y) - Height / 2.0d;
 			Rotation = physicsBody.Rotation;
 		}
 	}
