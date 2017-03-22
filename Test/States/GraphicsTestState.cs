@@ -1,4 +1,5 @@
 ﻿using Egg82LibEnhanced.Display;
+using Egg82LibEnhanced.Geom;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Utils;
 using System;

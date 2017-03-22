@@ -28,6 +28,30 @@ namespace Egg82LibEnhanced.Utils {
 		public static double Clamp(double min, double max, double val) {
 			return Math.Min(max, Math.Max(min, val));
 		}
+		public static float Clamp(float min, float max, float val) {
+			return Math.Min(max, Math.Max(min, val));
+		}
+		public static int Clamp(int min, int max, int val) {
+			return Math.Min(max, Math.Max(min, val));
+		}
+		public static short Clamp(short min, short max, short val) {
+			return Math.Min(max, Math.Max(min, val));
+		}
+		public static long Clamp(long min, long max, long val) {
+			return Math.Min(max, Math.Max(min, val));
+		}
+		public static byte Clamp(byte min, byte max, byte val) {
+			return Math.Min(max, Math.Max(min, val));
+		}
+		public static uint Clamp(uint min, uint max, uint val) {
+			return Math.Min(max, Math.Max(min, val));
+		}
+		public static ushort Clamp(ushort min, ushort max, ushort val) {
+			return Math.Min(max, Math.Max(min, val));
+		}
+		public static ulong Clamp(ulong min, ulong max, ulong val) {
+			return Math.Min(max, Math.Max(min, val));
+		}
 
 		public static int ToXY(int width, int x, int y) {
 			return y * width + x;

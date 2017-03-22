@@ -30,14 +30,20 @@ namespace Egg82LibEnhanced.Core {
 			disconnectTimer.AutoReset = true;
 
 			disconnectTimer.Start();
-			if(socket.Connected) {
-				socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(onReceive), socket);
+			if(IsConnected) {
+				try {
+					socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(onReceive), socket);
+				} catch (Exception ex) {
+					Error?.Invoke(this, new ExceptionEventArgs(ex));
+					Disconnect();
+					return;
+				}
 			}
 		}
 
 		//public
 		public void Disconnect() {
-			if (!socket.Connected) {
+			if (!IsConnected) {
 				return;
 			}
 
@@ -49,15 +55,11 @@ namespace Egg82LibEnhanced.Core {
 				socket.Disconnect(false);
 				socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
 			} catch (Exception ex) {
-				if (Error != null) {
-					Error.Invoke(this, new ExceptionEventArgs(ex));
-				}
+				Error?.Invoke(this, new ExceptionEventArgs(ex));
 				return;
 			}
-
-			if (Disconnected != null) {
-				Disconnected.Invoke(this, EventArgs.Empty);
-			}
+			
+			Disconnected?.Invoke(this, EventArgs.Empty);
 		}
 
 		public void Send(byte[] data) {
@@ -65,7 +67,7 @@ namespace Egg82LibEnhanced.Core {
 				return;
 			}
 
-			if (!socket.Connected) {
+			if (!IsConnected) {
 				backlog.Add(data);
 			} else {
 				if (!ready || backlog.Count > 0) {
@@ -75,13 +77,29 @@ namespace Egg82LibEnhanced.Core {
 					if (!compatibilityMode) {
 						data = buildArray(data);
 					}
-					socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(onSend), socket);
+					try {
+						socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(onSend), socket);
+					} catch (Exception ex) {
+						Error?.Invoke(this, new ExceptionEventArgs(ex));
+						Disconnect();
+						return;
+					}
 				}
 			}
 		}
-		public string ConnectedIp {
+		public string ConnectedIp4 {
 			get {
-				return ((IPEndPoint) socket.RemoteEndPoint).Address.ToString();
+				return (IsConnected) ? ((IPEndPoint) socket.RemoteEndPoint).Address.MapToIPv4().ToString() : null;
+			}
+		}
+		public string ConnectedIp6 {
+			get {
+				return (IsConnected) ? ((IPEndPoint) socket.RemoteEndPoint).Address.MapToIPv6().ToString() : null;
+			}
+		}
+		public ushort ConnectedPort {
+			get {
+				return (ushort) ((IsConnected) ? ((IPEndPoint) socket.RemoteEndPoint).Port : 0);
 			}
 		}
 
@@ -100,18 +118,30 @@ namespace Egg82LibEnhanced.Core {
 		private void onSend(IAsyncResult r) {
 			Socket socket = (Socket) r.AsyncState;
 
-			socket.EndSend(r);
-			if (DataSent != null) {
-				DataSent.Invoke(this, EventArgs.Empty);
+			try {
+				socket.EndSend(r);
+			} catch (Exception ex) {
+				Error?.Invoke(this, new ExceptionEventArgs(ex));
+				Disconnect();
+				return;
 			}
-			if (socket.Connected) {
+			DataSent?.Invoke(this, EventArgs.Empty);
+			if (IsConnected) {
 				sendNext();
 			}
 		}
 		private void onReceive(IAsyncResult r) {
 			Socket socket = (Socket) r.AsyncState;
 
-			int bytesRead = socket.EndReceive(r);
+			int bytesRead = 0;
+
+			try {
+				bytesRead = socket.EndReceive(r);
+			} catch (Exception ex) {
+				Error?.Invoke(this, new ExceptionEventArgs(ex));
+				Disconnect();
+				return;
+			}
 
 			if (!compatibilityMode) {
 				if (bytesRead == buffer.Length) {
@@ -122,13 +152,17 @@ namespace Egg82LibEnhanced.Core {
 					checkPacket();
 				}
 			} else {
-				if (DataReceived != null) {
-					DataReceived.Invoke(this, new DataCompleteEventArgs((byte[]) buffer.Clone()));
-				}
+				DataReceived?.Invoke(this, new DataCompleteEventArgs((byte[]) buffer.Clone()));
 			}
 
-			if (socket.Connected) {
-				socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(onReceive), socket);
+			if (IsConnected) {
+				try {
+					socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(onReceive), socket);
+				} catch (Exception ex) {
+					Error?.Invoke(this, new ExceptionEventArgs(ex));
+					Disconnect();
+					return;
+				}
 			}
 		}
 
@@ -141,9 +175,7 @@ namespace Egg82LibEnhanced.Core {
 
 			backlog.Clear();
 			currentPacket.Clear();
-			if (Disconnected != null) {
-				Disconnected.Invoke(this, EventArgs.Empty);
-			}
+			Disconnected?.Invoke(this, EventArgs.Empty);
 		}
 
 		private void sendNext() {
@@ -154,18 +186,33 @@ namespace Egg82LibEnhanced.Core {
 
 			byte[] data = (!compatibilityMode) ? buildArray(backlog[0]) : backlog[0];
 			backlog.RemoveAt(0);
-			socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(onSend), socket);
+			try {
+				socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(onSend), socket);
+			} catch (Exception ex) {
+				Error?.Invoke(this, new ExceptionEventArgs(ex));
+				Disconnect();
+				return;
+			}
 		}
 
 		private void checkPacket() {
+			if (currentPacket.Count == 0) {
+				return;
+			}
+
 			byte[] totalPacket = currentPacket.ToArray();
 			int length = getHeader(totalPacket);
-			if (length != 0 || currentPacket.Count - 4 >= length) {
+
+			while (length == 0) {
+				currentPacket.RemoveRange(0, 4);
+				totalPacket = currentPacket.ToArray();
+				length = getHeader(totalPacket);
+			}
+
+			if (currentPacket.Count - 4 >= length) {
 				byte[] data = unbuildArray(totalPacket, length);
 				currentPacket.RemoveRange(0, length + 4);
-				if (DataReceived != null) {
-					DataReceived.Invoke(this, new DataCompleteEventArgs(data));
-				}
+				DataReceived?.Invoke(this, new DataCompleteEventArgs(data));
 				checkPacket();
 			}
 		}

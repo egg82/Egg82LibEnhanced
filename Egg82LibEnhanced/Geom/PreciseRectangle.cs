@@ -296,7 +296,7 @@ namespace Egg82LibEnhanced.Geom {
 		}
 
 		public override string ToString() {
-			return "Egg82LibEnhanced.Utils.PreciseRectangle {X = " + _x + ", Y = " + _y + ", Width = " + _width + ", Height = " + _height + "}";
+			return "Egg82LibEnhanced.Geom.PreciseRectangle {X = " + _x + ", Y = " + _y + ", Width = " + _width + ", Height = " + _height + "}";
 		}
 
 		//private

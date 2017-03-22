@@ -161,7 +161,7 @@ namespace Egg82LibEnhanced.Geom {
 		}
 
 		public override string ToString() {
-			return "Egg82LibEnhanced.Utils.PrecisePoint {X = " + _x + ", Y = " + _y + "}";
+			return "Egg82LibEnhanced.Geom.PrecisePoint {X = " + _x + ", Y = " + _y + "}";
 		}
 
 		//private

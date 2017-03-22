@@ -13,9 +13,17 @@ namespace Egg82LibEnhanced.Net {
 		public event EventHandler<DataCompleteEventArgs> DataReceived = null;
 		public event EventHandler DataSent = null;
 
-		public bool compatibilityMode = false;
+		public bool CompatibilityMode = false;
+
+		private string _remoteHost = null;
+		private ushort _remotePort = 0;
 
 		private Timer disconnectTimer = new Timer(100.0d);
+
+		public void Send(object dHPublicKey) {
+			throw new NotImplementedException();
+		}
+
 		private Socket socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
 		private List<byte> currentPacket = new List<byte>();
 		private SynchronizedCollection<byte[]> backlog = new SynchronizedCollection<byte[]>();
@@ -24,14 +32,14 @@ namespace Egg82LibEnhanced.Net {
 
 		//constructor
 		public TcpClient(bool compatibilityMode = false) {
-			this.compatibilityMode = compatibilityMode;
+			CompatibilityMode = compatibilityMode;
 			disconnectTimer.Elapsed += onTimer;
 			disconnectTimer.AutoReset = true;
 		}
 
 		//public
 		public void Connect(string host, ushort port) {
-			if (socket.Connected) {
+			if (IsConnected) {
 				Disconnect();
 			}
 			ready = false;
@@ -39,16 +47,20 @@ namespace Egg82LibEnhanced.Net {
 			try {
 				socket.BeginConnect(host, port, new AsyncCallback(onConnect), socket);
 			} catch (Exception ex) {
-				if (Error != null) {
-					Error.Invoke(this, new ExceptionEventArgs(ex));
-				}
+				Error?.Invoke(this, new ExceptionEventArgs(ex));
 				return;
 			}
+
+			_remoteHost = host;
+			_remotePort = port;
 		}
 		public void Disconnect() {
-			if (!socket.Connected) {
+			if (!IsConnected) {
 				return;
 			}
+
+			_remoteHost = null;
+			_remotePort = 0;
 
 			disconnectTimer.Stop();
 
@@ -58,15 +70,11 @@ namespace Egg82LibEnhanced.Net {
 				socket.Disconnect(false);
 				socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
 			} catch (Exception ex) {
-				if (Error != null) {
-					Error.Invoke(this, new ExceptionEventArgs(ex));
-				}
+				Error?.Invoke(this, new ExceptionEventArgs(ex));
 				return;
 			}
-
-			if (Disconnected != null) {
-				Disconnected.Invoke(this, EventArgs.Empty);
-			}
+			
+			Disconnected?.Invoke(this, EventArgs.Empty);
 		}
 
 		public void Send(byte[] data) {
@@ -74,17 +82,23 @@ namespace Egg82LibEnhanced.Net {
 				return;
 			}
 
-			if (!socket.Connected) {
+			if (!IsConnected) {
 				backlog.Add(data);
 			} else {
 				if (!ready || backlog.Count > 0) {
 					backlog.Add(data);
 				} else {
 					ready = false;
-					if (!compatibilityMode) {
+					if (!CompatibilityMode) {
 						data = buildArray(data);
 					}
-					socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(onSend), socket);
+					try {
+						socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(onSend), socket);
+					} catch (Exception ex) {
+						Error?.Invoke(this, new ExceptionEventArgs(ex));
+						Disconnect();
+						return;
+					}
 				}
 			}
 		}
@@ -99,38 +113,71 @@ namespace Egg82LibEnhanced.Net {
 				}
 			}
 		}
+		public string RemoteHost {
+			get {
+				return _remoteHost;
+			}
+		}
+		public ushort RemotePort {
+			get {
+				return _remotePort;
+			}
+		}
 
 		//private
 		private void onConnect(IAsyncResult r) {
 			Socket socket = (Socket) r.AsyncState;
 
-			socket.EndConnect(r);
+			try {
+				socket.EndConnect(r);
+			} catch (Exception ex) {
+				Error?.Invoke(this, new ExceptionEventArgs(ex));
+				Disconnect();
+				return;
+			}
+			
 			disconnectTimer.Start();
-			if (socket.Connected) {
-				socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(onReceive), socket);
+			if (IsConnected) {
+				try {
+					socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(onReceive), socket);
+				} catch (Exception ex) {
+					Error?.Invoke(this, new ExceptionEventArgs(ex));
+					Disconnect();
+					return;
+				}
 			}
-			if (Connected != null) {
-				Connected.Invoke(this, EventArgs.Empty);
-			}
+			Connected?.Invoke(this, EventArgs.Empty);
 			sendNext();
 		}
 		private void onSend(IAsyncResult r) {
 			Socket socket = (Socket) r.AsyncState;
 
-			socket.EndSend(r);
-			if (DataSent != null) {
-				DataSent.Invoke(this, EventArgs.Empty);
+			try {
+				socket.EndSend(r);
+			} catch (Exception ex) {
+				Error?.Invoke(this, new ExceptionEventArgs(ex));
+				Disconnect();
+				return;
 			}
-			if (socket.Connected) {
+			
+			DataSent?.Invoke(this, EventArgs.Empty);
+			if (IsConnected) {
 				sendNext();
 			}
 		}
 		private void onReceive(IAsyncResult r) {
 			Socket socket = (Socket) r.AsyncState;
+			int bytesRead = 0;
 
-			int bytesRead = socket.EndReceive(r);
+			try {
+				bytesRead = socket.EndReceive(r);
+			} catch (Exception ex) {
+				Error?.Invoke(this, new ExceptionEventArgs(ex));
+				Disconnect();
+				return;
+			}
 
-			if (!compatibilityMode) {
+			if (!CompatibilityMode) {
 				if (bytesRead == buffer.Length) {
 					currentPacket.AddRange(buffer);
 					checkPacket();
@@ -139,13 +186,17 @@ namespace Egg82LibEnhanced.Net {
 					checkPacket();
 				}
 			} else {
-				if (DataReceived != null) {
-					DataReceived.Invoke(this, new DataCompleteEventArgs((byte[]) buffer.Clone()));
-				}
+				DataReceived?.Invoke(this, new DataCompleteEventArgs((byte[]) buffer.Clone()));
 			}
 
-			if (socket.Connected) {
-				socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(onReceive), socket);
+			if (IsConnected) {
+				try {
+					socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(onReceive), socket);
+				} catch (Exception ex) {
+					Error?.Invoke(this, new ExceptionEventArgs(ex));
+					Disconnect();
+					return;
+				}
 			}
 		}
 
@@ -158,9 +209,7 @@ namespace Egg82LibEnhanced.Net {
 
 			backlog.Clear();
 			currentPacket.Clear();
-			if (Disconnected != null) {
-				Disconnected.Invoke(this, EventArgs.Empty);
-			}
+			Disconnected?.Invoke(this, EventArgs.Empty);
 		}
 
 		private void sendNext() {
@@ -169,20 +218,35 @@ namespace Egg82LibEnhanced.Net {
 				return;
 			}
 
-			byte[] data = (!compatibilityMode) ? buildArray(backlog[0]) : backlog[0];
+			byte[] data = (!CompatibilityMode) ? buildArray(backlog[0]) : backlog[0];
 			backlog.RemoveAt(0);
-			socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(onSend), socket);
+			try {
+				socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(onSend), socket);
+			} catch (Exception ex) {
+				Error?.Invoke(this, new ExceptionEventArgs(ex));
+				Disconnect();
+				return;
+			}
 		}
 
 		private void checkPacket() {
+			if (currentPacket.Count == 0) {
+				return;
+			}
+
 			byte[] totalPacket = currentPacket.ToArray();
 			int length = getHeader(totalPacket);
-			if (length != 0 || currentPacket.Count - 4 >= length) {
+
+			while (length == 0) {
+				currentPacket.RemoveRange(0, 4);
+				totalPacket = currentPacket.ToArray();
+				length = getHeader(totalPacket);
+			}
+
+			if (currentPacket.Count - 4 >= length) {
 				byte[] data = unbuildArray(totalPacket, length);
 				currentPacket.RemoveRange(0, length + 4);
-				if (DataReceived != null) {
-					DataReceived.Invoke(this, new DataCompleteEventArgs(data));
-				}
+				DataReceived?.Invoke(this, new DataCompleteEventArgs(data));
 				checkPacket();
 			}
 		}

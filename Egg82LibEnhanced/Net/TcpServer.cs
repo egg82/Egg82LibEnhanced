@@ -40,9 +40,7 @@ namespace Egg82LibEnhanced.Net {
 				socket.Listen(100);
 				socket.BeginAccept(new AsyncCallback(onAccept), null);
 			} catch (Exception ex) {
-				if (Error != null) {
-					Error.Invoke(this, new ExceptionEventArgs(ex));
-				}
+				Error?.Invoke(this, new ExceptionEventArgs(ex));
 				return;
 			}
 		}
@@ -56,9 +54,7 @@ namespace Egg82LibEnhanced.Net {
 			try {
 				socket.Disconnect(true);
 			} catch (Exception ex) {
-				if (Error != null) {
-					Error.Invoke(this, new ExceptionEventArgs(ex));
-				}
+				Error?.Invoke(this, new ExceptionEventArgs(ex));
 				return;
 			}
 		}
@@ -94,11 +90,23 @@ namespace Egg82LibEnhanced.Net {
 			clients.Clear();
 		}
 
-		public string GetClientIp(int client) {
+		public string GetClientIp4(int client) {
 			if (client >= clients.Count) {
 				return null;
 			}
-			return clients[client].ConnectedIp;
+			return clients[client].ConnectedIp4;
+		}
+		public string GetClientIp6(int client) {
+			if (client >= clients.Count) {
+				return null;
+			}
+			return clients[client].ConnectedIp6;
+		}
+		public ushort GetClientPort(int client) {
+			if (client >= clients.Count) {
+				return 0;
+			}
+			return clients[client].ConnectedPort;
 		}
 
 		public bool CompatibilityMode {
@@ -129,10 +137,8 @@ namespace Egg82LibEnhanced.Net {
 				clients.Add(client);
 				index = clients.Count - 1;
 			}
-
-			if (ClientConnected != null) {
-				ClientConnected.Invoke(this, new ListEventArgs(index));
-			}
+			
+			ClientConnected?.Invoke(this, new ListEventArgs(index));
 		}
 
 		private void onDisconnected(object sender, EventArgs e) {
@@ -144,10 +150,8 @@ namespace Egg82LibEnhanced.Net {
 			lock (lockObj) {
 				clients.RemoveAt(index);
 			}
-
-			if (ClientDisconnected != null) {
-				ClientDisconnected.Invoke(this, new ListEventArgs(index));
-			}
+			
+			ClientDisconnected?.Invoke(this, new ListEventArgs(index));
 		}
 		private void onError(object sender, ExceptionEventArgs e) {
 			int index = clients.IndexOf((ServerClient) sender);
@@ -158,10 +162,8 @@ namespace Egg82LibEnhanced.Net {
 			lock (lockObj) {
 				clients.RemoveAt(index);
 			}
-
-			if (ClientError != null) {
-				ClientError.Invoke(this, new ListExceptionEventArgs(index, e.Exception));
-			}
+			
+			ClientError?.Invoke(this, new ListExceptionEventArgs(index, e.Exception));
 
 			((ServerClient) sender).Disconnect();
 		}
@@ -170,20 +172,16 @@ namespace Egg82LibEnhanced.Net {
 			if (index < 0) {
 				return;
 			}
-
-			if (ClientDataReceived != null) {
-				ClientDataReceived.Invoke(this, new ListDataCompleteEventArgs(index, e.Data));
-			}
+			
+			ClientDataReceived?.Invoke(this, new ListDataCompleteEventArgs(index, e.Data));
 		}
 		private void onDataSent(object sender, EventArgs e) {
 			int index = clients.IndexOf((ServerClient) sender);
 			if (index < 0) {
 				return;
 			}
-
-			if (ClientDataSent != null) {
-				ClientDataSent.Invoke(this, new ListEventArgs(index));
-			}
+			
+			ClientDataSent?.Invoke(this, new ListEventArgs(index));
 		}
 	}
 }

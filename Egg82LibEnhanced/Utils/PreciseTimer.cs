@@ -125,7 +125,7 @@ namespace Egg82LibEnhanced.Utils {
 					
 					//dt is the last frame's Delta Time. Playing catch-up.
 					//while ((dt - interval) + (watch.Elapsed.TotalMilliseconds - lastTime) < interval) {
-					while(dt + watch.Elapsed.TotalMilliseconds - lastTime - interval < interval) {
+					while(dt + watch.Elapsed.TotalMilliseconds - lastTime - interval < interval) { //apparently this is the reduced version of the above line
 						if (processors > 1) {
 							Thread.SpinWait(1000);
 						} else {

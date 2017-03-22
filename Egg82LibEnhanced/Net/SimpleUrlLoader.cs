@@ -43,7 +43,12 @@ namespace Egg82LibEnhanced.Net {
 			_data = null;
 			_loadedBytes = 0;
 			_totalBytes = 0;
-			client.DownloadDataAsync(uri);
+			try {
+				client.DownloadDataAsync(uri);
+			} catch (Exception ex) {
+				Error?.Invoke(this, new ExceptionEventArgs(ex));
+				return;
+			}
 		}
 		public void Cancel() {
 			if (!_loading) {
@@ -100,15 +105,11 @@ namespace Egg82LibEnhanced.Net {
 		private void onProgress(object sender, DownloadProgressChangedEventArgs e) {
 			_loadedBytes = e.BytesReceived;
 			_totalBytes = e.TotalBytesToReceive;
-			if (Progress != null) {
-				Progress.Invoke(this, new ProgressEventArgs((double) _loadedBytes, (double) _totalBytes));
-			}
+			Progress?.Invoke(this, new ProgressEventArgs((double) _loadedBytes, (double) _totalBytes));
 		}
 		private void onComplete(object sender, DownloadDataCompletedEventArgs e) {
 			if (e.Error != null) {
-				if (Error != null) {
-					Error.Invoke(this, new ExceptionEventArgs(e.Error));
-				}
+				Error?.Invoke(this, new ExceptionEventArgs(e.Error));
 				return;
 			}
 			if (e.Cancelled) {
@@ -116,9 +117,7 @@ namespace Egg82LibEnhanced.Net {
 			}
 			_data = e.Result;
 			_loading = false;
-			if (Completed != null) {
-				Completed.Invoke(this, new DataCompleteEventArgs((byte[]) _data.Clone()));
-			}
+			Completed?.Invoke(this, new DataCompleteEventArgs((byte[]) _data.Clone()));
 		}
 	}
 }

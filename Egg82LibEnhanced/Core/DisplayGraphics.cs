@@ -15,7 +15,7 @@ namespace Egg82LibEnhanced.Core {
 
 		//constructor
 		public DisplayGraphics() {
-			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+			using (Graphics g = Graphics.FromImage(Bitmap)) {
 				g.Clear(Color.Transparent);
 			}
 		}
@@ -24,7 +24,7 @@ namespace Egg82LibEnhanced.Core {
 		public void DrawArc(Pen pen, double x, double y, double width, double height, double startAngle, double sweepAngle) {
 			if (x + width + pen.Width > Bitmap.Width || y + height + pen.Width > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, Bitmap.Width), (int) Math.Max(y + height + pen.Width, Bitmap.Height));
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawArc(pen, (float) x, (float) y, (float) width, (float) height, (float) startAngle, (float) sweepAngle);
@@ -32,7 +32,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawArc(pen, (float) x, (float) y, (float) width, (float) height, (float) startAngle, (float) sweepAngle);
 				}
@@ -45,7 +45,7 @@ namespace Egg82LibEnhanced.Core {
 			int maxY = (int) Math.Max(Math.Max(Math.Max(Math.Max(y1 + pen.Width, y2 + pen.Width), y3 + pen.Width), y4 + pen.Width), Bitmap.Height);
 			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawBezier(pen, (float) x1, (float) y1, (float) x2, (float) y2, (float) x3, (float) y3, (float) x4, (float) y4);
@@ -53,7 +53,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawBezier(pen, (float) x1, (float) y1, (float) x2, (float) y2, (float) x3, (float) y3, (float) x4, (float) y4);
 				}
@@ -76,7 +76,7 @@ namespace Egg82LibEnhanced.Core {
 
 			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawBeziers(pen, precisePointArrayToPointFArray(points));
@@ -84,7 +84,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawBeziers(pen, precisePointArrayToPointFArray(points));
 				}
@@ -107,7 +107,7 @@ namespace Egg82LibEnhanced.Core {
 
 			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawClosedCurve(pen, precisePointArrayToPointFArray(points), (float) tension, fillMode);
@@ -115,7 +115,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawClosedCurve(pen, precisePointArrayToPointFArray(points), (float) tension, fillMode);
 				}
@@ -138,7 +138,7 @@ namespace Egg82LibEnhanced.Core {
 
 			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawCurve(pen, precisePointArrayToPointFArray(points), (int) offset, numberOfSegments, (float) tension);
@@ -146,7 +146,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawCurve(pen, precisePointArrayToPointFArray(points), (int) offset, numberOfSegments, (float) tension);
 				}
@@ -157,7 +157,7 @@ namespace Egg82LibEnhanced.Core {
 		public void DrawEllipse(Pen pen, double x, double y, double width, double height) {
 			if (x + width + pen.Width > Bitmap.Width || y + height + pen.Width > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, Bitmap.Width), (int) Math.Max(y + height + pen.Width, Bitmap.Height));
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawEllipse(pen, (float) x, (float) y, (float) width, (float) height);
@@ -165,7 +165,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawEllipse(pen, (float) x, (float) y, (float) width, (float) height);
 				}
@@ -179,7 +179,7 @@ namespace Egg82LibEnhanced.Core {
 
 			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawLine(pen, (float) x1, (float) y1, (float) x2, (float) y2);
@@ -187,7 +187,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawLine(pen, (float) x1, (float) y1, (float) x2, (float) y2);
 				}
@@ -210,7 +210,7 @@ namespace Egg82LibEnhanced.Core {
 
 			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawLines(pen, precisePointArrayToPointFArray(points));
@@ -218,7 +218,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawLines(pen, precisePointArrayToPointFArray(points));
 				}
@@ -229,7 +229,7 @@ namespace Egg82LibEnhanced.Core {
 		public void DrawPie(Pen pen, double x, double y, double width, double height, double startAngle, double sweepAngle) {
 			if (x + width + pen.Width > Bitmap.Width || y + height + pen.Width > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, Bitmap.Width), (int) Math.Max(y + height + pen.Width, Bitmap.Height));
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawPie(pen, (float) x, (float) y, (float) width, (float) height, (float) startAngle, (float) sweepAngle);
@@ -237,7 +237,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawPie(pen, (float) x, (float) y, (float) width, (float) height, (float) startAngle, (float) sweepAngle);
 				}
@@ -260,7 +260,7 @@ namespace Egg82LibEnhanced.Core {
 
 			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawPolygon(pen, precisePointArrayToPointFArray(points));
@@ -268,7 +268,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawPolygon(pen, precisePointArrayToPointFArray(points));
 				}
@@ -279,7 +279,7 @@ namespace Egg82LibEnhanced.Core {
 		public void DrawRectangle(Pen pen, double x, double y, double width, double height) {
 			if (x + width + pen.Width > Bitmap.Width || y + height + pen.Width > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, Bitmap.Width), (int) Math.Max(y + height + pen.Width, Bitmap.Height));
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawRectangle(pen, (float) x, (float) y, (float) width, (float) height);
@@ -287,7 +287,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawRectangle(pen, (float) x, (float) y, (float) width, (float) height);
 				}
@@ -310,7 +310,7 @@ namespace Egg82LibEnhanced.Core {
 
 			if (maxWidth > Bitmap.Width || maxHeight > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxWidth, maxHeight);
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawRectangles(pen, preciseRectangleArrayToRectangleFArray(rects));
@@ -318,7 +318,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.DrawRectangles(pen, preciseRectangleArrayToRectangleFArray(rects));
 				}
@@ -341,7 +341,7 @@ namespace Egg82LibEnhanced.Core {
 
 			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillClosedCurve(pen.Brush, precisePointArrayToPointFArray(points), fillMode, (float) tension);
@@ -349,7 +349,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillClosedCurve(pen.Brush, precisePointArrayToPointFArray(points), fillMode, (float) tension);
 				}
@@ -360,7 +360,7 @@ namespace Egg82LibEnhanced.Core {
 		public void FillEllipse(Pen pen, double x, double y, double width, double height) {
 			if (x + width + pen.Width > Bitmap.Width || y + height + pen.Width > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, Bitmap.Width), (int) Math.Max(y + height + pen.Width, Bitmap.Height));
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillEllipse(pen.Brush, (float) x, (float) y, (float) width, (float) height);
@@ -368,7 +368,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillEllipse(pen.Brush, (float) x, (float) y, (float) width, (float) height);
 				}
@@ -379,7 +379,7 @@ namespace Egg82LibEnhanced.Core {
 		public void FillPie(Pen pen, double x, double y, double width, double height, double startAngle, double sweepAngle) {
 			if (x + width + pen.Width > Bitmap.Width || y + height + pen.Width > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, Bitmap.Width), (int) Math.Max(y + height + pen.Width, Bitmap.Height));
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillPie(pen.Brush, (float) x, (float) y, (float) width, (float) height, (float) startAngle, (float) sweepAngle);
@@ -387,7 +387,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillPie(pen.Brush, (float) x, (float) y, (float) width, (float) height, (float) startAngle, (float) sweepAngle);
 				}
@@ -410,7 +410,7 @@ namespace Egg82LibEnhanced.Core {
 
 			if (maxX > Bitmap.Width || maxY > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxX, maxY);
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillPolygon(pen.Brush, precisePointArrayToPointFArray(points), fillMode);
@@ -418,7 +418,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillPolygon(pen.Brush, precisePointArrayToPointFArray(points), fillMode);
 				}
@@ -429,7 +429,7 @@ namespace Egg82LibEnhanced.Core {
 		public void FillRectangle(Pen pen, double x, double y, double width, double height) {
 			if (x + width + pen.Width > Bitmap.Width || y + height + pen.Width > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap((int) Math.Max(x + width + pen.Width, Bitmap.Width), (int) Math.Max(y + height + pen.Width, Bitmap.Height));
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillRectangle(pen.Brush, (float) x, (float) y, (float) width, (float) height);
@@ -437,7 +437,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillRectangle(pen.Brush, (float) x, (float) y, (float) width, (float) height);
 				}
@@ -460,7 +460,7 @@ namespace Egg82LibEnhanced.Core {
 
 			if (maxWidth > Bitmap.Width || maxHeight > Bitmap.Height) {
 				Bitmap newBitmap = new Bitmap(maxWidth, maxHeight);
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(newBitmap)) {
+				using (Graphics g = Graphics.FromImage(newBitmap)) {
 					g.DrawImageUnscaled(Bitmap, new Point(0, 0));
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillRectangles(pen.Brush, preciseRectangleArrayToRectangleFArray(rects));
@@ -468,7 +468,7 @@ namespace Egg82LibEnhanced.Core {
 				Bitmap = newBitmap;
 				BoundsChanged?.Invoke(this, EventArgs.Empty);
 			} else {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+				using (Graphics g = Graphics.FromImage(Bitmap)) {
 					g.SmoothingMode = (Antialiasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.FillRectangles(pen.Brush, preciseRectangleArrayToRectangleFArray(rects));
 				}
@@ -478,14 +478,14 @@ namespace Egg82LibEnhanced.Core {
 		}
 
 		public void FillColor(Color color) {
-			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+			using (Graphics g = Graphics.FromImage(Bitmap)) {
 				g.Clear(color);
 			}
 		}
 		public void Clear() {
 			Bitmap.Dispose();
 			Bitmap = new Bitmap(1, 1);
-			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(Bitmap)) {
+			using (Graphics g = Graphics.FromImage(Bitmap)) {
 				g.Clear(Color.Transparent);
 			}
 			BoundsChanged?.Invoke(this, EventArgs.Empty);
