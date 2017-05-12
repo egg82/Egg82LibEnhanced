@@ -72,6 +72,11 @@ namespace Egg82LibEnhanced.Geom {
 				return ((Math.Atan2(end.Y - start.Y, end.X - start.X) * 180.0d / Math.PI) % 360.0d) + 90.0d;
 			}
 		}
+		public double Slope {
+			get {
+				return (end.Y - start.Y) / (end.X - start.X);
+			}
+		}
 
 		public PrecisePoint Intersects(PreciseLine[] polygon) {
 			if (polygon == null) {
@@ -96,8 +101,83 @@ namespace Egg82LibEnhanced.Geom {
 
 			return closest;
 		}
-		public PrecisePoint Intersects(PreciseEllipse ellipse) {
-			
+		public PrecisePoint Intersects(PreciseEllipse ellipse, double epsilon = 0.0d) {
+			if (ellipse == null) {
+				throw new ArgumentNullException("ellipse");
+			}
+			if (epsilon <= 0.0d) {
+				throw new InvalidOperationException("epsilon cannot be <= 0");
+			}
+
+			double aa = 0.0d;
+			double bb = 0.0d;
+			double cc = 0.0d;
+			double m = 0.0d;
+
+			double a = ellipse.Major;
+			double b = ellipse.Minor;
+
+			PrecisePoint intersection1 = null;
+			PrecisePoint intersection2 = null;
+			PrecisePoint center = ellipse.Center;
+
+			if (start.X == end.X) {
+				// Vertical line
+				aa = a * a;
+				bb = -2.0d * center.Y * a * a;
+				cc = -a * a * b * b + b * b * (start.X - center.X) * (start.X - center.X);
+			} else {
+				// Non-vertical line
+				m = Slope;
+				double c = start.Y - m * start.X;
+
+				aa = b * b + a * a * m * m;
+				bb = 2 * a * a * c * m - 2 * a * a * center.Y * m - 2 * center.X * b * b;
+				cc = b * b * center.X * center.X + a * a * c * c - 2 * a * a * center.Y * c + a * a * center.Y * center.Y - a * a * b * b;
+			}
+
+			double d = bb * bb - 4.0d * aa * cc;
+
+			if (d > 0.0d) {
+				// Intersections found
+				if (start.X == end.X) {
+					// Vertical line
+					double y1 = (-bb + Math.Sqrt(d)) / (2 * aa);
+					intersection1 = new PrecisePoint(start.X, y1);
+					double y2 = (-bb - Math.Sqrt(d)) / (2 * aa);
+					intersection2 = new PrecisePoint(start.X, y2);
+				} else {
+					// Non-vertical line
+					double x1 = (-bb + Math.Sqrt(d)) / (2 * aa);
+					double y1 = start.Y + m * (x1 - start.X);
+					intersection1 = new PrecisePoint(x1, y1);
+
+					double x2 = (-bb - Math.Sqrt(d)) / (2 * aa);
+					double y2 = start.Y + m * (x2 - start.X);
+					intersection2 = new PrecisePoint(x2, y2);
+				}
+			} else {
+				// No intersections
+				return null;
+			}
+
+			// Get closest result
+			double startDistance = (intersection1.X - start.X) * (intersection1.X - start.X) + (intersection1.Y - start.Y) * (intersection1.Y - start.Y);
+			double endDistance = (intersection2.X - start.X) * (intersection2.X - start.X) + (intersection2.Y - start.Y) * (intersection2.Y - start.Y);
+
+			PrecisePoint result = null;
+
+			if (startDistance <= endDistance) {
+				result = intersection1;
+			} else {
+				result = intersection2;
+			}
+
+			// Is the result part of this line?
+			if (!Intersects(result, epsilon)) {
+				return null;
+			}
+			return result;
 		}
 		public PrecisePoint Intersects(PreciseRectangle rectangle, double epsilon = 1e-4) {
 			if (epsilon <= 0.0d) {
@@ -118,7 +198,6 @@ namespace Egg82LibEnhanced.Geom {
 					return (!p0.Equals(start) || Intersects(p0, epsilon)) ? p0 : null;
 				} else {
 					PrecisePoint p = new PrecisePoint();
-					//CohenSutherlandBitCode outCodeOut = (outCode0 != 0) ? outCode0 : outCode1;
 					CohenSutherlandBitCode outCodeOut = (outCode0 != 0) ? outCode0 : outCode1;
 
 					if (0 != (outCodeOut & CohenSutherlandBitCode.TOP)) {

@@ -28,8 +28,8 @@ namespace Egg82LibEnhanced.Geom {
 
 			_x = x;
 			_y = y;
-			_width = width;
-			_height = height;
+			_width = Math.Abs(width);
+			_height = Math.Abs(height);
 		}
 
 		//public
@@ -157,6 +157,19 @@ namespace Egg82LibEnhanced.Geom {
 				}
 				Right = value.X;
 				Bottom = value.Y;
+			}
+		}
+
+		public PrecisePoint Center {
+			get {
+				return new PrecisePoint(_x + _width / 2.0d, _y + _height / 2.0d);
+			}
+			set {
+				if (value == null) {
+					throw new ArgumentNullException("value");
+				}
+				_x = value.X - _width / 2.0d;
+				_y = value.Y - _height / 2.0d;
 			}
 		}
 
