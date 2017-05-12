@@ -7,6 +7,15 @@ namespace Egg82LibEnhanced.Geom {
 		private PrecisePoint start = new PrecisePoint();
 		private PrecisePoint end = new PrecisePoint();
 
+		//enums
+		private enum CohenSutherlandBitCode {
+			INSIDE = 0,
+			LEFT = 1,
+			RIGHT = 2,
+			BOTTOM = 4,
+			TOP = 8
+		}
+
 		//constructor
 		public PreciseLine(double startX, double startY, double endX, double endY) {
 			if (double.IsNaN(startX)) {
@@ -90,8 +99,49 @@ namespace Egg82LibEnhanced.Geom {
 		public PrecisePoint Intersects(PreciseEllipse ellipse) {
 			
 		}
-		public PrecisePoint Intersects(PreciseRectangle rectangle) {
-			
+		public PrecisePoint Intersects(PreciseRectangle rectangle, double epsilon = 1e-4) {
+			if (epsilon <= 0.0d) {
+				throw new InvalidOperationException("epsilon cannot be <= 0");
+			}
+
+			PrecisePoint p0 = (PrecisePoint) start.Clone();
+			PrecisePoint p1 = (PrecisePoint) end.Clone();
+			CohenSutherlandBitCode outCode0 = ComputeOutCode(rectangle, p0, epsilon);
+			CohenSutherlandBitCode outCode1 = ComputeOutCode(rectangle, p1, epsilon);
+
+			while (true) {
+				if (0 == (outCode0 | outCode1)) {
+					// Both points are inside
+					return (!p0.Equals(start) || Intersects(p0, epsilon)) ? p0 : null;
+				} else if (0 != (outCode0 & outCode1)) {
+					// Both points are outside and does not intersect
+					return (!p0.Equals(start) || Intersects(p0, epsilon)) ? p0 : null;
+				} else {
+					PrecisePoint p = new PrecisePoint();
+					//CohenSutherlandBitCode outCodeOut = (outCode0 != 0) ? outCode0 : outCode1;
+					CohenSutherlandBitCode outCodeOut = (outCode0 != 0) ? outCode0 : outCode1;
+
+					if (0 != (outCodeOut & CohenSutherlandBitCode.TOP)) {
+						p.X = p0.X + (p1.X - p0.X) * (rectangle.Bottom - p0.Y) / (p1.Y - p0.Y);
+						p.Y = rectangle.Bottom;
+					} else if (0 != (outCodeOut & CohenSutherlandBitCode.BOTTOM)) {
+						p.X = p0.X + (p1.X - p0.X) * (rectangle.Top - p0.Y) / (p1.Y - p0.Y);
+						p.Y = rectangle.Top;
+					} else if (0 != (outCodeOut & CohenSutherlandBitCode.RIGHT)) {
+						p.Y = p0.Y + (p1.Y - p0.Y) * (rectangle.Right - p0.X) / (p1.X - p0.X);
+						p.X = rectangle.Right;
+					} else if (0 != (outCodeOut & CohenSutherlandBitCode.LEFT)) {
+						p.Y = p0.Y + (p1.Y - p0.Y) * (rectangle.Left - p0.X) / (p1.X - p0.X);
+						p.X = rectangle.Left;
+					}
+
+					if (outCodeOut == outCode0) {
+						outCode0 = ComputeOutCode(rectangle, p0 = p, epsilon);
+					} else {
+						outCode1 = ComputeOutCode(rectangle, p1 = p, epsilon);
+					}
+				}
+			}
 		}
 		public PrecisePoint Intersects(PreciseLine line) {
 			double a1 = end.Y - start.Y;
@@ -154,9 +204,13 @@ namespace Egg82LibEnhanced.Geom {
 			return result;
 		}
 		public bool Intersects(PrecisePoint point, double epsilon = 0.0d) {
-			double crossproduct = (point.Y - start.Y) * (end.X - start.X) - (point.X - start.X) * (end.Y - start.Y);
+			if (epsilon < 0.0d) {
+				throw new InvalidOperationException("epsilon cannot be < 0");
+			}
 
-			if (epsilon * -1.0d <= crossproduct && crossproduct <= epsilon) {
+			double crossProduct = (point.Y - start.Y) * (end.X - start.X) - (point.X - start.X) * (end.Y - start.Y);
+
+			if (epsilon * -1.0d <= crossProduct && crossProduct <= epsilon) {
 				if (Math.Min(start.X, end.X) <= point.X && point.X <= Math.Max(start.X, end.X)) {
 					if (Math.Min(start.Y, end.Y) <= point.Y && point.Y <= Math.Max(start.Y, end.Y)) {
 						return true;
@@ -186,6 +240,21 @@ namespace Egg82LibEnhanced.Geom {
 		}
 
 		//private
+		private CohenSutherlandBitCode ComputeOutCode(PreciseRectangle r, PrecisePoint p, double epsilon) {
+			CohenSutherlandBitCode code = CohenSutherlandBitCode.INSIDE;
 
+			if (r.Left - p.X >= epsilon) {
+				code |= CohenSutherlandBitCode.LEFT;
+			} else if (p.X - r.Right >= epsilon) {
+				code |= CohenSutherlandBitCode.RIGHT;
+			}
+			if (r.Top - p.Y >= epsilon) {
+				code |= CohenSutherlandBitCode.BOTTOM;
+			} else if (p.Y - r.Bottom >= epsilon) {
+				code |= CohenSutherlandBitCode.TOP;
+			}
+
+			return code;
+		}
 	}
 }
