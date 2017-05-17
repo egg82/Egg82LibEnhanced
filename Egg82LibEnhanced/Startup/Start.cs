@@ -1,8 +1,8 @@
-﻿using Egg82LibEnhanced.Display;
+﻿using Egg82LibEnhanced.Crypto;
+using Egg82LibEnhanced.Display;
 using Egg82LibEnhanced.Engines;
 using Egg82LibEnhanced.Engines.Nulls;
 using Egg82LibEnhanced.Patterns;
-using Egg82LibEnhanced.Utils;
 using System;
 using System.Collections.Generic;
 
@@ -21,7 +21,7 @@ namespace Egg82LibEnhanced.Startup {
 		public static void ProvideDefaultServices(bool physics = false) {
 			ServiceLocator.ProvideService(typeof(AudioEngine));
 			ServiceLocator.ProvideService(typeof(ModEngine));
-			ServiceLocator.ProvideService(typeof(CryptoUtil));
+			ServiceLocator.ProvideService(typeof(CryptoHelper));
 
 			if (physics) {
 				ServiceLocator.ProvideService(typeof(PhysicsEngine), false);
@@ -33,11 +33,11 @@ namespace Egg82LibEnhanced.Startup {
 		}
 		public static void ProvideModServices() {
 			ServiceLocator.ProvideService(typeof(AudioEngine));
-			ServiceLocator.ProvideService(typeof(CryptoUtil));
+			ServiceLocator.ProvideService(typeof(CryptoHelper));
 		}
 		public static void DestroyModServices() {
 			ServiceLocator.RemoveService(typeof(IAudioEngine));
-			ServiceLocator.RemoveService(typeof(ICryptoUtil));
+			ServiceLocator.RemoveService(typeof(ICryptoHelper));
 
 			GC.Collect();
 		}
@@ -48,7 +48,7 @@ namespace Egg82LibEnhanced.Startup {
 
 			ServiceLocator.RemoveService(typeof(IAudioEngine));
 			ServiceLocator.RemoveService(typeof(IModEngine));
-			ServiceLocator.RemoveService(typeof(ICryptoUtil));
+			ServiceLocator.RemoveService(typeof(ICryptoHelper));
 
 			GC.Collect();
 		}

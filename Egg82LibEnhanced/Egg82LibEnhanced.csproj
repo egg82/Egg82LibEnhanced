@@ -73,6 +73,9 @@
       <HintPath>..\packages\FarseerPhysics.3.5.0\lib\NET40\FarseerPhysics.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.6.9.9\lib\net45\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="NAudio, Version=1.8.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.1.8.0\lib\net35\NAudio.dll</HintPath>
       <Private>True</Private>
@@ -135,6 +138,9 @@
     <Compile Include="Events\TriggerEventArgs.cs" />
     <Compile Include="Geom\PreciseEllipse.cs" />
     <Compile Include="Geom\PreciseLine.cs" />
+    <Compile Include="Net\UdpSender.cs" />
+    <Compile Include="Net\UdpReceiver.cs" />
+    <Compile Include="SQL\MySQL.cs" />
     <Compile Include="Utils\Easing.cs" />
     <Compile Include="Display\Sprite.cs" />
     <Compile Include="Display\State.cs" />
@@ -200,10 +206,11 @@
     <Compile Include="Patterns\States\FiniteStateMachine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup\Start.cs" />
-    <Compile Include="Utils\CryptoUtil.cs" />
+    <Compile Include="Crypto\CryptoHelper.cs" />
     <Compile Include="Utils\FileUtil.cs" />
     <Compile Include="Utils\FontUtil.cs" />
-    <Compile Include="Utils\ICryptoUtil.cs" />
+    <Compile Include="Crypto\ICryptoHelper.cs" />
+    <Compile Include="Utils\NetUtil.cs" />
     <Compile Include="Utils\MathUtil.cs" />
     <Compile Include="Geom\PrecisePoint.cs" />
     <Compile Include="Geom\PreciseRectangle.cs" />
@@ -211,7 +218,7 @@
     <Compile Include="Utils\QuadTree.cs" />
     <Compile Include="Utils\ReflectUtil.cs" />
     <Compile Include="Utils\SettingsUtil.cs" />
-    <Compile Include="Utils\SQLite.cs" />
+    <Compile Include="SQL\SQLite.cs" />
     <Compile Include="Utils\TextureUtil.cs" />
     <Compile Include="Utils\Tween.cs" />
   </ItemGroup>
@@ -220,6 +227,7 @@
     <None Include="packages.config" />
     <None Include="SFML.Net.dll.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

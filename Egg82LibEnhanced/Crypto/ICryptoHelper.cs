@@ -2,8 +2,8 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Egg82LibEnhanced.Utils {
-	public interface ICryptoUtil {
+namespace Egg82LibEnhanced.Crypto {
+	public interface ICryptoHelper {
 		/// <summary>
 		/// Converts a string to bytes. Uses UTF-8 encoding.
 		/// </summary>

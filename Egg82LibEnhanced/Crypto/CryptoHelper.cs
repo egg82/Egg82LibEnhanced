@@ -11,8 +11,8 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-namespace Egg82LibEnhanced.Utils {
-	public class CryptoUtil : ICryptoUtil {
+namespace Egg82LibEnhanced.Crypto {
+	public class CryptoHelper : ICryptoHelper {
 		//vars
 		private MD5 md5 = MD5.Create();
 		private SHA1 sha1 = SHA1.Create();
@@ -43,7 +43,7 @@ namespace Egg82LibEnhanced.Utils {
 		/// <summary>
 		/// A utility for easily using cryptographic functions. Automatically generates PGP and RSA keypairs.
 		/// </summary>
-		public CryptoUtil() {
+		public CryptoHelper() {
 			DsaKeyPairGenerator gen = new DsaKeyPairGenerator();
 			DsaParametersGenerator pGen = new DsaParametersGenerator();
 			pgpRng.SetSeed(GetRandomBytes(512));

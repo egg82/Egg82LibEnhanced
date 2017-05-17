@@ -16,17 +16,24 @@ namespace Egg82LibEnhanced.Net {
 		public event EventHandler<ListDataCompleteEventArgs> ClientDataReceived = null;
 		public event EventHandler<ListEventArgs> ClientDataSent = null;
 
+		private int bufferSize = 128;
 		private Socket socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
 		private bool _compatibilityMode = false;
 		private List<ServerClient> clients = new List<ServerClient>();
 		private object lockObj = new object();
 
 		//constructor
-		public TcpServer(bool compatibilityMode = false) {
+		public TcpServer(bool compatibilityMode = false, int bufferSize = 128) {
+			if (bufferSize <= 0) {
+				throw new InvalidOperationException("bufferSize cannot be <= 0");
+			}
+
+			this.bufferSize = bufferSize;
 			_compatibilityMode = compatibilityMode;
 		}
 		~TcpServer() {
 			DisconnectAll();
+			Close();
 		}
 
 		//public
@@ -126,7 +133,7 @@ namespace Egg82LibEnhanced.Net {
 
 		//private
 		private void onAccept(IAsyncResult r) {
-			ServerClient client = new ServerClient(socket.EndAccept(r), _compatibilityMode);
+			ServerClient client = new ServerClient(socket.EndAccept(r), _compatibilityMode, bufferSize);
 			client.Disconnected += onDisconnected;
 			client.Error += onError;
 			client.DataReceived += onDataReceived;

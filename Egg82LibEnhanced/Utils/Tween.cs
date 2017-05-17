@@ -1,5 +1,4 @@
 ﻿using Egg82LibEnhanced.Enums;
-using Egg82LibEnhanced.Events;
 using System;
 using System.Collections.Generic;
 

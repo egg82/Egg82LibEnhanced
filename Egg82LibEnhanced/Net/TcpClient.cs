@@ -1,6 +1,8 @@
 ﻿using Egg82LibEnhanced.Events;
+using Egg82LibEnhanced.Utils;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Timers;
 
@@ -15,43 +17,54 @@ namespace Egg82LibEnhanced.Net {
 
 		public bool CompatibilityMode = false;
 
-		private string _remoteHost = null;
+		private string _remoteAddress = null;
 		private ushort _remotePort = 0;
 
 		private Timer disconnectTimer = new Timer(100.0d);
 
-		public void Send(object dHPublicKey) {
-			throw new NotImplementedException();
-		}
-
 		private Socket socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
 		private List<byte> currentPacket = new List<byte>();
 		private SynchronizedCollection<byte[]> backlog = new SynchronizedCollection<byte[]>();
-		private byte[] buffer = new byte[128];
+		private byte[] buffer = null;
 		private bool ready = false;
 
 		//constructor
-		public TcpClient(bool compatibilityMode = false) {
+		public TcpClient(bool compatibilityMode = false, int bufferSize = 128) {
+			if (bufferSize <= 0) {
+				throw new InvalidOperationException("bufferSize cannot be <= 0");
+			}
+
+			buffer = new byte[bufferSize];
 			CompatibilityMode = compatibilityMode;
 			disconnectTimer.Elapsed += onTimer;
 			disconnectTimer.AutoReset = true;
 		}
+		~TcpClient() {
+			Disconnect();
+		}
 
 		//public
-		public void Connect(string host, ushort port) {
+		public void Connect(string address, ushort port) {
 			if (IsConnected) {
 				Disconnect();
 			}
 			ready = false;
-			
+
+			IPAddress ip = NetUtil.GetAddress(address);
+			if (ip == null) {
+				Error?.Invoke(this, new ExceptionEventArgs(new Exception("address is invalid.")));
+				return;
+			}
+			IPEndPoint ep = new IPEndPoint(ip, port);
+
 			try {
-				socket.BeginConnect(host, port, new AsyncCallback(onConnect), socket);
+				socket.BeginConnect(ep, new AsyncCallback(onConnect), socket);
 			} catch (Exception ex) {
 				Error?.Invoke(this, new ExceptionEventArgs(ex));
 				return;
 			}
 
-			_remoteHost = host;
+			_remoteAddress = address;
 			_remotePort = port;
 		}
 		public void Disconnect() {
@@ -59,7 +72,7 @@ namespace Egg82LibEnhanced.Net {
 				return;
 			}
 
-			_remoteHost = null;
+			_remoteAddress = null;
 			_remotePort = 0;
 
 			disconnectTimer.Stop();
@@ -113,9 +126,9 @@ namespace Egg82LibEnhanced.Net {
 				}
 			}
 		}
-		public string RemoteHost {
+		public string RemoteAddress {
 			get {
-				return _remoteHost;
+				return _remoteAddress;
 			}
 		}
 		public ushort RemotePort {

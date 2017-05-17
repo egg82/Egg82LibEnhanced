@@ -5,6 +5,5 @@ namespace Egg82LibEnhanced.Core {
 		public string[] columns;
 		public object[,] data;
 		public int recordsAffected;
-		public object queryData;
 	}
 }

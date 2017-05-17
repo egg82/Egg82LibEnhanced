@@ -19,13 +19,14 @@ namespace Egg82LibEnhanced.Core {
 		private Socket socket = null;
 		private List<byte> currentPacket = new List<byte>();
 		private SynchronizedCollection<byte[]> backlog = new SynchronizedCollection<byte[]>();
-		private byte[] buffer = new byte[128];
+		private byte[] buffer = null;
 		private bool ready = true;
 
 		//constructor
-		public ServerClient(Socket socket, bool compatibilityMode = false) {
+		public ServerClient(Socket socket, bool compatibilityMode, int bufferSize) {
 			this.socket = socket;
 			this.compatibilityMode = compatibilityMode;
+			this.buffer = new byte[bufferSize];
 			disconnectTimer.Elapsed += onTimer;
 			disconnectTimer.AutoReset = true;
 

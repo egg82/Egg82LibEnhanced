@@ -1,72 +1,47 @@
 ﻿using Egg82LibEnhanced.Core;
 using Egg82LibEnhanced.Events;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SQLite;
 using System.Threading;
 using System.Timers;
 
-namespace Egg82LibEnhanced.Utils {
-	public class SQLite {
+namespace Egg82LibEnhanced.SQL {
+	public class MySQL {
 		//vars
 		public event EventHandler OnConnect = null;
 		public event EventHandler OnDisconnect = null;
-		public event EventHandler<SQLiteEventArgs> OnData = null;
-		public event EventHandler<SQLiteEventArgs> OnError = null;
+		public event EventHandler<SQLEventArgs> OnData = null;
+		public event EventHandler<SQLEventArgs> OnError = null;
 
-		private SQLiteConnection conn = null;
-		private SQLiteCommand command = null;
-		
-		private SynchronizedCollection<Tuple<string, object>> backlog = null;
+		private MySqlConnection conn = null;
+		private MySqlCommand command = null;
+
+		private SynchronizedCollection<Tuple<string, Tuple<string, dynamic>[], Guid>> backlog = null;
 		private bool _busy = false;
 		private bool _connected = false;
 		private System.Timers.Timer backlogTimer = new System.Timers.Timer(100.0d);
 
-		private string dbFile = null;
+		private string dbString = null;
 
 		//constructor
-		public SQLite() {
+		public MySQL() {
 			backlogTimer.Elapsed += onBacklogTimerElapsed;
 			backlogTimer.AutoReset = true;
 		}
 
 		//public
-		public void Connect(string dbFile, string password = null) {
-			if (dbFile == null || dbFile == string.Empty) {
-				return;
-			}
-
-			if (!FileUtil.PathExists(dbFile)) {
-				FileUtil.CreateFile(dbFile);
-			} else {
-				if (!FileUtil.PathIsFile(dbFile)) {
-					return;
-				}
-			}
-
-			this.dbFile = dbFile;
+		public void Connect(string address, ushort port, string user, string pass, string database) {
+			dbString = "server=" + address + ";uid=" + "pwd=" + pass + ";database=" + database;
+			
 			_connected = false;
 			_busy = true;
 			
-			if (password != null) {
-				try {
-					conn = new SQLiteConnection("Data Source=" + dbFile + ";Version=3;Password=" + password + ";");
-					conn.Open();
-					conn.ChangePassword(password);
-					conn.Close();
-				} catch (Exception) {
-					conn = new SQLiteConnection("Data Source=" + dbFile + ";Version=3;");
-					conn.Open();
-					conn.ChangePassword(password);
-					conn.Close();
-				}
-			} else {
-				conn = new SQLiteConnection("Data Source=" + dbFile + ";Version=3;");
-			}
+			conn = new MySqlConnection(dbString);
 
-			backlog = new SynchronizedCollection<Tuple<string, object>>();
+			backlog = new SynchronizedCollection<Tuple<string, Tuple<string, dynamic>[], Guid>>();
 			conn.StateChange += onConnStateChange;
 			conn.OpenAsync();
 		}
@@ -78,21 +53,25 @@ namespace Egg82LibEnhanced.Utils {
 			conn.Close();
 		}
 
-		public void Query(string q, object data = null) {
+		public Guid Query(string q, params Tuple<string, dynamic>[] queryParameters) {
 			if (q == null || q == string.Empty) {
-				return;
+				return Guid.Empty;
 			}
 
+			Guid g = Guid.NewGuid();
+
 			if (!_connected) {
-				backlog.Add(new Tuple<string, object>(q, data));
+				backlog.Add(new Tuple<string, Tuple<string, dynamic>[], Guid>(q, queryParameters, g));
 			} else {
 				if (_busy || backlog.Count > 0) {
-					backlog.Add(new Tuple<string, object>(q, data));
+					backlog.Add(new Tuple<string, Tuple<string, dynamic>[], Guid>(q, queryParameters, g));
 				} else {
 					_busy = true;
-					queryInternal(q, data);
+					queryInternal(q, queryParameters, g);
 				}
 			}
+
+			return g;
 		}
 
 		public bool Connected {
@@ -107,24 +86,26 @@ namespace Egg82LibEnhanced.Utils {
 		}
 
 		//private
-		private async void queryInternal(string q, object data) {
-			command = new SQLiteCommand(q, conn);
+		private async void queryInternal(string q, Tuple<string, dynamic>[] parameters, Guid g) {
+			command = new MySqlCommand(q, conn);
+
+			if (parameters != null && parameters.Length > 0) {
+				for (int i = 0; i < parameters.Length; i++) {
+					command.Parameters.AddWithValue(parameters[i].Item1, parameters[i].Item2);
+				}
+			}
 
 			DbDataReader reader = null;
 			try {
 				reader = await command.ExecuteReaderAsync();
 			} catch (Exception ex) {
-				if (OnError != null) {
-					OnError.Invoke(this, new SQLiteEventArgs(new SQLError() {
-						queryData = data,
-						ex = ex
-					}, new SQLData()));
-				}
+				OnError?.Invoke(this, new SQLEventArgs(q, parameters, new SQLError() {
+					ex = ex
+				}, new SQLData(), g));
 				return;
 			}
 
 			SQLData d = new SQLData();
-			d.queryData = data;
 			d.recordsAffected = reader.RecordsAffected;
 
 			DataColumnCollection columns = reader.GetSchemaTable().Columns;
@@ -148,9 +129,7 @@ namespace Egg82LibEnhanced.Utils {
 				}
 			}
 
-			if (OnData != null) {
-				OnData.Invoke(this, new SQLiteEventArgs(new SQLError(), d));
-			}
+			OnData?.Invoke(this, new SQLEventArgs(q, parameters, new SQLError(), d, g));
 			new Thread(delegate() {
 				sendNext();
 			}).Start();
@@ -161,15 +140,13 @@ namespace Egg82LibEnhanced.Utils {
 				_connected = true;
 				backlogTimer.Start();
 
-				if (OnConnect != null) {
-					OnConnect.Invoke(this, EventArgs.Empty);
-				}
+				OnConnect?.Invoke(this, EventArgs.Empty);
 				sendNext();
 			} else if (e.CurrentState == ConnectionState.Closed || e.CurrentState == ConnectionState.Broken) {
 				backlogTimer.Stop();
 
-				string oldDbFile = dbFile;
-				dbFile = null;
+				string oldDbString = dbString;
+				dbString = null;
 
 				conn = null;
 				command = null;
@@ -177,25 +154,25 @@ namespace Egg82LibEnhanced.Utils {
 				_connected = false;
 				_busy = false;
 
-				if (OnDisconnect != null) {
-					OnDisconnect.Invoke(this, EventArgs.Empty);
-				}
+				OnDisconnect?.Invoke(this, EventArgs.Empty);
 			}
 		}
 
 		private void sendNext() {
 			string q = null;
-			object d = null;
-			
+			Tuple<string, dynamic>[] p = null;
+			Guid g = Guid.Empty;
+
 			if (backlog.Count == 0) {
 				_busy = false;
 				return;
 			}
 
 			q = backlog[0].Item1;
-			d = backlog[0].Item2;
+			p = backlog[0].Item2;
+			g = backlog[0].Item3;
 			backlog.RemoveAt(0);
-			queryInternal(q, d);
+			queryInternal(q, p, g);
 		}
 
 		private void onBacklogTimerElapsed(object sender, ElapsedEventArgs e) {
