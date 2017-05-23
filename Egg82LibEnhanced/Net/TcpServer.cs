@@ -66,6 +66,12 @@ namespace Egg82LibEnhanced.Net {
 			}
 		}
 
+		public bool IsOpen {
+			get {
+				return socket.IsBound;
+			}
+		}
+
 		public void Send(int client, byte[] data) {
 			if (client >= clients.Count) {
 				return;
