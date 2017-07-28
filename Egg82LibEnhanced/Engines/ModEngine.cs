@@ -1,12 +1,13 @@
 ﻿using Egg82LibEnhanced.Core;
 using Egg82LibEnhanced.Utils;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Egg82LibEnhanced.Engines {
 	public class ModEngine : IModEngine, IDisposable {
 		//vars
-		private Dictionary<string, ModContainer> mods = new Dictionary<string, ModContainer>();
+		private ConcurrentDictionary<string, ModContainer> mods = new ConcurrentDictionary<string, ModContainer>();
 
 		//constructor
 		public ModEngine() {
@@ -49,7 +50,7 @@ namespace Egg82LibEnhanced.Engines {
 				mods[name].Dispose();
 				mods[name] = new ModContainer(domain, mod);
 			} else {
-				mods.Add(name, new ModContainer(domain, mod));
+				mods.TryAdd(name, new ModContainer(domain, mod));
 			}
 		}
 		public void RemoveMod(string name) {
@@ -60,7 +61,7 @@ namespace Egg82LibEnhanced.Engines {
 			ModContainer retVal = null;
 			if (mods.TryGetValue(name, out retVal)) {
 				retVal.Dispose();
-				mods.Remove(name);
+				mods.TryRemove(name, out _);
 			}
 		}
 		public ModContainer GetMod(string name) {

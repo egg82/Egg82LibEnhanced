@@ -10,7 +10,7 @@ using System.Threading;
 using System.Timers;
 
 namespace Egg82LibEnhanced.SQL {
-	public class SQLite {
+	public class SQLite : ISQL {
 		//vars
 		public event EventHandler OnConnect = null;
 		public event EventHandler OnDisconnect = null;
@@ -25,7 +25,7 @@ namespace Egg82LibEnhanced.SQL {
 		private bool _connected = false;
 		private System.Timers.Timer backlogTimer = new System.Timers.Timer(100.0d);
 
-		private string dbFile = null;
+		private string filePath = null;
 
 		//constructor
 		public SQLite() {
@@ -34,37 +34,43 @@ namespace Egg82LibEnhanced.SQL {
 		}
 
 		//public
-		public void Connect(string dbFile, string password = null) {
-			if (dbFile == null || dbFile == string.Empty) {
-				return;
+		public void Connect(String address, String user, String pass, String dbName) {
+			throw new NotImplementedException("This database type does not support external (non-file) databases.");
+		}
+		public void Connect(String address, ushort port, String user, String pass, String dbName) {
+			throw new NotImplementedException("This database type does not support external (non-file) databases.");
+		}
+		public void Connect(string filePath, string password = null) {
+			if (filePath == null || filePath == string.Empty) {
+				throw new ArgumentNullException("filePath");
 			}
 
-			if (!FileUtil.PathExists(dbFile)) {
-				FileUtil.CreateFile(dbFile);
+			if (!FileUtil.PathExists(filePath)) {
+				FileUtil.CreateFile(filePath);
 			} else {
-				if (!FileUtil.PathIsFile(dbFile)) {
+				if (!FileUtil.PathIsFile(filePath)) {
 					return;
 				}
 			}
 
-			this.dbFile = dbFile;
+			this.filePath = filePath;
 			_connected = false;
 			_busy = true;
 			
 			if (password != null) {
 				try {
-					conn = new SQLiteConnection("Data Source=" + dbFile + ";Version=3;Password=" + password + ";");
+					conn = new SQLiteConnection("Data Source=" + filePath + ";Version=3;Password=" + password + ";");
 					conn.Open();
 					conn.ChangePassword(password);
 					conn.Close();
 				} catch (Exception) {
-					conn = new SQLiteConnection("Data Source=" + dbFile + ";Version=3;");
+					conn = new SQLiteConnection("Data Source=" + filePath + ";Version=3;");
 					conn.Open();
 					conn.ChangePassword(password);
 					conn.Close();
 				}
 			} else {
-				conn = new SQLiteConnection("Data Source=" + dbFile + ";Version=3;");
+				conn = new SQLiteConnection("Data Source=" + filePath + ";Version=3;");
 			}
 
 			backlog = new SynchronizedCollection<Tuple<string, Tuple<string, dynamic>[], Guid>>();
@@ -100,15 +106,14 @@ namespace Egg82LibEnhanced.SQL {
 			return g;
 		}
 
-		public bool Connected {
-			get {
-				return _connected;
-			}
+		public bool IsConnected() {
+			return _connected;
 		}
-		public bool Busy {
-			get {
-				return _busy;
-			}
+		public bool IsBusy() {
+			return _busy;
+		}
+		public bool IsExternal() {
+			return false;
 		}
 
 		//private
@@ -171,8 +176,8 @@ namespace Egg82LibEnhanced.SQL {
 			} else if (e.CurrentState == ConnectionState.Closed || e.CurrentState == ConnectionState.Broken) {
 				backlogTimer.Stop();
 
-				string oldDbFile = dbFile;
-				dbFile = null;
+				string oldDbFile = filePath;
+				filePath = null;
 
 				conn = null;
 				command = null;

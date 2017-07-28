@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace Egg82LibEnhanced.Utils {
@@ -21,7 +22,26 @@ namespace Egg82LibEnhanced.Utils {
 		}
 
 		public static bool DoesExtend(Type baseClass, Type classToTest) {
-			return classToTest == baseClass || classToTest.IsSubclassOf(baseClass) || classToTest.IsAssignableFrom(baseClass);
+			if (classToTest == null || baseClass == null) {
+				return false;
+			}
+
+			return classToTest == baseClass || classToTest.IsSubclassOf(baseClass) || baseClass.IsAssignableFrom(classToTest);
+		}
+
+		public static T TryConvert<T>(dynamic input) {
+			TypeConverter converter = TypeDescriptor.GetConverter(typeof(T));
+			if (converter != null) {
+				return converter.ConvertFrom(input);
+			}
+			return default(T);
+		}
+		public static dynamic TryConvert(Type type, dynamic input) {
+			TypeConverter converter = TypeDescriptor.GetConverter(type);
+			if (converter != null) {
+				return converter.ConvertFrom(input);
+			}
+			return null;
 		}
 
 		public static Func<T> FunctionFromPropertyGetter<T>(object obj, string propertyName) {

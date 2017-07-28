@@ -5,8 +5,9 @@ using System.IO;
 namespace Egg82LibEnhanced.Utils {
 	public class FileUtil {
 		//vars
-		public static readonly string CurrentDirectory = Directory.GetCurrentDirectory();
-		public static readonly char DirectorySeparatorChar = Path.DirectorySeparatorChar;
+		public static readonly string CURRENT_DIRECTORY = Directory.GetCurrentDirectory();
+		public static readonly char DIRECTORY_SEPARATOR_CHAR = Path.DirectorySeparatorChar;
+		public static readonly string LINE_SEPARATOR = Environment.NewLine;
 
 		private static Dictionary<string, FileStream> streams = new Dictionary<string, FileStream>();
 

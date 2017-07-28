@@ -1,14 +1,23 @@
 ﻿using System;
 
 namespace Egg82LibEnhanced.Patterns {
-	public interface IRegistry {
+	public interface IRegistry<K> {
 		//functions
-		void SetRegister(string name, Type type, dynamic data);
-		dynamic GetRegister(string name);
-		Type GetRegisterType(string name);
-		bool HasRegister(string name);
+		void SetRegister(K key, dynamic data);
+        dynamic RemoveRegister(K key);
+        T RemoveRegister<T>(K key);
 
-		void Clear();
-		string[] RegistryNames { get; }
+        dynamic GetRegister(K key);
+        T GetRegister<T>(K key);
+        K GetKey(dynamic data);
+        Type GetRegisterType(K key);
+
+        Type GetKeyClass();
+
+        bool HasRegister(K key);
+        bool HasValue(dynamic data);
+
+        void Clear();
+        K[] GetKeys();
 	}
 }

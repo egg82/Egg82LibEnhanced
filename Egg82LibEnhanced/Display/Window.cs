@@ -1,4 +1,5 @@
 ﻿using Egg82LibEnhanced.Engines;
+using Egg82LibEnhanced.Events;
 using Egg82LibEnhanced.Geom;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Startup;
@@ -21,9 +22,9 @@ namespace Egg82LibEnhanced.Display {
 		internal event EventHandler<MouseButtonEventArgs> MouseButtonPressed = null;
 		internal event EventHandler<MouseButtonEventArgs> MouseButtonReleased = null;
 		
-		private IGameEngine gameEngine = (IGameEngine) ServiceLocator.GetService(typeof(IGameEngine));
-		private IPhysicsEngine physicsEngine = (IPhysicsEngine) ServiceLocator.GetService(typeof(IPhysicsEngine));
-		private IInputEngine inputEngine = (IInputEngine) ServiceLocator.GetService(typeof(IInputEngine));
+		private IGameEngine gameEngine = ServiceLocator.GetService<IGameEngine>();
+		private IPhysicsEngine physicsEngine = ServiceLocator.GetService<IPhysicsEngine>();
+		private IInputEngine inputEngine = ServiceLocator.GetService<IInputEngine>();
 
 		private List<State> states = new List<State>();
 		private World _physicsWorld = null;
@@ -42,9 +43,14 @@ namespace Egg82LibEnhanced.Display {
 		private string _title = null;
 		private bool previousVsync = false;
 		private volatile bool _vSync = false;
+		private bool previousSynchronous = false;
+		private volatile bool _synchronous = false;
 		private uint _antiAliasing = 0;
 		private bool _cursorVisible = true;
 		private bool _visible = true;
+
+		private PreciseTimer updateTimer = new PreciseTimer((1.0d / 60.0d) * 1000.0d);
+		private PreciseTimer drawTimer = new PreciseTimer((1.0d / 60.0d) * 1000.0d);
 
 		//constructor
 		/// <summary>
@@ -55,8 +61,9 @@ namespace Egg82LibEnhanced.Display {
 		/// <param name="title">The window's title.</param>
 		/// <param name="style">Any style flags to apply to the window.</param>
 		/// <param name="vSync">(optional) Whether or not this window syncs its rendering to the refresh rate of the monitor.</param>
+		/// <param name="synchronous">(optional) Whether or not the window's update() and draw() calls will be handled by the main GameEngine (ture) or itself (false).</param>
 		/// <param name="antiAliasing">(optional) The amount of AntiAliasing to use. More = slower but lexx pixelated.</param>
-		public Window(double width, double height, string title, Styles style, bool vSync = true, uint antiAliasing = 16) {
+		public Window(double width, double height, string title, Styles style, bool vSync = true, bool synchronous = true, uint antiAliasing = 16) {
 			if (double.IsNaN(width)) {
 				throw new ArgumentNullException("width");
 			}
@@ -76,6 +83,7 @@ namespace Egg82LibEnhanced.Display {
 			_fullscreen = ((style & Styles.Fullscreen) != Styles.None) ? true : false;
 			_title = title;
 			previousVsync = _vSync = vSync;
+			previousSynchronous = _synchronous = synchronous;
 			_antiAliasing = antiAliasing;
 
 			_icon = TextureUtil.FromBitmap(new System.Drawing.Bitmap(1, 1));
@@ -98,14 +106,33 @@ namespace Egg82LibEnhanced.Display {
 			viewport.Height = (double) vp.Height;
 			_quadTree = new QuadTree<DisplayObject>(new PreciseRectangle(0.0d, 0.0d, viewport.Width, viewport.Height));
 
+			int processors = Environment.ProcessorCount;
+			if (processors >= 4) {
+				drawTimer.ProcessorNumber = processors - 3;
+				updateTimer.ProcessorNumber = processors - 2;
+			} else if (processors >= 2) {
+				drawTimer.ProcessorNumber = 1;
+				updateTimer.ProcessorNumber = 1;
+			}
+
+			updateTimer.Elapsed += onUpdateTimer;
+			updateTimer.AutoReset = true;
+			drawTimer.Elapsed += onDrawTimer;
+			drawTimer.AutoReset = true;
+
 			window.SetActive(false);
 
 			_physicsWorld = physicsEngine.CreateWorld();
 			inputEngine.AddWindow(this);
 			gameEngine.AddWindow(this);
 			Start.AddWindow(this);
+
+			if (!synchronous) {
+				updateTimer.Start();
+				drawTimer.Start();
+			}
 		}
-		internal Window(World physicsWorld, List<State> states, Styles alternateStyle, Texture icon, double width, double height, string title, Styles style, bool vSync, uint antiAliasing) {
+		internal Window(World physicsWorld, List<State> states, Styles alternateStyle, Texture icon, double width, double height, string title, Styles style, bool vSync, bool synchronous, uint antiAliasing) {
 			window = new RenderWindow(new VideoMode((uint) width, (uint) height), title, style, new ContextSettings(24, 8, antiAliasing));
 
 			alternateStyles = alternateStyle;
@@ -113,6 +140,7 @@ namespace Egg82LibEnhanced.Display {
 			_fullscreen = ((style & Styles.Fullscreen) != Styles.None) ? true : false;
 			_title = title;
 			previousVsync = _vSync = vSync;
+			previousSynchronous = _synchronous = synchronous;
 			_antiAliasing = antiAliasing;
 
 			_icon = icon;
@@ -140,13 +168,35 @@ namespace Egg82LibEnhanced.Display {
 				states[i].SetWindow(this);
 			}
 
+			int processors = Environment.ProcessorCount;
+			if (processors >= 4) {
+				drawTimer.ProcessorNumber = processors - 3;
+				updateTimer.ProcessorNumber = processors - 2;
+			} else if (processors >= 2) {
+				drawTimer.ProcessorNumber = 1;
+				updateTimer.ProcessorNumber = 1;
+			}
+
+			updateTimer.Elapsed += onUpdateTimer;
+			updateTimer.AutoReset = true;
+			drawTimer.Elapsed += onDrawTimer;
+			drawTimer.AutoReset = true;
+
 			window.SetActive(false);
 
 			_physicsWorld = physicsWorld;
 			inputEngine.AddWindow(this);
 			gameEngine.AddWindow(this);
+
+			if (!synchronous) {
+				updateTimer.Start();
+				drawTimer.Start();
+			}
 		}
 		~Window() {
+			drawTimer.Stop();
+			updateTimer.Stop();
+
 			window.Closed -= onClosed;
 			window.Resized -= onResize;
 
@@ -250,6 +300,22 @@ namespace Egg82LibEnhanced.Display {
 				}
 
 				_vSync = value;
+			}
+		}
+		/// <summary>
+		/// Whether or not the window's update() and draw() calls are handled by the main GameEngine (ture) or itself (false).
+		/// Beware that if the window is not synchronous then it may not play well with anything running in the GameEngine's main threads
+		/// </summary>
+		public bool Synchronous {
+			get {
+				return _synchronous;
+			}
+			set {
+				if (value == _synchronous) {
+					return;
+				}
+
+				_synchronous = value;
 			}
 		}
 		/// <summary>
@@ -531,6 +597,9 @@ namespace Egg82LibEnhanced.Display {
 				if (_antiAliasing != window.Settings.AntialiasingLevel) {
 					return true;
 				}
+				if (_synchronous != previousSynchronous) {
+					return true;
+				}
 				return false;
 			}
 		}
@@ -538,7 +607,7 @@ namespace Egg82LibEnhanced.Display {
 			gameEngine.RemoveWindow(this);
 			inputEngine.RemoveWindow(this);
 
-			return new Window(_physicsWorld, states, styles, _icon, (double) window.Size.X, (double) window.Size.Y, _title, alternateStyles, _vSync, _antiAliasing);
+			return new Window(_physicsWorld, states, styles, _icon, (double) window.Size.X, (double) window.Size.Y, _title, alternateStyles, _vSync, _synchronous, _antiAliasing);
 		}
 		internal void DispatchEvents() {
 			window.DispatchEvents();
@@ -584,6 +653,38 @@ namespace Egg82LibEnhanced.Display {
 			}
 			for (int i = 0; i < states.Count; i++) {
 				states[i].Resize((double) e.Width, (double) e.Height);
+			}
+		}
+
+		private void onUpdateTimer(object sender, PreciseElapsedEventArgs e) {
+			updateTimer.Interval = gameEngine.UpdateInterval;
+			if (gameEngine.DrawSync) {
+				update(e);
+				draw();
+			} else {
+				update(e);
+			}
+		}
+		private void update(PreciseElapsedEventArgs e) {
+			double deltaTime = e.DeltaTime / gameEngine.TargetUpdateInterval;
+
+			Tween.Update(e.DeltaTime);
+			
+			Update(deltaTime);
+			SwapBuffers();
+		}
+		private void onDrawTimer(object sender, PreciseElapsedEventArgs e) {
+			drawTimer.Interval = gameEngine.DrawInterval;
+
+			if (!gameEngine.DrawSync) {
+				draw();
+			}
+		}
+		private void draw() {
+			try {
+				Draw();
+			} catch (Exception) {
+
 			}
 		}
 	}

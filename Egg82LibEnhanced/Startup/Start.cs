@@ -3,13 +3,15 @@ using Egg82LibEnhanced.Display;
 using Egg82LibEnhanced.Engines;
 using Egg82LibEnhanced.Engines.Nulls;
 using Egg82LibEnhanced.Patterns;
+using Egg82LibEnhanced.Patterns.Prototypes;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Egg82LibEnhanced.Startup {
 	public class Start {
 		//vars
-		private static List<Window> windows = new List<Window>();
+		private static SynchronizedCollection<Window> windows = new SynchronizedCollection<Window>();
 		private static int _numWindowsOpen = 0;
 
 		//constructor
@@ -19,6 +21,7 @@ namespace Egg82LibEnhanced.Startup {
 
 		//public
 		public static void ProvideDefaultServices(bool physics = false) {
+			ServiceLocator.ProvideService(typeof(PrototypeFactory));
 			ServiceLocator.ProvideService(typeof(AudioEngine));
 			ServiceLocator.ProvideService(typeof(ModEngine));
 			ServiceLocator.ProvideService(typeof(CryptoHelper));
@@ -32,23 +35,26 @@ namespace Egg82LibEnhanced.Startup {
 			ServiceLocator.ProvideService(typeof(GameEngine), false);
 		}
 		public static void ProvideModServices() {
+			ServiceLocator.ProvideService(typeof(PrototypeFactory));
 			ServiceLocator.ProvideService(typeof(AudioEngine));
 			ServiceLocator.ProvideService(typeof(CryptoHelper));
 		}
 		public static void DestroyModServices() {
-			ServiceLocator.RemoveService(typeof(IAudioEngine));
-			ServiceLocator.RemoveService(typeof(ICryptoHelper));
+			ServiceLocator.RemoveServices<PrototypeFactory>();
+			ServiceLocator.RemoveServices<IAudioEngine>();
+			ServiceLocator.RemoveServices<ICryptoHelper>();
 
 			GC.Collect();
 		}
 		public static void DestroyDefaultServices() {
-			ServiceLocator.RemoveService(typeof(IGameEngine));
-			ServiceLocator.RemoveService(typeof(IInputEngine));
-			ServiceLocator.RemoveService(typeof(IPhysicsEngine));
+			ServiceLocator.RemoveServices<IGameEngine>();
+			ServiceLocator.RemoveServices<IInputEngine>();
+			ServiceLocator.RemoveServices<IPhysicsEngine>();
 
-			ServiceLocator.RemoveService(typeof(IAudioEngine));
-			ServiceLocator.RemoveService(typeof(IModEngine));
-			ServiceLocator.RemoveService(typeof(ICryptoHelper));
+			ServiceLocator.RemoveServices<IAudioEngine>();
+			ServiceLocator.RemoveServices<ICryptoHelper>();
+			ServiceLocator.RemoveServices<ICryptoHelper>();
+			ServiceLocator.RemoveServices<PrototypeFactory>();
 
 			GC.Collect();
 		}
@@ -68,6 +74,7 @@ namespace Egg82LibEnhanced.Startup {
 					windows.RemoveAt(i);
 				}
 			}
+			Thread.Yield();
 		}
 		public static int NumWindowsOpen {
 			get {

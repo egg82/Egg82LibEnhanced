@@ -14,7 +14,7 @@ namespace Egg82LibEnhanced.Engines {
 		private double _speed = 1.0d;
 
 		private object worldLock = new object();
-		private List<World> worlds = new List<World>();
+		private SynchronizedCollection<World> worlds = new SynchronizedCollection<World>();
 		//private List<PhysicsWorld> worlds = new List<PhysicsWorld>();
 
 		//constructor

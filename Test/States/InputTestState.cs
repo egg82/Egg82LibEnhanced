@@ -12,7 +12,7 @@ namespace Test.States {
 		//vars
 		private InputCircleSprite sprite = new InputCircleSprite();
 
-		private IInputEngine inputEngine = ServiceLocator.GetService(typeof(IInputEngine));
+		private IInputEngine inputEngine = ServiceLocator.GetService<IInputEngine>();
 		private int[] leftKeys = new int[] { (int) Key.A, (int) Key.Left, (int) Key.Num4 };
 		private int[] rightKeys = new int[] { (int) Key.D, (int) Key.Right, (int) Key.Num6 };
 
@@ -34,19 +34,19 @@ namespace Test.States {
 		}
 		protected override void OnUpdate(double deltaTime) {
 			if (inputEngine.Keyboard.IsAnyKeyDown(leftKeys)) {
-				sprite.X -= sprite.Speed;
-				sprite.Rotation -= sprite.Speed;
+				sprite.X -= sprite.Speed * deltaTime;
+				sprite.Rotation -= sprite.Speed * deltaTime;
 			}
 			if (inputEngine.Keyboard.IsAnyKeyDown(rightKeys)) {
-				sprite.X += sprite.Speed;
-				sprite.Rotation += sprite.Speed;
+				sprite.X += sprite.Speed * deltaTime;
+				sprite.Rotation += sprite.Speed * deltaTime;
 			}
 
 			if (inputEngine.Controllers.NumControllers > 0) {
 				PrecisePoint left = inputEngine.Controllers.GetStickPosition(0, XboxStickSide.Left);
 				if (left.Length > inputEngine.Controllers.StickDeadZone) {
-					sprite.X += left.X * sprite.Speed;
-					sprite.Rotation += left.X * sprite.Speed;
+					sprite.X += left.X * sprite.Speed * deltaTime;
+					sprite.Rotation += left.X * sprite.Speed * deltaTime;
 				}
 			}
 		}

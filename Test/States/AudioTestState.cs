@@ -10,7 +10,7 @@ using System.IO;
 namespace Test.States {
 	public class AudioTestState : State {
 		//vars
-		private IAudioEngine audioEngine = ServiceLocator.GetService(typeof(IAudioEngine));
+		private IAudioEngine audioEngine = ServiceLocator.GetService<IAudioEngine>();
 		private string ambientPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + ".."  + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Assets" + Path.DirectorySeparatorChar + "Audio" + Path.DirectorySeparatorChar + "725191_Subwoofer-Lullaby.mp3";
 
 		//constructor

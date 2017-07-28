@@ -14,7 +14,7 @@ namespace Egg82LibEnhanced.Display.Interactable {
 		public event EventHandler Released = null;
 		public event EventHandler ReleasedOutside = null;
 
-		private IInputEngine inputEngine = ServiceLocator.GetService(typeof(IInputEngine));
+		private IInputEngine inputEngine = ServiceLocator.GetService<IInputEngine>();
 
 		private TextureAtlas atlas = null;
 		private string _normalTexture = null;

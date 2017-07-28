@@ -15,10 +15,10 @@ namespace Egg82LibEnhanced.Utils {
 		}
 
 		//public
-		public static void Load(string path, IRegistry registry) {
+		public static void Load(string path, IRegistry<string> registry) {
 			Load(path, registry, Encoding.UTF8);
 		}
-		public static void Load(string path, IRegistry registry, Encoding enc) {
+		public static void Load(string path, IRegistry<string> registry, Encoding enc) {
 			if (!FileUtil.PathExists(path)) {
 				throw new Exception("path does not exist.");
 			}
@@ -51,10 +51,10 @@ namespace Egg82LibEnhanced.Utils {
 			}
 		}
 
-		public static void Save(string path, IRegistry registry) {
+		public static void Save(string path, IRegistry<string> registry) {
 			Save(path, registry, Encoding.UTF8);
 		}
-		public static void Save(string path, IRegistry registry, Encoding enc) {
+		public static void Save(string path, IRegistry<string> registry, Encoding enc) {
 			if (FileUtil.PathExists(path)) {
 				if (!FileUtil.PathIsFile(path)) {
 					throw new Exception("path is not a file.");
@@ -63,7 +63,7 @@ namespace Egg82LibEnhanced.Utils {
 				FileUtil.CreateFile(path);
 			}
 
-			string[] names = registry.RegistryNames;
+			string[] names = registry.GetKeys();
 
 			bool fileWasOpen = true;
 
@@ -85,10 +85,10 @@ namespace Egg82LibEnhanced.Utils {
 			}
 		}
 
-		public static void LoadSave(string path, IRegistry registry) {
+		public static void LoadSave(string path, IRegistry<string> registry) {
 			LoadSave(path, registry, Encoding.UTF8);
 		}
-		public static void LoadSave(string path, IRegistry registry, Encoding enc) {
+		public static void LoadSave(string path, IRegistry<string> registry, Encoding enc) {
 			if (!FileUtil.PathExists(path)) {
 				FileUtil.CreateFile(path);
 			}
@@ -98,14 +98,14 @@ namespace Egg82LibEnhanced.Utils {
 		}
 
 		//private
-		private static void setRegistry(dynamic[] json, IRegistry registry) {
+		private static void setRegistry(dynamic[] json, IRegistry<string> registry) {
 			for (int i = 0; i < json.Length; i++) {
 				if (json[i].data.Type == JTokenType.Array) {
 					try {
 						if (registry.HasRegister(json[i].name.Value)) {
-							registry.SetRegister(json[i].name.Value, registry.GetRegisterType(json[i].name.Value), json[i].data.ToObject(registry.GetRegisterType(json[i].name.Value)));
+							registry.SetRegister(json[i].name.Value, ReflectUtil.TryConvert(registry.GetRegisterType(json[i].name.Value), json[i].data.ToObject(registry.GetRegisterType(json[i].name.Value))));
 						} else {
-							registry.SetRegister(json[i].name.Value, typeof(object[]), json[i].data.ToObject(registry.GetRegisterType(json[i].name.Value)));
+							registry.SetRegister(json[i].name.Value, ReflectUtil.TryConvert<object[]>(json[i].data.ToObject(registry.GetRegisterType(json[i].name.Value))));
 						}
 					} catch (Exception) {
 						
@@ -114,9 +114,9 @@ namespace Egg82LibEnhanced.Utils {
 					if (json[i].data.Value == null) {
 						try {
 							if (registry.HasRegister(json[i].name.Value)) {
-								registry.SetRegister(json[i].name.Value, registry.GetRegisterType(json[i].name.Value), JsonConvert.DeserializeObject(json[i].data.ToString()));
+								registry.SetRegister(json[i].name.Value, ReflectUtil.TryConvert(registry.GetRegisterType(json[i].name.Value), JsonConvert.DeserializeObject(json[i].data.ToString())));
 							} else {
-								registry.SetRegister(json[i].name.Value, typeof(object), JsonConvert.DeserializeObject(json[i].data.ToString()));
+								registry.SetRegister(json[i].name.Value, ReflectUtil.TryConvert<object>(JsonConvert.DeserializeObject(json[i].data.ToString())));
 							}
 						} catch (Exception) {
 
@@ -124,9 +124,9 @@ namespace Egg82LibEnhanced.Utils {
 					} else {
 						try {
 							if (registry.HasRegister(json[i].name.Value)) {
-								registry.SetRegister(json[i].name.Value, registry.GetRegisterType(json[i].name.Value), json[i].data.Value);
+								registry.SetRegister(json[i].name.Value, ReflectUtil.TryConvert(registry.GetRegisterType(json[i].name.Value), json[i].data.Value));
 							} else {
-								registry.SetRegister(json[i].name.Value, typeof(object), json[i].data.Value);
+								registry.SetRegister(json[i].name.Value, ReflectUtil.TryConvert<object>(json[i].data.Value));
 							}
 						} catch (Exception) {
 

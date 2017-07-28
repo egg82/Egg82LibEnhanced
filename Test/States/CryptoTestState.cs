@@ -6,7 +6,7 @@ using System;
 namespace Test.States {
 	class CryptoTestState : State {
 		//vars
-		private ICryptoHelper cryptoUtil = ServiceLocator.GetService(typeof(ICryptoHelper));
+		private ICryptoHelper cryptoUtil = ServiceLocator.GetService<ICryptoHelper>();
 
 		//constructor
 		public CryptoTestState() {

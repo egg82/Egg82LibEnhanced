@@ -5,7 +5,7 @@ using System.Net;
 namespace Egg82LibEnhanced.Utils {
 	public class NetUtil {
 		//vars
-		private static IRegistry addressCache = new Registry();
+		private static IRegistry<string> addressCache = new Registry<string>();
 
 		//constructor
 		public NetUtil() {
@@ -32,7 +32,7 @@ namespace Egg82LibEnhanced.Utils {
 				}
 
 				if (retVal != null) {
-					addressCache.SetRegister(address, typeof(IPAddress), retVal);
+					addressCache.SetRegister(address, retVal);
 				}
 			}
 

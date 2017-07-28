@@ -21,6 +21,7 @@ namespace Egg82LibEnhanced.Utils {
 		private volatile int _processorNumber = 0;
 
 		private Thread timerThread = null;
+		private double ticksPerMillisecond = TimeSpan.TicksPerMillisecond;
 
 		//constructor
 		public PreciseTimer(double interval, bool autoStart = false, bool autoReset = false) {
@@ -98,7 +99,7 @@ namespace Egg82LibEnhanced.Utils {
 
 		//private
 		private void setThread() {
-			timerThread = new Thread(delegate() {
+			timerThread = new Thread(delegate () {
 				Stopwatch watch = new Stopwatch();
 				ProcessThread currentThread = getCurrentThread();
 				Thread.BeginThreadAffinity();
@@ -109,34 +110,46 @@ namespace Egg82LibEnhanced.Utils {
 				}
 
 				watch.Start();
-				double lastTime = 0.0d;
-				double dt = 0.0d;
-				/*
-				 * 0.002 ms is about the time it takes
-				 * to do the below operations on a reasonable
-				 * CPU. Need to take that into account!
-				 */
-				double interval = _interval - 0.002d;
+				long lastTime = 0L;
+				long dt = 0L;
+				double target = _interval * ticksPerMillisecond;
+				double interval = target;
+				long frameAverage = 0L;
+				int numFramesCalculated = 0;
 				do {
 					if (oldAffinity != _processorNumber) {
 						currentThread.ProcessorAffinity = new IntPtr((_processorNumber != 0) ? 1 << _processorNumber - 1 : 0xFFFF);
 						oldAffinity = _processorNumber;
 					}
-					
-					//dt is the last frame's Delta Time. Playing catch-up.
-					//while ((dt - interval) + (watch.Elapsed.TotalMilliseconds - lastTime) < interval) {
-					while(dt + watch.Elapsed.TotalMilliseconds - lastTime - interval < interval) { //apparently this is the reduced version of the above line
+
+					// dt is the last frame's Delta Time. Playing short-term catch-up on the next frame.
+					// We use Elapsed.Ticks as a high-performance replacement for Elapsed.TotalMilliseconds
+					// Why not use ElapsedTicks? Because its output is orders of magnitude wrong. I have no idea why.
+					long ms = 0L;
+					//while ((dt - interval) + ((ms = watch.Elapsed.Ticks) - lastTime) < interval) {
+					while (dt + (ms = watch.Elapsed.Ticks) - lastTime - interval < interval) { //apparently this is the reduced version of the above line
 						if (processors > 1) {
-							Thread.SpinWait(1000);
+							Thread.SpinWait(1); // This is most efficient
 						} else {
-							Thread.Sleep(1);
+							Thread.Yield(); // Next best thing to SpinWait so we don't start locking up our only CPU
 						}
 					}
-					double ms = watch.Elapsed.TotalMilliseconds;
 					dt = ms - lastTime;
 					lastTime = ms;
 
-					Elapsed?.Invoke(this, new PreciseElapsedEventArgs(ms, dt));
+					if (numFramesCalculated >= 99) {
+						frameAverage += dt;
+						frameAverage = frameAverage / (numFramesCalculated + 1);
+						interval += 0.08d * (target - frameAverage);
+						interval = MathUtil.Clamp(1.0d, double.MaxValue, interval);
+						frameAverage = 0L;
+						numFramesCalculated = 0;
+					} else {
+						frameAverage += dt;
+						numFramesCalculated++;
+					}
+
+					Elapsed?.Invoke(this, new PreciseElapsedEventArgs(ms / ticksPerMillisecond, dt / ticksPerMillisecond));
 				} while (_running && AutoReset);
 				watch.Stop();
 
@@ -146,8 +159,9 @@ namespace Egg82LibEnhanced.Utils {
 
 				Thread.EndThreadAffinity();
 				_running = false;
-			});
-			timerThread.Priority = ThreadPriority.AboveNormal;
+			}) {
+				Priority = ThreadPriority.AboveNormal
+			};
 		}
 
 		private ProcessThread getCurrentThread() {

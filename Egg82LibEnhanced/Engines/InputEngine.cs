@@ -29,7 +29,7 @@ namespace Egg82LibEnhanced.Engines {
 		private short maxAnglePos = 8192;
 		private short maxAngleNeg = -8193;
 
-		private List<Display.Window> windows = new List<Display.Window>();
+		private SynchronizedCollection<Display.Window> windows = new SynchronizedCollection<Display.Window>();
 		private Display.Window _focusedWindow = null;
 
 		//constructor

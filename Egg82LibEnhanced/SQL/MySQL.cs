@@ -9,7 +9,7 @@ using System.Threading;
 using System.Timers;
 
 namespace Egg82LibEnhanced.SQL {
-	public class MySQL {
+	public class MySQL : ISQL {
 		//vars
 		public event EventHandler OnConnect = null;
 		public event EventHandler OnDisconnect = null;
@@ -33,8 +33,11 @@ namespace Egg82LibEnhanced.SQL {
 		}
 
 		//public
-		public void Connect(string address, ushort port, string user, string pass, string database) {
-			dbString = "server=" + address + ";uid=" + "pwd=" + pass + ";database=" + database;
+		public void Connect(string address, string user, string pass, string dbName) {
+			Connect(address, 3306, user, pass, dbName);
+		}
+		public void Connect(string address, ushort port, string user, string pass, string dbName) {
+			dbString = "server=" + address + ";uid=" + "pwd=" + pass + ";database=" + dbName;
 			
 			_connected = false;
 			_busy = true;
@@ -44,6 +47,9 @@ namespace Egg82LibEnhanced.SQL {
 			backlog = new SynchronizedCollection<Tuple<string, Tuple<string, dynamic>[], Guid>>();
 			conn.StateChange += onConnStateChange;
 			conn.OpenAsync();
+		}
+		public void Connect(string filePath, string password = null) {
+			throw new NotImplementedException("This database type does not support internal (file) databases.");
 		}
 
 		public void Disconnect() {
@@ -74,15 +80,14 @@ namespace Egg82LibEnhanced.SQL {
 			return g;
 		}
 
-		public bool Connected {
-			get {
-				return _connected;
-			}
+		public bool IsConnected() {
+			return _connected;
 		}
-		public bool Busy {
-			get {
-				return _busy;
-			}
+		public bool IsBusy() {
+			return _busy;
+		}
+		public bool IsExternal() {
+			return true;
 		}
 
 		//private
