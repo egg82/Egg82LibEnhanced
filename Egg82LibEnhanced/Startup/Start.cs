@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Threading;
 
 namespace Egg82LibEnhanced.Startup {
-	public class Start {
+	internal class Start {
 		//vars
 		private static SynchronizedCollection<Window> windows = new SynchronizedCollection<Window>();
 		private static int _numWindowsOpen = 0;
@@ -21,18 +21,13 @@ namespace Egg82LibEnhanced.Startup {
 		}
 
 		//public
-		public static void ProvideDefaultServices(bool physics = false) {
+		public static void ProvideDefaultServices() {
 			ServiceLocator.ProvideService(typeof(NullExceptionHandler));
 			ServiceLocator.ProvideService(typeof(PrototypeFactory));
 			ServiceLocator.ProvideService(typeof(AudioEngine));
 			ServiceLocator.ProvideService(typeof(ModEngine));
 			ServiceLocator.ProvideService(typeof(CryptoHelper));
-
-			if (physics) {
-				ServiceLocator.ProvideService(typeof(PhysicsEngine), false);
-			} else {
-				ServiceLocator.ProvideService(typeof(NullPhysicsEngine), false);
-			}
+			ServiceLocator.ProvideService(typeof(PhysicsEngine), false);
 			ServiceLocator.ProvideService(typeof(InputEngine), false);
 			ServiceLocator.ProvideService(typeof(GameEngine), false);
 		}

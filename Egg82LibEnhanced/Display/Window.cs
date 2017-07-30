@@ -36,8 +36,8 @@ namespace Egg82LibEnhanced.Display {
 		private RenderWindow window = null;
 		private PreciseRectangle viewport = new PreciseRectangle();
 		private volatile bool _fullscreen = false;
-		private Styles alternateStyles = Styles.Fullscreen;
-		private Styles styles = Styles.None;
+		private WindowStyle alternateStyles = WindowStyle.Fullscreen;
+		private WindowStyle styles = WindowStyle.None;
 		private Texture _icon = null;
 		private Color _color = new Color(255, 255, 255, 255);
 		private string _title = null;
@@ -63,7 +63,7 @@ namespace Egg82LibEnhanced.Display {
 		/// <param name="vSync">(optional) Whether or not this window syncs its rendering to the refresh rate of the monitor.</param>
 		/// <param name="synchronous">(optional) Whether or not the window's update() and draw() calls will be handled by the main GameEngine (ture) or itself (false).</param>
 		/// <param name="antiAliasing">(optional) The amount of AntiAliasing to use. More = slower but lexx pixelated.</param>
-		public Window(double width, double height, string title, Styles style, bool vSync = true, bool synchronous = true, uint antiAliasing = 16) {
+		public Window(double width, double height, string title, WindowStyle style, bool vSync = true, bool synchronous = true, uint antiAliasing = 16) {
 			if (double.IsNaN(width)) {
 				throw new ArgumentNullException("width");
 			}
@@ -77,10 +77,10 @@ namespace Egg82LibEnhanced.Display {
 				throw new InvalidOperationException("height cannot be less than 1 or infinity.");
 			}
 
-			window = new RenderWindow(new VideoMode((uint) width, (uint) height), title, style, new ContextSettings(24, 8, antiAliasing));
+			window = new RenderWindow(new VideoMode((uint) width, (uint) height), title, (Styles) style, new ContextSettings(24, 8, antiAliasing));
 
 			styles = style;
-			_fullscreen = ((style & Styles.Fullscreen) != Styles.None) ? true : false;
+			_fullscreen = ((style & WindowStyle.Fullscreen) != WindowStyle.None) ? true : false;
 			_title = title;
 			previousVsync = _vSync = vSync;
 			previousSynchronous = _synchronous = synchronous;
@@ -132,12 +132,12 @@ namespace Egg82LibEnhanced.Display {
 				drawTimer.Start();
 			}
 		}
-		internal Window(World physicsWorld, List<State> states, Styles alternateStyle, Texture icon, double width, double height, string title, Styles style, bool vSync, bool synchronous, uint antiAliasing) {
-			window = new RenderWindow(new VideoMode((uint) width, (uint) height), title, style, new ContextSettings(24, 8, antiAliasing));
+		internal Window(World physicsWorld, List<State> states, WindowStyle alternateStyle, Texture icon, double width, double height, string title, WindowStyle style, bool vSync, bool synchronous, uint antiAliasing) {
+			window = new RenderWindow(new VideoMode((uint) width, (uint) height), title, (Styles) style, new ContextSettings(24, 8, antiAliasing));
 
 			alternateStyles = alternateStyle;
 			styles = style;
-			_fullscreen = ((style & Styles.Fullscreen) != Styles.None) ? true : false;
+			_fullscreen = ((style & WindowStyle.Fullscreen) != WindowStyle.None) ? true : false;
 			_title = title;
 			previousVsync = _vSync = vSync;
 			previousSynchronous = _synchronous = synchronous;
@@ -589,9 +589,9 @@ namespace Egg82LibEnhanced.Display {
 		
 		internal bool NeedsRepacement {
 			get {
-				if (_fullscreen && (styles & Styles.Fullscreen) == Styles.None) {
+				if (_fullscreen && (styles & WindowStyle.Fullscreen) == WindowStyle.None) {
 					return true;
-				} else if (!_fullscreen && (styles & Styles.Fullscreen) != Styles.None) {
+				} else if (!_fullscreen && (styles & WindowStyle.Fullscreen) != WindowStyle.None) {
 					return true;
 				}
 				if (_antiAliasing != window.Settings.AntialiasingLevel) {

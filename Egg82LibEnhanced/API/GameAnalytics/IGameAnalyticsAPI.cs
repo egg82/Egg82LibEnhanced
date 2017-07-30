@@ -5,6 +5,7 @@ namespace Egg82LibEnhanced.API.GameAnalytics {
 	public interface IGameAnalyticsAPI {
 		//functions
 		bool IsInitialized();
+		string GetGameKey();
 
 		void SendInit(string gameKey, string secretKey, ulong sessionNum);
 
@@ -22,6 +23,7 @@ namespace Egg82LibEnhanced.API.GameAnalytics {
 		void SendProgression(ProgressionType type, ulong attemptNum, long score, string levelName, string subWorldName = null, string worldName = null);
 
 		void SendError(ErrorSeverity severity, string message);
+		void SendError(string message);
 
 		void SendOther(double value, string rootNode, string nodeLevel1 = null, string nodeLevel2 = null, string nodeLevel3 = null, string nodeLevel4 = null);
 	}

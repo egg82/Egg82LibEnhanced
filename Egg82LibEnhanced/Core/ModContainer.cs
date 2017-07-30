@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Egg82LibEnhanced.Mod;
+using System;
 
 namespace Egg82LibEnhanced.Core {
 	public class ModContainer : IDisposable {
 		//vars
 		private AppDomain _domain = null;
-		private IMod _mod = null;
+		private ModBase _mod = null;
 
 		//constructor
-		public ModContainer(AppDomain domain, IMod mod) {
+		public ModContainer(AppDomain domain, ModBase mod) {
 			_domain = domain;
 			_mod = mod;
 		}
@@ -25,7 +26,7 @@ namespace Egg82LibEnhanced.Core {
 		}
 
 		public void Dispose() {
-			_mod.OnUnload();
+			_mod.Unload();
 		}
 
 		//private

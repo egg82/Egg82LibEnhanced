@@ -1,4 +1,5 @@
 ﻿using Egg82LibEnhanced.Core;
+using Egg82LibEnhanced.Mod;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Reflection.ExceptionHandlers;
 using Egg82LibEnhanced.Utils;
@@ -36,10 +37,10 @@ namespace Egg82LibEnhanced.Engines {
 
 			AppDomain domain = AppDomain.CreateDomain(name);
 			ServiceLocator.GetService<IExceptionHandler>().AddDomain(domain);
-			Type t = typeof(IMod);
-			IMod mod = null;
+			Type t = typeof(ModBase);
+			ModBase mod = null;
 			try {
-				mod = (IMod) domain.CreateInstanceFromAndUnwrap(path, t.Name);
+				mod = (ModBase) domain.CreateInstanceFromAndUnwrap(path, t.Name);
 			} catch (Exception ex) {
 				throw new Exception("Cannot create instance of mod.", ex);
 			}
@@ -47,7 +48,7 @@ namespace Egg82LibEnhanced.Engines {
 				throw new Exception("Cannot create instance of mod.");
 			}
 
-			mod.OnLoad();
+			mod.Load();
 
 			if (mods.ContainsKey(name)) {
 				mods[name].Dispose();

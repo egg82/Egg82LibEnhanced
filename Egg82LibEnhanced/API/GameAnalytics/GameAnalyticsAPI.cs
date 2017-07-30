@@ -181,6 +181,9 @@ namespace Egg82LibEnhanced.API.GameAnalytics {
 		public bool IsInitialized() {
 			return initialized;
 		}
+		public string GetGameKey() {
+			return gameKey;
+		}
 		
 		public void SendInit(string gameKey, string secretKey, ulong sessionNum) {
 			if (gameKey == null || gameKey == string.Empty) {
@@ -435,6 +438,9 @@ namespace Egg82LibEnhanced.API.GameAnalytics {
 			sendEvent(postData);
 		}
 
+		public void SendError(String message) {
+			SendError(ErrorSeverity.Error, message);
+		}
 		public void SendError(ErrorSeverity severity, string message) {
 			if (message == null || message == string.Empty) {
 				throw new ArgumentNullException("message");

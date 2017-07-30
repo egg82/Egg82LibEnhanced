@@ -52,15 +52,11 @@ namespace Egg82LibEnhanced.Reflection.ExceptionHandlers {
 			if (p == null || p.Length != 2) {
 				throw new ArgumentException("params must have a length of 2. Use Egg82LibEnhanced.Reflection.ExceptionHandlers.Builders.RollbarBuilder");
 			}
-
-			Console.WriteLine();
 			
 			rollbar.Connect(new RollbarConfig {
 				AccessToken = p[0],
 				Environment = p[1]
 			});
-
-			AddDomain(AppDomain.CurrentDomain);
 
 			List<System.Exception> exceptions = rollbar.GetUnsentExceptions();
 			rollbar.ClearExceptions();
@@ -71,6 +67,8 @@ namespace Egg82LibEnhanced.Reflection.ExceptionHandlers {
 					CodeVersion = version
 				}));
 			}
+
+			AddDomain(AppDomain.CurrentDomain);
 
 			resendTimer = new Timer(60.0d * 60.0d * 1000.0d);
 			resendTimer.Elapsed += onResendTimer;
@@ -140,6 +138,7 @@ namespace Egg82LibEnhanced.Reflection.ExceptionHandlers {
 		//private
 		private void onException(object sender, UnhandledExceptionEventArgs e) {
 			System.Exception ex = (System.Exception) e.ExceptionObject;
+			rollbar.SetLastException(ex);
 			rollbar.PostItem(new Payload(rollbar.Config.AccessToken, new Data(rollbar.Config.Environment, new Body(ex)) {
 				Person = person,
 				CodeVersion = version
