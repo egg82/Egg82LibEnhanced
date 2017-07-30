@@ -1,4 +1,6 @@
 ﻿using Egg82LibEnhanced.Core;
+using Egg82LibEnhanced.Patterns;
+using Egg82LibEnhanced.Reflection.ExceptionHandlers;
 using Egg82LibEnhanced.Utils;
 using System;
 using System.Collections.Concurrent;
@@ -33,6 +35,7 @@ namespace Egg82LibEnhanced.Engines {
 			}
 
 			AppDomain domain = AppDomain.CreateDomain(name);
+			ServiceLocator.GetService<IExceptionHandler>().AddDomain(domain);
 			Type t = typeof(IMod);
 			IMod mod = null;
 			try {
@@ -61,6 +64,8 @@ namespace Egg82LibEnhanced.Engines {
 			ModContainer retVal = null;
 			if (mods.TryGetValue(name, out retVal)) {
 				retVal.Dispose();
+				ServiceLocator.GetService<IExceptionHandler>().RemoveDomain(retVal.Domain);
+				AppDomain.Unload(retVal.Domain);
 				mods.TryRemove(name, out _);
 			}
 		}

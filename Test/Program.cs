@@ -1,5 +1,8 @@
-﻿using Egg82LibEnhanced.Engines;
+﻿using Egg82LibEnhanced.API.GameAnalytics;
+using Egg82LibEnhanced.Engines;
 using Egg82LibEnhanced.Patterns;
+using Egg82LibEnhanced.Reflection.ExceptionHandlers;
+using Egg82LibEnhanced.Reflection.ExceptionHandlers.Builders;
 using Egg82LibEnhanced.Startup;
 using SFML.Window;
 using System;
@@ -16,6 +19,23 @@ namespace Test {
 
 		static void Main(string[] args) {
 			Start.ProvideDefaultServices(true);
+
+			ServiceLocator.ProvideService(typeof(GameAnalyticsAPI), false);
+			IGameAnalyticsAPI api = ServiceLocator.GetService<IGameAnalyticsAPI>();
+			api.SendInit("698deede3c3e55cfa6a4e242b21ed0c6", "e894c3b2524f011a3aa8e53f88a86659356406f3", 1);
+			api.SendUserSessionStart();
+
+			/*IExceptionHandler oldExceptionHandler = ServiceLocator.GetService<IExceptionHandler>();
+			ServiceLocator.RemoveServices<IExceptionHandler>();
+
+			ServiceLocator.ProvideService(typeof(RollbarExceptionHandler), false);
+			IExceptionHandler exceptionHandler = ServiceLocator.GetService<IExceptionHandler>();
+			exceptionHandler.Connect(new RollbarBuilder("d29c2cb0a2cd43528c513509380115a0", "production"));
+			exceptionHandler.SetUnsentExceptions(oldExceptionHandler.GetUnsentExceptions());
+			exceptionHandler.SetDomains(oldExceptionHandler.GetDomains());
+			oldExceptionHandler.Disconnect();*/
+
+			//throw new Exception("Test 1.0.0.0");
 
 			IGameEngine gameEngine = ServiceLocator.GetService<IGameEngine>();
 			//gameEngine.DrawSync = false;
@@ -43,6 +63,8 @@ namespace Test {
 			do {
 				Start.UpdateEvents();
 			} while (Start.NumWindowsOpen > 0);
+
+			api.SendUserSessionEnd();
 
 			Start.DestroyDefaultServices();
 			Environment.Exit(0);

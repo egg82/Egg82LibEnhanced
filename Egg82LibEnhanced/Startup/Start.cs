@@ -4,6 +4,7 @@ using Egg82LibEnhanced.Engines;
 using Egg82LibEnhanced.Engines.Nulls;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Patterns.Prototypes;
+using Egg82LibEnhanced.Reflection.ExceptionHandlers;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -21,6 +22,7 @@ namespace Egg82LibEnhanced.Startup {
 
 		//public
 		public static void ProvideDefaultServices(bool physics = false) {
+			ServiceLocator.ProvideService(typeof(NullExceptionHandler));
 			ServiceLocator.ProvideService(typeof(PrototypeFactory));
 			ServiceLocator.ProvideService(typeof(AudioEngine));
 			ServiceLocator.ProvideService(typeof(ModEngine));
@@ -35,6 +37,7 @@ namespace Egg82LibEnhanced.Startup {
 			ServiceLocator.ProvideService(typeof(GameEngine), false);
 		}
 		public static void ProvideModServices() {
+			ServiceLocator.ProvideService(typeof(NullExceptionHandler));
 			ServiceLocator.ProvideService(typeof(PrototypeFactory));
 			ServiceLocator.ProvideService(typeof(AudioEngine));
 			ServiceLocator.ProvideService(typeof(CryptoHelper));
@@ -43,6 +46,7 @@ namespace Egg82LibEnhanced.Startup {
 			ServiceLocator.RemoveServices<PrototypeFactory>();
 			ServiceLocator.RemoveServices<IAudioEngine>();
 			ServiceLocator.RemoveServices<ICryptoHelper>();
+			ServiceLocator.RemoveServices<IExceptionHandler>();
 
 			GC.Collect();
 		}
@@ -55,6 +59,7 @@ namespace Egg82LibEnhanced.Startup {
 			ServiceLocator.RemoveServices<ICryptoHelper>();
 			ServiceLocator.RemoveServices<ICryptoHelper>();
 			ServiceLocator.RemoveServices<PrototypeFactory>();
+			ServiceLocator.RemoveServices<IExceptionHandler>();
 
 			GC.Collect();
 		}

@@ -85,10 +85,16 @@ namespace Egg82LibEnhanced.Utils {
 				if (value < 0.0d) {
 					value = 0.0d;
 				}
+				if (_interval == value) {
+					return;
+				}
 				if (value == 0.0d) {
 					Stop();
 				}
+
 				_interval = value;
+				Stop();
+				Start();
 			}
 		}
 		public bool Running {
