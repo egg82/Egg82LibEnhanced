@@ -1,7 +1,7 @@
 ﻿using Egg82LibEnhanced.Enums;
 using System;
 
-namespace Egg82LibEnhanced.Utils {
+namespace Egg82LibEnhanced.Tweening {
 	public class Easing {
 		//vars
 		private static double Pi2 = Math.PI * 2.0d;

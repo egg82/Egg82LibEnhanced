@@ -77,7 +77,7 @@ namespace Egg82LibEnhanced.Utils {
 
 			Rectangle dest = new Rectangle(0, 0, region.Width, region.Height);
 			Bitmap retVal = new Bitmap(region.Width, region.Height);
-			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(retVal)) {
+			using (Graphics g = Graphics.FromImage(retVal)) {
 				g.Clear(System.Drawing.Color.Transparent);
 				g.SmoothingMode = SmoothingMode.AntiAlias;
 				g.DrawImage(bitmap, dest, region, GraphicsUnit.Pixel);

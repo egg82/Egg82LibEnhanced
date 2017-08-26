@@ -51,7 +51,7 @@
 using System;
 using System.Text;
 
-namespace Egg82LibEnhanced.Utils {
+namespace Egg82LibEnhanced.Core {
 	/// <summary>Implements the Double Metaphone phonetic matching algorithm published
 	///     by Lawrence Phillips in June 2000 C/C++ Users Journal. 
 	/// 

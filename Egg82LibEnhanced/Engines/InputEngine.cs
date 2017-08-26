@@ -348,6 +348,8 @@ namespace Egg82LibEnhanced.Engines {
 			
 			_mouse.X = (double) e.X;
 			_mouse.Y = (double) e.Y;
+
+			_mouse.CurrentWindow = (Display.Window) sender;
 			
 			MouseMove?.Invoke(sender, e);
 		}
@@ -394,7 +396,6 @@ namespace Egg82LibEnhanced.Engines {
 
 		private void onFocused(object sender, EventArgs e) {
 			_focusedWindow = (Display.Window) sender;
-			_mouse.CurrentWindow = _focusedWindow;
 		}
 	}
 }

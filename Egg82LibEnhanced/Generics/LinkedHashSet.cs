@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Egg82LibEnhanced.Utils {
+namespace Egg82LibEnhanced.Generics {
 	public class LinkedHashSet<T> : ISet<T> {
 
 		private readonly IDictionary<T, LinkedListNode<T>> dict;

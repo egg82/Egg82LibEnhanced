@@ -8,7 +8,9 @@ using System.IO;
 namespace Egg82LibEnhanced.Engines.Nulls {
 	public class NullAudioEngine : IAudioEngine {
 		//vars
+#pragma warning disable 0414
 		public event EventHandler<ExceptionEventArgs> Error = null;
+#pragma warning restore 0414
 
 		//constructor
 		public NullAudioEngine() {
@@ -16,11 +18,11 @@ namespace Egg82LibEnhanced.Engines.Nulls {
 		}
 
 		//public
-		public void AddAudio(string name, AudioType type, AudioFormat format, byte[] data) {
-
+		public Audio AddAudio(string name, AudioType type, AudioFormat format, byte[] data) {
+			return null;
 		}
-		public void RemoveAudio(string name) {
-
+		public Audio RemoveAudio(string name) {
+			return null;
 		}
 		public Audio GetAudio(string name) {
 			return null;

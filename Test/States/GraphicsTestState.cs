@@ -1,10 +1,8 @@
 ﻿using Egg82LibEnhanced.Display;
-using Egg82LibEnhanced.Geom;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Utils;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Test.Sprites;
 
 namespace Test.States {
@@ -13,7 +11,7 @@ namespace Test.States {
 		private ObjectPool<CircleSprite> circleFactory = new ObjectPool<CircleSprite>(new CircleSprite(), 1000);
 		private List<CircleSprite> circles = new List<CircleSprite>();
 
-		private string atlasPath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + ".."  + Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar + "Assets" + Path.DirectorySeparatorChar + "Images" + Path.DirectorySeparatorChar + "terrain.png";
+		private string atlasPath = FileUtil.CURRENT_DIRECTORY + FileUtil.DIRECTORY_SEPARATOR_CHAR + ".." + FileUtil.DIRECTORY_SEPARATOR_CHAR + ".." + FileUtil.DIRECTORY_SEPARATOR_CHAR + "Assets" + FileUtil.DIRECTORY_SEPARATOR_CHAR + "Images" + FileUtil.DIRECTORY_SEPARATOR_CHAR + "terrain.png";
 		private TextureAtlas atlas = null;
 		private TileMap background = null;
 
@@ -26,9 +24,7 @@ namespace Test.States {
 
 		//private
 		protected override void OnEnter() {
-			FileUtil.Open(atlasPath);
-			atlas = new TextureAtlas(TextureUtil.BitmapFromBytes(FileUtil.Read(atlasPath, 0, (int) FileUtil.GetTotalBytes(atlasPath))), 32, 32);
-			FileUtil.Close(atlasPath);
+			atlas = new TextureAtlas(TextureUtil.BitmapFromBytes(FileUtil.Read(atlasPath, 0)), 32, 32);
 			background = new TileMap(ref atlas, 40, 23, 32, 32);
 
 			for (int x = 0; x < 40; x++) {

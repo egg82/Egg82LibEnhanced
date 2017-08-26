@@ -1,8 +1,11 @@
-﻿using Egg82LibEnhanced.Engines;
+﻿using Egg82LibEnhanced.Core;
+using Egg82LibEnhanced.Engines;
+using Egg82LibEnhanced.Enums;
 using Egg82LibEnhanced.Events;
 using Egg82LibEnhanced.Geom;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Startup;
+using Egg82LibEnhanced.Tweening;
 using Egg82LibEnhanced.Utils;
 using FarseerPhysics.Dynamics;
 using SFML.Graphics;
@@ -45,7 +48,9 @@ namespace Egg82LibEnhanced.Display {
 		private volatile bool _vSync = false;
 		private bool previousSynchronous = false;
 		private volatile bool _synchronous = false;
+		private uint previousAntialiasing = 0;
 		private uint _antiAliasing = 0;
+		private bool _cursorGrabbed = false;
 		private bool _cursorVisible = true;
 		private bool _visible = true;
 
@@ -84,7 +89,7 @@ namespace Egg82LibEnhanced.Display {
 			_title = title;
 			previousVsync = _vSync = vSync;
 			previousSynchronous = _synchronous = synchronous;
-			_antiAliasing = antiAliasing;
+			previousAntialiasing = _antiAliasing = antiAliasing;
 
 			_icon = TextureUtil.FromBitmap(new System.Drawing.Bitmap(1, 1));
 			window.SetIcon(_icon.Size.X, _icon.Size.Y, TextureUtil.ToBytes(_icon));
@@ -141,7 +146,7 @@ namespace Egg82LibEnhanced.Display {
 			_title = title;
 			previousVsync = _vSync = vSync;
 			previousSynchronous = _synchronous = synchronous;
-			_antiAliasing = antiAliasing;
+			previousAntialiasing = _antiAliasing = antiAliasing;
 
 			_icon = icon;
 			window.SetIcon(_icon.Size.X, _icon.Size.Y, TextureUtil.ToBytes(_icon));
@@ -253,6 +258,22 @@ namespace Egg82LibEnhanced.Display {
 			}
 			set {
 				_antiAliasing = value;
+			}
+		}
+		/// <summary>
+		/// Whether or not the mouse cursor is "grabbed" or cannot move while inside the window.
+		/// </summary>
+		public bool CursorGrabbed {
+			get {
+				return _cursorGrabbed;
+			}
+			set {
+				if (value == _cursorGrabbed) {
+					return;
+				}
+
+				_cursorGrabbed = value;
+				window.SetMouseCursorGrabbed(value);
 			}
 		}
 		/// <summary>
@@ -488,13 +509,12 @@ namespace Egg82LibEnhanced.Display {
 		}
 
 		/// <summary>
-		/// Tries to swap states from the old BaseState provided to the provided new BaseState.
+		/// Swaps states from the old BaseState provided to the provided new BaseState.
 		/// This swaps at the old BaseState's current index as opposed to adding a new state to the stack.
 		/// </summary>
 		/// <param name="oldState">The old state from which to swap.</param>
 		/// <param name="newState">The new state to swap to.</param>
-		/// <returns>True if successful, false if unsuccessful.</returns>
-		public bool TrySwapStates(State oldState, State newState) {
+		public void SwapStates(State oldState, State newState) {
 			if (oldState == null) {
 				throw new ArgumentNullException("oldState");
 			}
@@ -504,7 +524,7 @@ namespace Egg82LibEnhanced.Display {
 
 			int index = states.IndexOf(oldState);
 			if (index == -1) {
-				return false;
+				throw new InvalidOperationException("oldState is not part of this window's state stack.");
 			}
 
 			oldState.Ready = false;
@@ -514,7 +534,6 @@ namespace Egg82LibEnhanced.Display {
 			states[index] = newState;
 			newState.Enter();
 			newState.Ready = true;
-			return true;
 		}
 
 		/// <summary>
@@ -594,7 +613,7 @@ namespace Egg82LibEnhanced.Display {
 				} else if (!_fullscreen && (styles & WindowStyle.Fullscreen) != WindowStyle.None) {
 					return true;
 				}
-				if (_antiAliasing != window.Settings.AntialiasingLevel) {
+				if (_antiAliasing != previousAntialiasing) {
 					return true;
 				}
 				if (_synchronous != previousSynchronous) {
@@ -667,8 +686,6 @@ namespace Egg82LibEnhanced.Display {
 		}
 		private void update(PreciseElapsedEventArgs e) {
 			double deltaTime = e.DeltaTime / gameEngine.TargetUpdateInterval;
-
-			Tween.Update(e.DeltaTime);
 			
 			Update(deltaTime);
 			SwapBuffers();

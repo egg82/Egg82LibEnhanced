@@ -66,6 +66,7 @@ namespace Egg82LibEnhanced.API.GameAnalytics {
 		}
 
 		// structs
+#pragma warning disable 0649
 		private struct InitData {
 			public string platform;
 			public string os_version;
@@ -148,6 +149,7 @@ namespace Egg82LibEnhanced.API.GameAnalytics {
 			public string severity;
 			public string message;
 		}
+#pragma warning restore 0649
 
 		//constructor
 		public GameAnalyticsAPI() {

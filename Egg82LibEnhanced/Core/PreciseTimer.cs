@@ -1,11 +1,12 @@
 ﻿using Egg82LibEnhanced.Events;
+using Egg82LibEnhanced.Utils;
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Egg82LibEnhanced.Utils {
+namespace Egg82LibEnhanced.Core {
 	public class PreciseTimer {
 		//externs
 		[DllImport("kernel32.dll")]

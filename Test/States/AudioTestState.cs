@@ -22,10 +22,7 @@ namespace Test.States {
 
 		//private
 		protected override void OnEnter() {
-			FileUtil.Open(ambientPath);
-			audioEngine.AddAudio("ambient1", AudioType.Ambient, AudioFormat.Mp3, FileUtil.Read(ambientPath, 0, (int) FileUtil.GetTotalBytes(ambientPath)));
-			FileUtil.Close(ambientPath);
-			Audio a = audioEngine.GetAudio("ambient1");
+			Audio a = audioEngine.AddAudio("ambient1", AudioType.Ambient, AudioFormat.Mp3, FileUtil.Read(ambientPath, 0));
 			a.Play(true);
 		}
 		protected override void OnExit() {

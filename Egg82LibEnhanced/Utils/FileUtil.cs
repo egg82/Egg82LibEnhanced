@@ -127,19 +127,29 @@ namespace Egg82LibEnhanced.Utils {
 		}
 
 		public static long GetTotalBytes(string path) {
-			if (!streams.ContainsKey(path)) {
-				return 0L;
-			}
+			if (streams.ContainsKey(path)) {
+				return streams[path].Length;
+			} else {
+				if (!PathExists(path) || !PathIsFile(path)) {
+					return 0L;
+				}
 
-			return streams[path].Length;
+				try {
+					return new FileInfo(path).Length;
+				} catch (Exception) {
+					return 0L;
+				}
+			}
 		}
 
 		public static byte[] Read(string path, long position, long length = -1) {
 			if (path == null) {
 				throw new ArgumentNullException("path");
 			}
+			bool wasOpen = true;
 			if (!streams.ContainsKey(path)) {
-				throw new Exception("File is not open.");
+				wasOpen = false;
+				Open(path);
 			}
 
 			if (position < 0) {
@@ -160,6 +170,10 @@ namespace Egg82LibEnhanced.Utils {
 			}
 			streams[path].Read(buffer, 0, (int) length);
 
+			if (!wasOpen) {
+				Close(path);
+			}
+
 			return buffer;
 		}
 		public static void Write(string path, byte[] bytes, long position) {
@@ -171,8 +185,10 @@ namespace Egg82LibEnhanced.Utils {
 				return;
 			}
 
+			bool wasOpen = true;
 			if (!streams.ContainsKey(path)) {
-				throw new Exception("File is not open.");
+				wasOpen = false;
+				Open(path);
 			}
 
 			if (position < 0) {
@@ -188,6 +204,10 @@ namespace Egg82LibEnhanced.Utils {
 			}
 			streams[path].Write(bytes, 0, (int) length);
 			streams[path].Flush(true);
+
+			if (!wasOpen) {
+				Close(path);
+			}
 		}
 
 		public static void Erase(string path) {

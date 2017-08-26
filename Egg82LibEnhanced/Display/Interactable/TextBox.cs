@@ -23,6 +23,7 @@ namespace Egg82LibEnhanced.Display.Interactable {
 		private Bitmap fontBitmap = new Bitmap(1, 1);
 		private Font _font = null;
 		private string _text = null;
+		private StringFormat _textFormat = new StringFormat();
 		private bool _antiAliasing = true;
 		private Color _color = System.Drawing.Color.White;
 		private PreciseRectangle _hitBox = new PreciseRectangle(0.0d, 0.0d, 1.0d, 1.0d);
@@ -161,13 +162,27 @@ namespace Egg82LibEnhanced.Display.Interactable {
 			}
 		}
 
+		public StringFormat TextFormat {
+			get {
+				return _textFormat;
+			}
+			set {
+				if (value == null) {
+					throw new ArgumentNullException("TextFormat");
+				}
+
+				_textFormat = value;
+				drawString();
+			}
+		}
+
 		//private
 		protected override void OnUpdate(double deltaTime) {
 			
 		}
 
 		private void onMouseDown(object sender, MouseButtonEventArgs e) {
-			if (e.Button == Mouse.Button.Left && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
+			if (e.Button == Mouse.Button.Left && inputEngine.Mouse.CurrentWindow == Window && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
 				if (_state != InteractableState.Down) {
 					_state = InteractableState.Down;
 					Pressed?.Invoke(this, EventArgs.Empty);
@@ -176,7 +191,7 @@ namespace Egg82LibEnhanced.Display.Interactable {
 		}
 		private void onMouseUp(object sender, MouseButtonEventArgs e) {
 			if (e.Button == Mouse.Button.Left && _state == InteractableState.Down) {
-				if (e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
+				if (inputEngine.Mouse.CurrentWindow == Window && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
 					_state = InteractableState.Hover;
 					Released?.Invoke(this, EventArgs.Empty);
 				} else {
@@ -186,7 +201,7 @@ namespace Egg82LibEnhanced.Display.Interactable {
 			}
 		}
 		private void onMouseMove(object sender, MouseMoveEventArgs e) {
-			if (e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
+			if (inputEngine.Mouse.CurrentWindow == Window && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
 				if (_state == InteractableState.Normal) {
 					_state = InteractableState.Hover;
 					Entered?.Invoke(this, EventArgs.Empty);
@@ -205,7 +220,7 @@ namespace Egg82LibEnhanced.Display.Interactable {
 			}
 
 			if (string.IsNullOrWhiteSpace(_text)) {
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(fontBitmap)) {
+				using (Graphics g = System.Drawing.Graphics.FromImage(fontBitmap)) {
 					g.Clear(System.Drawing.Color.Transparent);
 				}
 				Texture = TextureUtil.FromBitmap(fontBitmap);
@@ -217,24 +232,24 @@ namespace Egg82LibEnhanced.Display.Interactable {
 			}
 
 			SizeF size = new SizeF();
-			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(fontBitmap)) {
+			using (Graphics g = System.Drawing.Graphics.FromImage(fontBitmap)) {
 				g.TextRenderingHint = (_antiAliasing) ? TextRenderingHint.AntiAliasGridFit : TextRenderingHint.SingleBitPerPixel;
 				g.SmoothingMode = (_antiAliasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
-				size = g.MeasureString(_text, _font);
+				size = g.MeasureString(_text, _font, new PointF(), _textFormat);
 				if (size.Width == fontBitmap.Width && size.Height == fontBitmap.Height) {
 					g.Clear(System.Drawing.Color.Transparent);
-					g.DrawString(_text, _font, new Pen(_color).Brush, 0.0f, 0.0f);
+					g.DrawString(_text, _font, new Pen(_color).Brush, (_textFormat.Alignment == StringAlignment.Near) ? 0.0f : (_textFormat.Alignment == StringAlignment.Center) ? size.Width / 2.0f : size.Width, (_textFormat.LineAlignment == StringAlignment.Near) ? 0.0f : (_textFormat.LineAlignment == StringAlignment.Center) ? size.Height / 2.0f : size.Height, _textFormat);
 				}
 			}
 
 			if (size.Width != fontBitmap.Width || size.Height != fontBitmap.Height) {
 				fontBitmap.Dispose();
 				fontBitmap = new Bitmap((int) size.Width, (int) size.Height);
-				using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(fontBitmap)) {
+				using (Graphics g = System.Drawing.Graphics.FromImage(fontBitmap)) {
 					g.TextRenderingHint = (_antiAliasing) ? TextRenderingHint.AntiAliasGridFit : TextRenderingHint.SingleBitPerPixel;
 					g.SmoothingMode = (_antiAliasing) ? SmoothingMode.AntiAlias : SmoothingMode.None;
 					g.Clear(System.Drawing.Color.Transparent);
-					g.DrawString(_text, _font, new Pen(_color).Brush, 0.0f, 0.0f);
+					g.DrawString(_text, _font, new Pen(_color).Brush, (_textFormat.Alignment == StringAlignment.Near) ? 0.0f : (_textFormat.Alignment == StringAlignment.Center) ? size.Width / 2.0f : size.Width, (_textFormat.LineAlignment == StringAlignment.Near) ? 0.0f : (_textFormat.LineAlignment == StringAlignment.Center) ? size.Height / 2.0f : size.Height, _textFormat);
 				}
 			}
 			

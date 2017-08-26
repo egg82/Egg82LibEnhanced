@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Egg82LibEnhanced.Display {
+namespace Egg82LibEnhanced.Enums {
 	public enum WindowStyle {
 		None = 0,
 		Titlebar = 1,

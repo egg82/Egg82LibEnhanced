@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Egg82LibEnhanced.Utils {
+namespace Egg82LibEnhanced.Core {
 	/// <summary>
 	/// Interface to define Rect, so that QuadTree knows how to store the object.
 	/// </summary>

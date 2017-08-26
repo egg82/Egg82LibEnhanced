@@ -1,7 +1,8 @@
-﻿using Egg82LibEnhanced.Display;
+﻿using Egg82LibEnhanced.Core;
+using Egg82LibEnhanced.Display;
 using Egg82LibEnhanced.Events;
 using Egg82LibEnhanced.Patterns;
-using Egg82LibEnhanced.Utils;
+using Egg82LibEnhanced.Tweening;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;

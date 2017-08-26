@@ -1,4 +1,5 @@
-﻿using Egg82LibEnhanced.Events;
+﻿using Egg82LibEnhanced.Core;
+using Egg82LibEnhanced.Events;
 using Egg82LibEnhanced.Utils;
 using System;
 using System.Threading;
@@ -7,10 +8,12 @@ using System.Timers;
 namespace Egg82LibEnhanced.Patterns {
 	public abstract class Command {
 		//vars
+#pragma warning disable 0414
 		public event EventHandler Complete = null;
 		public event EventHandler<ExceptionEventArgs> Error = null;
 		public event EventHandler<ProgressEventArgs> Progress = null;
-		
+#pragma warning restore 0414
+
 		private System.Timers.Timer timer = null;
 		private PreciseTimer preciseTimer = null;
 		private double startTime = 0.0d;

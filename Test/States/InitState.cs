@@ -1,22 +1,27 @@
 ﻿using Egg82LibEnhanced.API.GameAnalytics;
 using Egg82LibEnhanced.Display;
 using Egg82LibEnhanced.Engines;
+using Egg82LibEnhanced.Enums;
 using Egg82LibEnhanced.Patterns;
 using Egg82LibEnhanced.Reflection.ExceptionHandlers;
 using Egg82LibEnhanced.Reflection.ExceptionHandlers.Builders;
 using Egg82LibEnhanced.Startup;
+using Egg82LibEnhanced.Utils;
 using System;
 using System.Timers;
 
 namespace Test.States {
 	public class InitState : Init {
 		//vars
+#pragma warning disable 0414
 		private Window graphicsWindow = null;
 		private Window physicsWindow = null;
 		private Window inputWindow = null;
 		private Window clientServerWindow = null;
 		private Window audioWindow = null;
 		private Window cryptoWindow = null;
+		private Window gameDoorsWindow = null;
+#pragma warning restore 0414
 
 		private IGameAnalyticsAPI api = null;
 
@@ -32,8 +37,8 @@ namespace Test.States {
 
 		//private
 		protected override void OnEnter() {
-			provideExceptionHandler();
-			provideGameAnalytics();
+			//provideExceptionHandler();
+			//provideGameAnalytics();
 
 			//throw new Exception("Test 1.0.0.0");
 
@@ -42,26 +47,34 @@ namespace Test.States {
 			//gameEngine.UpdateInterval = (1.0d / 65.0d) / 1000.0d;
 			//gameEngine.DrawInterval = (1.0d / 65.0d) / 1000.0d;
 
-			graphicsWindow = new Window(1280, 720, "Graphics Test", WindowStyle.Titlebar | WindowStyle.Close | WindowStyle.Resize, false, true, 16);
-			graphicsWindow.AddState(new GraphicsTestState());
+			/*graphicsWindow = new Window(1280, 720, "Graphics Test", WindowStyle.Titlebar | WindowStyle.Close | WindowStyle.Resize, false, true, 16);
+			graphicsWindow.AddState(new GraphicsTestState());*/
 
-			/*physicsWindow = new Egg82LibEnhanced.Display.Window(1280, 720, "Physics Test", WindowStyle.Titlebar | WindowStyle.Close, true, true, 16);
-			physicsWindow.AddState(new PhysicsTestState());
+			/*physicsWindow = new Window(1280, 720, "Physics Test", WindowStyle.Titlebar | WindowStyle.Close, true, true, 16);
+			physicsWindow.AddState(new PhysicsTestState());*/
 
-			inputWindow = new Egg82LibEnhanced.Display.Window(1280, 720, "Input Test", WindowStyle.Titlebar | WindowStyle.Close, true, true, 16);
+			/*inputWindow = new Window(1280, 720, "Input Test", WindowStyle.Titlebar | WindowStyle.Close, true, true, 16);
 			inputWindow.AddState(new InputTestState());*/
 
-			/*clientServerWindow = new Egg82LibEnhanced.Display.Window(1280, 720, "Client/Server Test", WindowStyle.Titlebar | WindowStyle.Close, true, true, 16);
+			/*clientServerWindow = new Window(1280, 720, "Client/Server Test", WindowStyle.Titlebar | WindowStyle.Close, true, true, 16);
 			clientServerWindow.AddState(new ClientServerTestState());*/
 
-			/*audioWindow = new Egg82LibEnhanced.Display.Window(1280, 720, "Audio Test", WindowStyle.Titlebar | WindowStyle.Close, true, true, 16);
+			/*audioWindow = new Window(1280, 720, "Audio Test", WindowStyle.Titlebar | WindowStyle.Close, true, true, 16);
 			audioWindow.AddState(new AudioTestState());*/
 
-			/*cryptoWindow = new Egg82LibEnhanced.Display.Window(1280, 720, "Crypto Test", WindowStyle.Titlebar | WindowStyle.Close, true, true, 16);
+			/*cryptoWindow = new Window(1280, 720, "Crypto Test", WindowStyle.Titlebar | WindowStyle.Close, true, true, 16);
 			cryptoWindow.AddState(new CryptoTestState());*/
+
+			string pixelFontPath = FileUtil.CURRENT_DIRECTORY + FileUtil.DIRECTORY_SEPARATOR_CHAR + ".." + FileUtil.DIRECTORY_SEPARATOR_CHAR + ".." + FileUtil.DIRECTORY_SEPARATOR_CHAR + "Assets" + FileUtil.DIRECTORY_SEPARATOR_CHAR + "Fonts" + FileUtil.DIRECTORY_SEPARATOR_CHAR + "ARCADECLASSIC.TTF";
+			FontUtil.AddFont("pixel", FileUtil.Read(pixelFontPath, 0));
+
+			gameDoorsWindow = new Window(1280, 720, "Baking For Doors", WindowStyle.Titlebar | WindowStyle.Close);
+			gameDoorsWindow.AddState(new GameDoorInitState());
 		}
 		protected override void OnExit() {
-			api.SendUserSessionEnd();
+			if (api != null && api.IsInitialized()) {
+				api.SendUserSessionEnd();
+			}
 		}
 
 		private void provideExceptionHandler() {

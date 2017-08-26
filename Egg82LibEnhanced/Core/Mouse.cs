@@ -18,7 +18,7 @@ namespace Egg82LibEnhanced.Core {
 		private bool _extraButton1Down = false;
 		private bool _extraButton2Down = false;
 
-		internal Window CurrentWindow = null;
+		private Window _currentWindow = null;
 
 		//constructor
 		public Mouse() {
@@ -90,6 +90,18 @@ namespace Egg82LibEnhanced.Core {
 
 				_location.Y = value;
 				//SetCursorPos((int) (CurrentWindow.X + _location.X), (int) (CurrentWindow.Y + _location.Y));
+			}
+		}
+		public Window CurrentWindow {
+			get {
+				return _currentWindow;
+			}
+			internal set {
+				if (value == null || value == _currentWindow) {
+					return;
+				}
+
+				_currentWindow = value;
 			}
 		}
 		public double WheelDelta {

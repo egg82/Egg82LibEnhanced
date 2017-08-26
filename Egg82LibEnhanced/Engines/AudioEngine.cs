@@ -30,7 +30,7 @@ namespace Egg82LibEnhanced.Engines {
 		}
 
 		//public
-		public void AddAudio(string name, AudioType type, AudioFormat format, byte[] data) {
+		public Audio AddAudio(string name, AudioType type, AudioFormat format, byte[] data) {
 			if (name == null) {
 				throw new ArgumentNullException("name");
 			}
@@ -45,8 +45,10 @@ namespace Egg82LibEnhanced.Engines {
 			Audio audio = new Audio(type, format, 1.0d, data, _currentOutputDevice);
 			audio.Error += onError;
 			sounds.Add(name, audio);
+
+			return audio;
 		}
-		public void RemoveAudio(string name) {
+		public Audio RemoveAudio(string name) {
 			if (name == null) {
 				throw new ArgumentNullException("name");
 			}
@@ -57,6 +59,8 @@ namespace Egg82LibEnhanced.Engines {
 				audio.Dispose();
 				sounds.Remove(name);
 			}
+
+			return audio;
 		}
 		public Audio GetAudio(string name) {
 			if (name == null) {

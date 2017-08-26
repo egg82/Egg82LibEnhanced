@@ -5,8 +5,10 @@ using System;
 namespace Egg82LibEnhanced.Mod {
 	public abstract class ModBase : IMod {
 		//vars
+#pragma warning disable 0067
 		public event EventHandler<ExceptionEventArgs> Error;
 		public event EventHandler<ModDataEventArgs> Data;
+#pragma warning restore 0067
 
 		//constructor
 		public ModBase() {

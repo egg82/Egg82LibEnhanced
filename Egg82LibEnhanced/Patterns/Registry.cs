@@ -28,7 +28,7 @@ namespace Egg82LibEnhanced.Patterns {
 			if (data != null) {
 				try {
 					type = ReflectUtil.TryConvert<ObjectHandle>(data).Unwrap().GetType();
-				} catch (Exception ex) {
+				} catch (Exception) {
 					try {
 						type = data.GetType();
 					} catch (Exception ex2) {

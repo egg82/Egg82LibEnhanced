@@ -102,8 +102,8 @@ namespace Egg82LibEnhanced.Display {
 
 			currentBitmap = new Bitmap(tileWidth * numColumns, tileHeight * numRows);
 			using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(currentBitmap)) {
-				g.Clear(System.Drawing.Color.Transparent);
 				g.SmoothingMode = SmoothingMode.AntiAlias;
+				g.Clear(System.Drawing.Color.Transparent);
 				for (int x = 0; x < numColumns; x++) {
 					for (int y = 0; y < numRows; y++) {
 						if (!string.IsNullOrEmpty(bitmapNames[x, y])) {

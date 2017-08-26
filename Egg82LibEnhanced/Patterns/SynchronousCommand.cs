@@ -6,10 +6,12 @@ using System.Threading;
 namespace Egg82LibEnhanced.Patterns {
 	public abstract class SynchronousCommand {
 		//vars
+#pragma warning disable 0414
 		public event EventHandler Complete = null;
 		public event EventHandler<ExceptionEventArgs> Error = null;
 		public event EventHandler<ProgressEventArgs> Progress = null;
-		
+#pragma warning restore 0414
+
 		private int timer = 0;
 
 		//constructor

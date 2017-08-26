@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections.ObjectModel;
 
-namespace Egg82LibEnhanced.Utils {
+namespace Egg82LibEnhanced.Generics {
 
 	/// <summary>
 	/// A dictionary object that allows rapid hash lookups using keys, but also
@@ -101,9 +101,11 @@ namespace Egg82LibEnhanced.Utils {
 			}
 
 			Initialize();
+#pragma warning disable 0278
 			foreach (KeyValuePair<TKey, TValue> pair in dictionary) {
 				_keyedCollection.Add(pair);
 			}
+#pragma warning restore 0278
 		}
 
 		public LinkedDictionary(IOrderedDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer) {
@@ -112,9 +114,11 @@ namespace Egg82LibEnhanced.Utils {
 			}
 
 			Initialize(comparer);
+#pragma warning disable 0278
 			foreach (KeyValuePair<TKey, TValue> pair in dictionary) {
 				_keyedCollection.Add(pair);
 			}
+#pragma warning restore 0278
 		}
 
 		public LinkedDictionary(IEnumerable<KeyValuePair<TKey, TValue>> items) {

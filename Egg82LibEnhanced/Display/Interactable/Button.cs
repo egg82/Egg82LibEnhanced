@@ -26,6 +26,9 @@ namespace Egg82LibEnhanced.Display.Interactable {
 
 		//constructor
 		public Button(ref TextureAtlas atlas, string normalTexture, string downTexture = null, string hoverTexture = null) {
+			if (atlas == null) {
+				throw new ArgumentNullException("atlas");
+			}
 			if (normalTexture == null) {
 				throw new ArgumentNullException("normalTexture");
 			}
@@ -185,7 +188,7 @@ namespace Egg82LibEnhanced.Display.Interactable {
 		}
 
 		private void onMouseDown(object sender, MouseButtonEventArgs e) {
-			if (e.Button == Mouse.Button.Left && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
+			if (e.Button == Mouse.Button.Left && inputEngine.Mouse.CurrentWindow == Window && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
 				if (_state != InteractableState.Down) {
 					if (_downTexture != null) {
 						/*bool update = false;
@@ -207,7 +210,7 @@ namespace Egg82LibEnhanced.Display.Interactable {
 		}
 		private void onMouseUp(object sender, MouseButtonEventArgs e) {
 			if (e.Button == Mouse.Button.Left && _state == InteractableState.Down) {
-				if (e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
+				if (inputEngine.Mouse.CurrentWindow == Window && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
 					/*bool update = false;
 					if (_hitBox.X == X && _hitBox.Y == Y && _hitBox.Width == Width && _hitBox.Height == Height) {
 						update = true;
@@ -239,7 +242,7 @@ namespace Egg82LibEnhanced.Display.Interactable {
 			}
 		}
 		private void onMouseMove(object sender, MouseMoveEventArgs e) {
-			if (e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
+			if (inputEngine.Mouse.CurrentWindow == Window && e.X >= GlobalX + _hitBox.X && e.X <= GlobalX + _hitBox.X + _hitBox.Width && e.Y >= GlobalY + _hitBox.Y && e.Y <= GlobalY + _hitBox.Y + _hitBox.Height) {
 				if (_state == InteractableState.Normal) {
 					if (_hoverTexture != null) {
 						/*bool update = false;

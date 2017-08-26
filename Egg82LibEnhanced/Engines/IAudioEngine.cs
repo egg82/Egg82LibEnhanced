@@ -10,8 +10,8 @@ namespace Egg82LibEnhanced.Engines {
 		event EventHandler<ExceptionEventArgs> Error;
 
 		//functions
-		void AddAudio(string name, AudioType type, AudioFormat format, byte[] data);
-		void RemoveAudio(string name);
+		Audio AddAudio(string name, AudioType type, AudioFormat format, byte[] data);
+		Audio RemoveAudio(string name);
 		Audio GetAudio(string name);
 		int NumAudio { get; }
 		string CurrentOutputDeviceName { get; }
